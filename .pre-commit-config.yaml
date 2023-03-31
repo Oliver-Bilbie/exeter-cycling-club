@@ -1,0 +1,47 @@
+fail_fast: true
+default_stages: [commit]
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+      - id: check-merge-conflict
+      - id: detect-aws-credentials
+      - id: mixed-line-ending
+      - id: check-yaml
+  - repo: local
+    hooks:
+      - id: format-src
+        name: Format
+        entry: make format-src
+        language: system
+        verbose: false
+      - id: lint
+        name: Lint
+        entry: make lint
+        language: system
+        verbose: false
+      - id: bandit
+        name: Bandit
+        entry: make bandit
+        language: system
+        verbose: false
+      - id: type-check
+        name: Type-Check
+        entry: make type-check
+        language: system
+        verbose: false
+      # - id: unit-test
+      #   name: Unit Test
+      #   entry: make unit-test
+      #   language: system
+      #   verbose: false
+      # - id: int-test
+      #   name: Integration Test
+      #   entry: make int-test
+      #   language: system
+      #   verbose: false
+      # - id: frontend-test
+      #   name: Frontend Test
+      #   entry: make frontend-test
+      #   language: system
+      #   verbose: false

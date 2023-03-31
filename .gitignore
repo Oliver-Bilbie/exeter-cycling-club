@@ -1,0 +1,25 @@
+# Backend
+backend/node_modules
+backend/.serverless
+backend/.mypy_cache
+backend/.pytest_cache
+backend/target
+backend/requirements.txt
+backend/Pipfile.lock
+backend/package-lock.json
+
+# Frontend
+frontend/node_modules
+frontend/build
+frontend/yarn.lock
+
+# Terraform
+terraform/.terraform
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/.terraform.tfstate.lock.info
+terraform/plan.out
+
+# Misc
+.vscode

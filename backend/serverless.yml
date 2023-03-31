@@ -1,0 +1,224 @@
+service: ecc-website
+plugins:
+    - serverless-iam-roles-per-function
+    - serverless-python-requirements
+custom:
+    appName: ecc-website
+    serviceName: ecc-website-backend
+    pythonRequirements:
+        slim: true
+        useDownloadCache: false
+        useStaticCache: false
+        usePipenv: false
+        layer:
+            name: requirements-layer
+            description: "Python requirements lambda layer"
+            compatibleRuntimes:
+                - python3.9
+provider:
+    name: aws
+    region: eu-west-1
+    runtime: python3.9
+    httpApi:
+        cors:
+            allowedMethods:
+                - GET
+                - PUT
+                - DELETE
+functions:
+    authenticate_user:
+        handler: src/authenticate.authenticate_user
+        environment:
+            CLIENT_ID: ${ssm:/ecc-strava-client-id}
+            CLIENT_SECRET: ${ssm:/ecc-strava-client-secret}
+            ADMIN_LIST: ${ssm:/ecc-admin-strava-ids}
+        package:
+            individually: true
+            include:
+                - src/authenticate.py
+            exclude:
+                - ./**
+        memorySize: 128
+        events:
+            - httpApi:
+                  path: /auth/{code}
+                  method: get
+        timeout: 25
+        layers:
+            - { Ref: PythonRequirementsLambdaLayer }
+    set_route:
+        handler: src/set_route.set_route
+        environment:
+            S3_BUCKET: ecc.oliver-bilbie.co.uk
+            TABLE_NAME: ecc-mailing-list
+            ADMIN_LIST: ${ssm:/ecc-admin-strava-ids}
+        package:
+            individually: true
+            include:
+                - src/set_route.py
+            exclude:
+                - ./**
+        memorySize: 128
+        events:
+            - httpApi:
+                  path: /route
+                  method: put
+        timeout: 25
+        iamRoleStatementsName: ecc-set-route-role
+        iamRoleStatements:
+            - Effect: Allow
+              Action:
+                  - s3:PutObject
+              Resource: arn:aws:s3:::ecc.oliver-bilbie.co.uk/*
+            - Effect: Allow
+              Action:
+                  - dynamodb:Scan
+              Resource: arn:aws:dynamodb:eu-west-1:082862148481:table/ecc-mailing-list
+            - Effect: Allow
+              Action:
+                  - ses:SendRawEmail
+              Resource: "*"
+        layers:
+            - { Ref: PythonRequirementsLambdaLayer }
+    cancel_route:
+        handler: src/cancel_route.cancel_route
+        environment:
+            S3_BUCKET: ecc.oliver-bilbie.co.uk
+            TABLE_NAME: ecc-mailing-list
+            ADMIN_LIST: ${ssm:/ecc-admin-strava-ids}
+        package:
+            individually: true
+            include:
+                - src/cancel_route.py
+            exclude:
+                - ./**
+        memorySize: 128
+        events:
+            - httpApi:
+                  path: /route
+                  method: delete
+        timeout: 25
+        iamRoleStatementsName: ecc-cancel-route-role
+        iamRoleStatements:
+            - Effect: Allow
+              Action:
+                  - s3:PutObject
+              Resource: arn:aws:s3:::ecc.oliver-bilbie.co.uk/*
+            - Effect: Allow
+              Action:
+                  - dynamodb:Scan
+              Resource: arn:aws:dynamodb:eu-west-1:082862148481:table/ecc-mailing-list
+            - Effect: Allow
+              Action:
+                  - ses:SendRawEmail
+              Resource: "*"
+        layers:
+            - { Ref: PythonRequirementsLambdaLayer }
+    remove_route:
+        handler: src/cancel_route.remove_route
+        environment:
+            S3_BUCKET: ecc.oliver-bilbie.co.uk
+            ADMIN_LIST: ${ssm:/ecc-admin-strava-ids}
+        package:
+            individually: true
+            include:
+                - src/cancel_route.py
+            exclude:
+                - ./**
+        memorySize: 128
+        events:
+            - schedule: cron(0 9 ? * SUN *)
+        timeout: 25
+        iamRoleStatementsName: ecc-remove-route-role
+        iamRoleStatements:
+            - Effect: Allow
+              Action:
+                  - s3:PutObject
+              Resource: arn:aws:s3:::ecc.oliver-bilbie.co.uk/*
+        layers:
+            - { Ref: PythonRequirementsLambdaLayer }
+    subscribe:
+        handler: src/email.subscribe
+        environment:
+            TABLE_NAME: ecc-mailing-list
+        package:
+            individually: true
+            include:
+                - src/email.py
+            exclude:
+                - ./**
+        memorySize: 128
+        events:
+            - httpApi:
+                  path: /email
+                  method: put
+        timeout: 25
+        iamRoleStatementsName: ecc-email-subscribe-role
+        iamRoleStatements:
+            - Effect: Allow
+              Action:
+                  - dynamodb:PutItem
+              Resource: arn:aws:dynamodb:eu-west-1:082862148481:table/ecc-mailing-list
+            - Effect: Allow
+              Action:
+                  - dynamodb:Query
+              Resource: arn:aws:dynamodb:eu-west-1:082862148481:table/ecc-mailing-list/index/EmailIndex
+            - Effect: Allow
+              Action:
+                  - ses:VerifyEmailIdentity
+              Resource: "*"
+        layers:
+            - { Ref: PythonRequirementsLambdaLayer }
+    unsubscribe:
+        handler: src/email.unsubscribe
+        environment:
+            TABLE_NAME: ecc-mailing-list
+        package:
+            individually: true
+            include:
+                - src/email.py
+            exclude:
+                - ./**
+        memorySize: 128
+        events:
+            - httpApi:
+                  path: /email
+                  method: delete
+        timeout: 25
+        iamRoleStatementsName: ecc-email-unsubscribe-role
+        iamRoleStatements:
+            - Effect: Allow
+              Action:
+                  - dynamodb:GetItem
+                  - dynamodb:DeleteItem
+              Resource: arn:aws:dynamodb:eu-west-1:082862148481:table/ecc-mailing-list
+            - Effect: Allow
+              Action:
+                  - ses:DeleteIdentity
+              Resource: "*"
+        layers:
+            - { Ref: PythonRequirementsLambdaLayer }
+    contact_us:
+        handler: src/contact.contact_us
+        environment:
+            ADMIN_EMAILS: ${ssm:/ecc-admin-emails}
+        package:
+            individually: true
+            include:
+                - src/contact.py
+            exclude:
+                - ./**
+        memorySize: 128
+        events:
+            - httpApi:
+                  path: /contact
+                  method: post
+        timeout: 25
+        iamRoleStatementsName: ecc-contact-us-role
+        iamRoleStatements:
+            - Effect: Allow
+              Action:
+                  - ses:SendRawEmail
+              Resource: "*"
+        layers:
+            - { Ref: PythonRequirementsLambdaLayer }
