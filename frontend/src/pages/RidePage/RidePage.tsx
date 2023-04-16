@@ -28,7 +28,7 @@ const RidePage: React.FC = (): React.ReactElement => {
         description: "",
         gpx: "",
     } as RouteType);
-    const [status, setStatus] = useState("ready");
+    const [status, setStatus] = useState("loading");
     const [message, setMessage] = useState("");
     const [reload, setReload] = useState(false);
 
@@ -70,7 +70,6 @@ const RidePage: React.FC = (): React.ReactElement => {
             background="background"
             width={{ min: "400px" }}
             overflow={{ horizontal: "hidden" }}
-            fill
         >
             <Header
                 title="Upcoming Ride"
@@ -83,7 +82,7 @@ const RidePage: React.FC = (): React.ReactElement => {
                 height={
                     status === "ready"
                         ? {
-                              min:
+                              min: 
                                   width > WIDTH_THRESHOLD
                                       ? "1150px"
                                       : `${
@@ -95,8 +94,8 @@ const RidePage: React.FC = (): React.ReactElement => {
             >
                 {status === "missing" && (
                     <Box align="center" margin="xlarge" gap="medium">
-                        <Heading margin="none">Unable to load route</Heading>
-                        <Text>
+                        <Heading textAlign="center" margin="none">Unable to load route</Heading>
+                        <Text textAlign="center">
                             Please click retry or visit our Facebook page
                         </Text>
                         <Button
@@ -113,7 +112,7 @@ const RidePage: React.FC = (): React.ReactElement => {
                 )}
                 {(status === "cancelled" || status === "unavailable") && (
                     <Box align="center" margin="large">
-                        <Heading margin="none">
+                        <Heading textAlign="center" margin="none">
                             {status === "cancelled" &&
                                 "This week's ride has been cancelled"}
                             {status === "unavailable" &&
@@ -127,7 +126,11 @@ const RidePage: React.FC = (): React.ReactElement => {
                                     paragraph: string,
                                     index: number
                                 ): ReactElement => {
-                                    return <Text key={index}>{paragraph}</Text>;
+                                    return (
+                                        <Text textAlign="center" margin={{"vertical": "small"}} key={index}>
+                                            {paragraph}
+                                        </Text>
+                                    );
                                 }
                             )}
                     </Box>

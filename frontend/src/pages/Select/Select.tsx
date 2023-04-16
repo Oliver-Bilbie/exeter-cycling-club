@@ -124,7 +124,7 @@ const Select: React.FC = (): React.ReactElement => {
             />
             {message.show ? (
                 <Box align="center" margin="large">
-                    <Heading alignSelf="center">{message.body}</Heading>
+                    <Heading textAlign="center" alignSelf="center">{message.body}</Heading>
                     <Link to={"/"}>
                         <Button label="Home" primary />
                     </Link>

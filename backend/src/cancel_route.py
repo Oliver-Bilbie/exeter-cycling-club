@@ -47,7 +47,7 @@ def remove_route(event, context):
     """
     output_body = json.dumps({
         "status": "unavailable",
-        "message": "This week's route has not been announced yet.$NEWLINESubscribe to email updates to find out as soon as it goes live."
+        "message": "Subscribe to email updates to find out as soon as it goes live."
     })
 
     # Upload data to be consumed by the website
