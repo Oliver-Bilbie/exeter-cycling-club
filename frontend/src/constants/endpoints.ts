@@ -9,3 +9,4 @@ export const AUTH_ENDPOINT = `${BASE_ENDPOINT}/auth`;
 export const ROUTE_ENDPOINT = `${BASE_ENDPOINT}/route`;
 export const EMAIL_ENDPOINT = `${BASE_ENDPOINT}/email`;
 export const CONTACT_ENDPOINT = `${BASE_ENDPOINT}/contact`;
+export const STATUS_ENDPOINT = `${BASE_ENDPOINT}/status`;

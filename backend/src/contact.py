@@ -21,8 +21,8 @@ def contact_us(event, context):
         contact_email = body.get("contact_email")
         message = body.get("message")
 
-        ses_client = boto3.client('ses')
-        mailing_list = os.getenv("ADMIN_EMAILS", None).split(",")
+        ses_client = boto3.client("ses")
+        mailing_list = os.getenv("ADMIN_EMAILS").split(",")
 
         for admin_email in mailing_list:
             SENDER = "Exeter Cycling Club <contact@oliver-bilbie.co.uk>"
@@ -30,13 +30,13 @@ def contact_us(event, context):
             SUBJECT = "Message for ECC"
             BODY_TEXT = f"Contact Email: {contact_email}\n\n{message}"
 
-            msg = MIMEMultipart('mixed')
-            msg['Subject'] = SUBJECT
-            msg['From'] = SENDER
-            msg['To'] = RECIPIENT
+            msg = MIMEMultipart("mixed")
+            msg["Subject"] = SUBJECT
+            msg["From"] = SENDER
+            msg["To"] = RECIPIENT
 
-            msg_body = MIMEMultipart('alternative')
-            textpart = MIMEText(BODY_TEXT.encode("utf-8"), 'plain', "utf-8")
+            msg_body = MIMEMultipart("alternative")
+            textpart = MIMEText(BODY_TEXT.encode("utf-8"), "plain", "utf-8")
 
             msg_body.attach(textpart)
             msg.attach(msg_body)
@@ -45,8 +45,8 @@ def contact_us(event, context):
                 Source=SENDER,
                 Destinations=[RECIPIENT],
                 RawMessage={
-                    'Data':msg.as_string(),
-                }
+                    "Data": msg.as_string(),
+                },
             )
 
         response = json.dumps({"status": 200, "body": "Message sent successfully"})

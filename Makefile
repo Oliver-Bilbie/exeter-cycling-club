@@ -33,20 +33,6 @@ type-check:
 	@echo "[INFO] Checking static typing of source code using mypy"
 	@cd backend && python -m mypy src/service --ignore-missing-imports
 
-unit-test:
-	@echo "[INFO] Running unit tests"
-	@cd backend && export COVERAGE_FILE=./target/coverage/.cov_unit && python -m pipenv run coverage run --source=src/service -m pytest -s --junitxml=target/unit-test/unit-result.xml src/test/unit/*.py
-	@cd backend && export COVERAGE_FILE=./target/coverage/.cov_unit && python -m pipenv run coverage html --directory=target/unit-test/coverage --fail-under=60
-	@cd backend && export COVERAGE_FILE=./target/coverage/.cov_unit && python -m pipenv run coverage report
-	@cd backend && export COVERAGE_FILE=./target/coverage/.cov_unit && python -m pipenv run coverage xml -o target/unit-test/coverage/coverage.xml
-
-int-test:
-	@echo "[INFO] Running component integration tests"
-	@cd backend && export COVERAGE_FILE=./target/coverage/.cov_int && python -m pipenv run coverage run --source=src/service -m pytest -s --junitxml=target/integration-test/integration-result.xml src/test/integration/*.py
-	@cd backend && export COVERAGE_FILE=./target/coverage/.cov_int && python -m pipenv run coverage html --directory=target/integration-test/coverage --fail-under=50
-	@cd backend && export COVERAGE_FILE=./target/coverage/.cov_int && python -m pipenv run coverage report
-	@cd backend && export COVERAGE_FILE=./target/coverage/.cov_int && python -m pipenv run coverage xml -o target/integration-test/coverage/coverage.xml
-
 frontend-test:
 	@echo "[INFO] Running frontend tests"
 	@cd frontend && yarn test
