@@ -25,8 +25,8 @@ def subscribe(event, context):
                 TableName=dynamodb_table,
                 IndexName="EmailIndex",
                 KeyConditionExpression="#em = :em",
-                ExpressionAttributeNames={"#em":"email"},
-                ExpressionAttributeValues={":em": {"S": email}}
+                ExpressionAttributeNames={"#em": "email"},
+                ExpressionAttributeValues={":em": {"S": email}},
             )["Count"]
             == 0
         ):
@@ -42,6 +42,7 @@ def subscribe(event, context):
                     "email": {"S": email},
                     "verified": {"BOOL": False},
                     "bounces": {"N": "0"},
+                    "status": {"S": "N"},
                 },
             )
 
@@ -55,7 +56,7 @@ def subscribe(event, context):
 
 def unsubscribe(event, context):
     """
-    Removes an email address to the mailing list
+    Removes an email address from the mailing list
     """
 
     try:

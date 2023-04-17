@@ -32,16 +32,18 @@ def set_route(event, context):
         distance = str(distance).split(".")[0][:-3] + "km"
         elevation_gain = str(elevation_gain).split(".")[0] + "m"
 
-        output_body = json.dumps({
-            "status": "ready",
-            "id": id,
-            "name": name,
-            "distance": distance,
-            "elevation_gain": elevation_gain,
-            "map_url": map_url,
-            "description": description,
-            "gpx": gpx,
-        })
+        output_body = json.dumps(
+            {
+                "status": "ready",
+                "id": id,
+                "name": name,
+                "distance": distance,
+                "elevation_gain": elevation_gain,
+                "map_url": map_url,
+                "description": description,
+                "gpx": gpx,
+            }
+        )
 
         # Upload data to be consumed by the website
         upload_to_s3(output_body, "routeData.json")
@@ -63,9 +65,12 @@ def check_admin_status(access_token):
     # Before updating the route we should confirm that the request was made by an admin
     # To do this we call the athlete API and compare the returned ID value to the list of admin IDs
 
-    admins = os.getenv("ADMIN_LIST", None).split(",")
+    admins = os.getenv("ADMIN_LIST").split(",")
 
-    response = requests.get(f"https://www.strava.com/api/v3/athlete", headers={"Authorization": f"Bearer {access_token}"})
+    response = requests.get(
+        f"https://www.strava.com/api/v3/athlete",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
     if response.status_code == 200:
         response = response.json()
         id = str(response.get("id"))
@@ -78,7 +83,10 @@ def check_admin_status(access_token):
 
 
 def get_route_data(access_token, id):
-    response = requests.get(f"https://www.strava.com/api/v3/routes/{id}", headers={"Authorization": f"Bearer {access_token}"})
+    response = requests.get(
+        f"https://www.strava.com/api/v3/routes/{id}",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
 
     if response.status_code == 200:
         response = response.json()
@@ -94,7 +102,10 @@ def get_route_data(access_token, id):
 
 
 def get_route_gpx(access_token, id):
-    response = requests.get(f"https://www.strava.com/api/v3/routes/{id}/export_gpx", headers={"Authorization": f"Bearer {access_token}"})
+    response = requests.get(
+        f"https://www.strava.com/api/v3/routes/{id}/export_gpx",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
 
     if response.status_code == 200:
         gpx = response.content.decode("utf-8")
@@ -107,7 +118,7 @@ def get_route_gpx(access_token, id):
 
 def upload_to_s3(body, key):
     S3_BUCKET = os.getenv("S3_BUCKET", None)
-    s3_client = boto3.client('s3')
+    s3_client = boto3.client("s3")
 
     with tempfile.NamedTemporaryFile() as output_file:
         output_file.write(str.encode(body))
@@ -115,15 +126,17 @@ def upload_to_s3(body, key):
         s3_client.upload_file(output_file.name, S3_BUCKET, key)
 
 
-def send_email_notifications(route_name, description, distance, elevation_gain, map_url):
+def send_email_notifications(
+    route_name, description, distance, elevation_gain, map_url
+):
     dynamodb_table = os.getenv("TABLE_NAME", None)
 
-    ses_client = boto3.client('ses')
-    dynamodb_client = boto3.client('dynamodb')
+    ses_client = boto3.client("ses")
+    dynamodb_client = boto3.client("dynamodb")
 
     mailing_list = dynamodb_client.scan(TableName=dynamodb_table).get("Items")
 
-    newLineChar = "\n" # necessary due to the limitations of f-strings in Python
+    newLineChar = "\n"  # necessary due to the limitations of f-strings in Python
 
     for entry in mailing_list:
         SENDER = "Exeter Cycling Club <updates@oliver-bilbie.co.uk>"
@@ -170,6 +183,28 @@ def send_email_notifications(route_name, description, distance, elevation_gain, 
 <td style="width: 70%; text-align: center; height: 30px;">&nbsp;</td>
 <td style="width: 15%; height: 30px;">&nbsp;</td>
 </tr>
+<tr style="height: 73px;">
+<td style="width: 15%; height: 73px;">&nbsp;</td>
+<td style="width: 70%; height: 73px; text-align: center;">
+<h2><strong>Let us know you're coming</strong></h2>
+</td>
+<td style="width: 15%; height: 73px;">&nbsp;</td>
+</tr>
+<tr style="height: 23px;">
+<td style="width: 15%; height: 23px;">&nbsp;</td>
+<td style="width: 70%; text-align: center; height: 23px;"><a title="YesStatus" href="http://ecc.oliver-bilbie.co.uk.s3-website-eu-west-1.amazonaws.com/status?id={RECIPIENT_ID}&status=Y" target="_blank">I'll be there!</a></td>
+<td style="width: 15%; height: 23px;">&nbsp;</td>
+</tr>
+<tr style="height: 23px;">
+<td style="width: 15%; height: 23px;">&nbsp;</td>
+<td style="width: 70%; text-align: center; height: 23px;"><a title="MaybeStatus" href="http://ecc.oliver-bilbie.co.uk.s3-website-eu-west-1.amazonaws.com/status?id={RECIPIENT_ID}&status=M" target="_blank">Maybe</a></td>
+<td style="width: 15%; height: 23px;">&nbsp;</td>
+</tr>
+<tr style="height: 30px;">
+<td style="width: 15%; height: 30px;">&nbsp;</td>
+<td style="width: 70%; text-align: center; height: 30px;">&nbsp;</td>
+<td style="width: 15%; height: 30px;">&nbsp;</td>
+</tr>
 <tr style="height: 23px;">
 <td style="width: 15%; height: 23px;">&nbsp;</td>
 <td style="width: 70%; text-align: center; height: 23px;">Please do not reply to this email. You are receiving this email because you signed up for alerts from Exeter Cycling Club. If you no longer wish to receive these updates then you may unsubscribe using the link below.</td>
@@ -186,14 +221,14 @@ def send_email_notifications(route_name, description, distance, elevation_gain, 
 </html>
     """
 
-        msg = MIMEMultipart('mixed')
-        msg['Subject'] = SUBJECT
-        msg['From'] = SENDER
-        msg['To'] = RECIPIENT
+        msg = MIMEMultipart("mixed")
+        msg["Subject"] = SUBJECT
+        msg["From"] = SENDER
+        msg["To"] = RECIPIENT
 
-        msg_body = MIMEMultipart('alternative')
-        textpart = MIMEText(BODY_TEXT.encode("utf-8"), 'plain', "utf-8")
-        htmlpart = MIMEText(BODY_HTML.encode("utf-8"), 'html', "utf-8")
+        msg_body = MIMEMultipart("alternative")
+        textpart = MIMEText(BODY_TEXT.encode("utf-8"), "plain", "utf-8")
+        htmlpart = MIMEText(BODY_HTML.encode("utf-8"), "html", "utf-8")
 
         msg_body.attach(textpart)
         msg_body.attach(htmlpart)
@@ -203,6 +238,6 @@ def send_email_notifications(route_name, description, distance, elevation_gain, 
             Source=SENDER,
             Destinations=[RECIPIENT],
             RawMessage={
-                'Data':msg.as_string(),
-            }
+                "Data": msg.as_string(),
+            },
         )

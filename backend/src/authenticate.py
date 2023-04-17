@@ -16,7 +16,10 @@ def authenticate_user(event, context):
         admin = check_if_admin(id)
 
         user_data = {
-            "id": id, "name": name, "access_token": access_token, "admin": admin
+            "id": id,
+            "name": name,
+            "access_token": access_token,
+            "admin": admin,
         }
         response = json.dumps({"status": 200, "body": user_data})
 
@@ -42,14 +45,16 @@ def handle_authentication(code):
     CLIENT_ID = os.getenv("CLIENT_ID", None)
     CLIENT_SECRET = os.getenv("CLIENT_SECRET", None)
 
-    auth_response = requests.post(f"https://www.strava.com/oauth/token?client_id={CLIENT_ID}&client_secret={CLIENT_SECRET}&code={code}&grant_type=authorization_code")
-    
+    auth_response = requests.post(
+        f"https://www.strava.com/oauth/token?client_id={CLIENT_ID}&client_secret={CLIENT_SECRET}&code={code}&grant_type=authorization_code"
+    )
+
     if auth_response.status_code == 200:
         auth_response = auth_response.json()
         id = str(auth_response.get("athlete").get("id"))
         name = f'{auth_response.get("athlete").get("firstname")} {auth_response.get("athlete").get("lastname")}'
         access_token = auth_response.get("access_token")
-    
+
     else:
         raise Exception()
 

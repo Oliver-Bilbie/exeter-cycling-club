@@ -20,11 +20,8 @@ def cancel_route(event, context):
         message = body.get("message")
 
         check_admin_status(access_token)
-            
-        output_body = json.dumps({
-            "status": "cancelled",
-            "message": message
-        })
+
+        output_body = json.dumps({"status": "cancelled", "message": message})
 
         # Upload data to be consumed by the website
         upload_to_s3(output_body, "routeData.json")
@@ -45,10 +42,12 @@ def remove_route(event, context):
     takes place in the past.
     This will NOT notify the mailing list.
     """
-    output_body = json.dumps({
-        "status": "unavailable",
-        "message": "Subscribe to email updates to find out as soon as it goes live."
-    })
+    output_body = json.dumps(
+        {
+            "status": "unavailable",
+            "message": "Subscribe to email updates to find out as soon as it goes live.",
+        }
+    )
 
     # Upload data to be consumed by the website
     upload_to_s3(output_body, "routeData.json")
@@ -60,7 +59,10 @@ def check_admin_status(access_token):
 
     admins = os.getenv("ADMIN_LIST", None).split(",")
 
-    response = requests.get(f"https://www.strava.com/api/v3/athlete", headers={"Authorization": f"Bearer {access_token}"})
+    response = requests.get(
+        f"https://www.strava.com/api/v3/athlete",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
     if response.status_code == 200:
         response = response.json()
         id = str(response.get("id"))
@@ -74,7 +76,7 @@ def check_admin_status(access_token):
 
 def upload_to_s3(body, key):
     S3_BUCKET = os.getenv("S3_BUCKET", None)
-    s3_client = boto3.client('s3')
+    s3_client = boto3.client("s3")
 
     with tempfile.NamedTemporaryFile() as output_file:
         output_file.write(str.encode(body))
@@ -85,12 +87,12 @@ def upload_to_s3(body, key):
 def send_email_notifications(message):
     dynamodb_table = os.getenv("TABLE_NAME", None)
 
-    ses_client = boto3.client('ses')
-    dynamodb_client = boto3.client('dynamodb')
+    ses_client = boto3.client("ses")
+    dynamodb_client = boto3.client("dynamodb")
 
     mailing_list = dynamodb_client.scan(TableName=dynamodb_table).get("Items")
 
-    newLineChar = "\n" # necessary due to the limitations of f-strings in Python
+    newLineChar = "\n"  # necessary due to the limitations of f-strings in Python
 
     for entry in mailing_list:
         SENDER = "Exeter Cycling Club <updates@oliver-bilbie.co.uk>"
@@ -136,14 +138,14 @@ def send_email_notifications(message):
 </html>
     """
 
-        msg = MIMEMultipart('mixed')
-        msg['Subject'] = SUBJECT
-        msg['From'] = SENDER
-        msg['To'] = RECIPIENT
+        msg = MIMEMultipart("mixed")
+        msg["Subject"] = SUBJECT
+        msg["From"] = SENDER
+        msg["To"] = RECIPIENT
 
-        msg_body = MIMEMultipart('alternative')
-        textpart = MIMEText(BODY_TEXT.encode("utf-8"), 'plain', "utf-8")
-        htmlpart = MIMEText(BODY_HTML.encode("utf-8"), 'html', "utf-8")
+        msg_body = MIMEMultipart("alternative")
+        textpart = MIMEText(BODY_TEXT.encode("utf-8"), "plain", "utf-8")
+        htmlpart = MIMEText(BODY_HTML.encode("utf-8"), "html", "utf-8")
 
         msg_body.attach(textpart)
         msg_body.attach(htmlpart)
@@ -153,6 +155,6 @@ def send_email_notifications(message):
             Source=SENDER,
             Destinations=[RECIPIENT],
             RawMessage={
-                'Data':msg.as_string(),
-            }
+                "Data": msg.as_string(),
+            },
         )
