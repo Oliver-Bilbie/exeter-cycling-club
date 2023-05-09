@@ -255,6 +255,8 @@ functions:
             individually: true
             include:
                 - src/attendance.py
+                - src/templates/attendance.txt
+                - src/templates/attendance.html
             exclude:
                 - ./**
         memorySize: 128

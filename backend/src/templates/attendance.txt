@@ -1,0 +1,6 @@
+This email is not being displayed correctly.\n\n
+This week's riders:\n
+Coming: %YES_LIST%\n
+Maybe: %MAYBE_LIST%\n\n
+You are receiving this email because you are registered as an Exeter Cycling Club administrator.
+If you no longer wish to receive these updates then please contact Ollie at oliverbilbie@tuta.io.

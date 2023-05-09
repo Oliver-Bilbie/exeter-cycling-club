@@ -1,3 +1,8 @@
+"""
+This module contains the functions required for admins to set the upcoming
+route. Users that have registered for email updates will be notified.
+"""
+
 import os
 import json
 import tempfile
