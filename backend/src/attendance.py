@@ -8,8 +8,8 @@ import json
 import boto3
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.mime.application import MIMEApplication
 
+ses_client = boto3.client("ses")
 dynamodb_client = boto3.client("dynamodb")
 dynamodb_table = os.getenv("TABLE_NAME", None)
 
@@ -78,11 +78,15 @@ def get_report(event, context):
 
 
 def send_email_notifications(yes_list, maybe_list):
-    dynamodb_table = os.getenv("TABLE_NAME", None)
-    mailing_list = os.getenv("ADMIN_EMAILS").split(",")
+    """
+    Generates the email body and sends the email to the admins.
 
-    ses_client = boto3.client("ses")
-    dynamodb_client = boto3.client("dynamodb")
+    Args:
+        yes_list (string[]): Names of users that have confirmed they will be attending
+        maybe_list (string[]): Names of users that have confirmed they may be attending
+    """
+
+    mailing_list = os.getenv("ADMIN_EMAILS").split(",")
 
     yes_list = "\n".join(map(str, yes_list))
     maybe_list = "\n".join(map(str, maybe_list))
@@ -97,23 +101,23 @@ def send_email_notifications(yes_list, maybe_list):
     BODY_HTML = BODY_HTML.replace("%YES_LIST%", yes_list)
     BODY_HTML = BODY_HTML.replace("%MAYBE_LIST%", maybe_list)
 
-    msg = MIMEMultipart("mixed")
-    msg["Subject"] = "This week's riders"
-    msg["From"] = "Exeter Cycling Club <updates@oliver-bilbie.co.uk>"
-
-    msg_body = MIMEMultipart("alternative")
-    textpart = MIMEText(BODY_TEXT.encode("utf-8"), "plain", "utf-8")
-    htmlpart = MIMEText(BODY_HTML.encode("utf-8"), "html", "utf-8")
-
-    msg_body.attach(textpart)
-    msg_body.attach(htmlpart)
-    msg.attach(msg_body)
-
     for admin_email in mailing_list:
+        msg = MIMEMultipart("mixed")
+        msg["Subject"] = "This week's riders"
+        msg["From"] = "Exeter Cycling Club <updates@oliver-bilbie.co.uk>"
         msg["To"] = admin_email
-        ses_response = ses_client.send_raw_email(
-            Source=SENDER,
-            Destinations=[RECIPIENT],
+
+        msg_body = MIMEMultipart("alternative")
+        textpart = MIMEText(BODY_TEXT.encode("utf-8"), "plain", "utf-8")
+        htmlpart = MIMEText(BODY_HTML.encode("utf-8"), "html", "utf-8")
+
+        msg_body.attach(textpart)
+        msg_body.attach(htmlpart)
+        msg.attach(msg_body)
+
+        ses_client.send_raw_email(
+            Source=msg["From"],
+            Destinations=[msg["To"]],
             RawMessage={
                 "Data": msg.as_string(),
             },
