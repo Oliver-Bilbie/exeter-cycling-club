@@ -1,3 +1,8 @@
+"""
+This module contains functions which allow a user to contact the admins
+via email.
+"""
+
 import os
 import json
 import boto3

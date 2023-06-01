@@ -16,6 +16,7 @@ install-dev-deps:
 format-src:
 	@echo "[INFO] Formatting backend source code using black"
 	@cd backend && python -m pipenv run black src
+	@cd backend && python -m pipenv run black tests
 	@echo "[INFO] Formatting frontend source code using prettier"
 	@cd frontend && yarn pretty
 
@@ -32,6 +33,13 @@ bandit:
 type-check:
 	@echo "[INFO] Checking static typing of source code using mypy"
 	@cd backend && python -m mypy src/service --ignore-missing-imports
+
+backend-test:
+	@echo "[INFO] Running backend tests"
+	@cd backend && export COVERAGE_FILE=./coverage/.cov && python -m pipenv run coverage run --source=src -m pytest -s --junitxml=target/results.xml tests/*.py
+	@cd backend && export COVERAGE_FILE=./coverage/.cov && python -m pipenv run coverage html --directory=target/coverage --fail-under=10
+	@cd backend && export COVERAGE_FILE=./coverage/.cov && python -m pipenv run coverage report
+	@cd backend && export COVERAGE_FILE=./coverage/.cov && python -m pipenv run coverage xml -o target/coverage/coverage.xml
 
 frontend-test:
 	@echo "[INFO] Running frontend tests"

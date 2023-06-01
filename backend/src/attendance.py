@@ -1,10 +1,15 @@
+"""
+This module contains the functions required for users to notify the admins that
+they will be attending the upcoming ride.
+"""
+
 import os
 import json
 import boto3
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.mime.application import MIMEApplication
 
+ses_client = boto3.client("ses")
 dynamodb_client = boto3.client("dynamodb")
 dynamodb_table = os.getenv("TABLE_NAME", None)
 
@@ -73,71 +78,34 @@ def get_report(event, context):
 
 
 def send_email_notifications(yes_list, maybe_list):
-    dynamodb_table = os.getenv("TABLE_NAME", None)
+    """
+    Generates the email body and sends the email to the admins.
 
-    ses_client = boto3.client("ses")
-    dynamodb_client = boto3.client("dynamodb")
+    Args:
+        yes_list (string[]): Names of users that have confirmed they will be attending
+        maybe_list (string[]): Names of users that have confirmed they may be attending
+    """
 
     mailing_list = os.getenv("ADMIN_EMAILS").split(",")
-    newLineChar = "\n"  # necessary due to the limitations of f-strings in Python
+
+    yes_list = "\n".join(map(str, yes_list))
+    maybe_list = "\n".join(map(str, maybe_list))
+
+    with open("src/templates/attendance.txt", "r") as text_file:
+        BODY_TEXT = text_file.read()
+    with open("src/templates/attendance.html", "r") as html_file:
+        BODY_HTML = html_file.read()
+
+    BODY_TEXT = BODY_TEXT.replace("%YES_LIST%", yes_list)
+    BODY_TEXT = BODY_TEXT.replace("%MAYBE_LIST%", maybe_list)
+    BODY_HTML = BODY_HTML.replace("%YES_LIST%", yes_list)
+    BODY_HTML = BODY_HTML.replace("%MAYBE_LIST%", maybe_list)
 
     for admin_email in mailing_list:
-        SENDER = "Exeter Cycling Club <updates@oliver-bilbie.co.uk>"
-        RECIPIENT = admin_email
-        SUBJECT = "This week's riders"
-        BODY_TEXT = f"This email is not being displayed correctly.\n\nThis week's riders:\nComing: {yes_list}\nMaybe: {maybe_list}\n\nYou are receiving this email because you are registered as an Exeter Cycling Club administrator. If you no longer wish to receive these updates then please contact Ollie at oliverbilbie@tuta.io."
-        BODY_HTML = f"""\
-<html>
-<body>
-<table style="height: 187px; width: 100%; border-collapse: collapse; border-style: none; cellpadding=0; cellspacing=0; border=0">
-<tbody>
-<tr style="height: 73px;">
-<td style="width: 15%; height: 73px;">&nbsp;</td>
-<td style="width: 70%; height: 73px; text-align: center;">
-<h1><strong>This week's riders</strong></h1>
-</td>
-<td style="width: 15%; height: 73px;">&nbsp;</td>
-</tr>
-<tr style="height: 18px;">
-<td style="width: 15%; height: 18px;">&nbsp;</td>
-<td style="width: 70%; height: 18px; text-align: center;"><h3><strong>Coming:</strong></h3></td>
-<td style="width: 15%; height: 18px;">&nbsp;</td>
-</tr>
-<tr style="height: 18px;">
-<td style="width: 15%; height: 18px;">&nbsp;</td>
-<td style="width: 70%; height: 18px; text-align: center;">{newLineChar.join(map(str, yes_list))}</td>
-<td style="width: 15%; height: 18px;">&nbsp;</td>
-</tr>
-<tr style="height: 18px;">
-<td style="width: 15%; height: 18px;">&nbsp;</td>
-<td style="width: 70%; height: 18px; text-align: center;"><h3><strong>Maybe:</strong></h3></td>
-<td style="width: 15%; height: 18px;">&nbsp;</td>
-</tr>
-<tr style="height: 18px;">
-<td style="width: 15%; height: 18px;">&nbsp;</td>
-<td style="width: 70%; height: 18px; text-align: center;">{newLineChar.join(map(str, maybe_list))}</td>
-<td style="width: 15%; height: 18px;">&nbsp;</td>
-</tr>
-<tr style="height: 30px;">
-<td style="width: 15%; height: 30px;">&nbsp;</td>
-<td style="width: 70%; text-align: center; height: 30px;">&nbsp;</td>
-<td style="width: 15%; height: 30px;">&nbsp;</td>
-</tr>
-<tr style="height: 23px;">
-<td style="width: 15%; height: 23px;">&nbsp;</td>
-<td style="width: 70%; text-align: center; height: 23px;">You are receiving this email because you are registered as an Exeter Cycling Club administrator. If you no longer wish to receive these updates then please contact Ollie at oliverbilbie@tuta.io.</td>
-<td style="width: 15%; height: 23px;">&nbsp;</td>
-</tr>
-</tbody>
-</table>
-</body>
-</html>
-"""
-
         msg = MIMEMultipart("mixed")
-        msg["Subject"] = SUBJECT
-        msg["From"] = SENDER
-        msg["To"] = RECIPIENT
+        msg["Subject"] = "This week's riders"
+        msg["From"] = "Exeter Cycling Club <updates@oliver-bilbie.co.uk>"
+        msg["To"] = admin_email
 
         msg_body = MIMEMultipart("alternative")
         textpart = MIMEText(BODY_TEXT.encode("utf-8"), "plain", "utf-8")
@@ -147,9 +115,9 @@ def send_email_notifications(yes_list, maybe_list):
         msg_body.attach(htmlpart)
         msg.attach(msg_body)
 
-        ses_response = ses_client.send_raw_email(
-            Source=SENDER,
-            Destinations=[RECIPIENT],
+        ses_client.send_raw_email(
+            Source=msg["From"],
+            Destinations=[msg["To"]],
             RawMessage={
                 "Data": msg.as_string(),
             },

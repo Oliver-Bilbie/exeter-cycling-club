@@ -1,3 +1,8 @@
+"""
+This module contains the logic for handling Strava OAuth.
+Adding this extra layer to the authentication process avoids exposing the secret key.
+"""
+
 import os
 import json
 import requests

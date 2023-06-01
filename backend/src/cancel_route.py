@@ -1,3 +1,9 @@
+"""
+This module contains the functions which handle the removal of the current upcoming
+route. This can be a manually request from an admin or an automatic process which
+triggers when a ride is scheduled to be in progress.
+"""
+
 import os
 import json
 import tempfile

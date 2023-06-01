@@ -1,3 +1,8 @@
+"""
+This module contains the functions required for users to subscribe to or
+unsubscribe from email notifications.
+"""
+
 import os
 import json
 import uuid
