@@ -10,7 +10,6 @@ import requests
 import boto3
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.mime.application import MIMEApplication
 
 
 def set_route(event, context):
@@ -29,13 +28,18 @@ def set_route(event, context):
         id = body.get("id")
         description = body.get("description")
 
+        # Before updating the route we should confirm that the request was made by an admin
         check_admin_status(access_token)
+        
         name, distance, elevation_gain, map_url = get_route_data(access_token, id)
         gpx = get_route_gpx(access_token, id)
 
         # Convert distances to a more readable format
-        distance = str(distance).split(".")[0][:-3] + "km"
         elevation_gain = str(elevation_gain).split(".")[0] + "m"
+        if distance >= 1000:
+            distance = str(distance / 1000).split(".")[0] + "km"
+        else:
+            distance = str(distance).split(".")[0] + "m"
 
         output_body = json.dumps(
             {
@@ -67,8 +71,13 @@ def set_route(event, context):
 
 
 def check_admin_status(access_token):
-    # Before updating the route we should confirm that the request was made by an admin
-    # To do this we call the athlete API and compare the returned ID value to the list of admin IDs
+    """
+    Validate that the request was made by an admin by comparing the returned
+    ID value to the list of admin IDs.
+
+    Args:
+        access_token [string]: Strava access token of the authenticated user
+    """
 
     admins = os.getenv("ADMIN_LIST").split(",")
 
@@ -88,6 +97,13 @@ def check_admin_status(access_token):
 
 
 def get_route_data(access_token, id):
+    """
+    Retrieves the route data from Strava for the specified route ID.
+    
+    Args:
+        access_token [string]: Strava access token of the authenticated user
+        id [string]: Strava route ID of the chosen route
+    """
     response = requests.get(
         f"https://www.strava.com/api/v3/routes/{id}",
         headers={"Authorization": f"Bearer {access_token}"},
@@ -107,6 +123,14 @@ def get_route_data(access_token, id):
 
 
 def get_route_gpx(access_token, id):
+    """
+    Retrieves the GPX file from Strava for the specified route ID.
+
+    Args:
+        access_token [string]: Strava access token of the authenticated user
+        id [string]: Strava route ID of the chosen route
+    """
+
     response = requests.get(
         f"https://www.strava.com/api/v3/routes/{id}/export_gpx",
         headers={"Authorization": f"Bearer {access_token}"},
@@ -122,6 +146,14 @@ def get_route_gpx(access_token, id):
 
 
 def upload_to_s3(body, key):
+    """
+    Uploads a Python dictionary to the specified S3 bucket as a JSON file.
+
+    Args:
+        body [dict]: Dictionary to be uploaded
+        key [string]: Name of the file once uploaded
+    """
+
     S3_BUCKET = os.getenv("S3_BUCKET", None)
     s3_client = boto3.client("s3")
 
@@ -134,97 +166,47 @@ def upload_to_s3(body, key):
 def send_email_notifications(
     route_name, description, distance, elevation_gain, map_url
 ):
-    dynamodb_table = os.getenv("TABLE_NAME", None)
+    """
+    Generates the email body and sends the email to the admins.
 
+    Args:
+        route_name [string]: Name of the route
+        description [string]: Description of the route
+        distance [string]: Distance of the route
+        elevation_gain [string]: Elevation gain of the route
+        map_url [string]: URL of the route image
+    """
+
+    dynamodb_table = os.getenv("TABLE_NAME", None)
     ses_client = boto3.client("ses")
     dynamodb_client = boto3.client("dynamodb")
 
     mailing_list = dynamodb_client.scan(TableName=dynamodb_table).get("Items")
 
-    newLineChar = "\n"  # necessary due to the limitations of f-strings in Python
-
+    
     for entry in mailing_list:
         SENDER = "Exeter Cycling Club <updates@oliver-bilbie.co.uk>"
         RECIPIENT = entry.get("email").get("S")
         RECIPIENT_ID = entry.get("id").get("S")
         SUBJECT = "This week's route"
-        BODY_TEXT = f"This email is not being displayed correctly.\nIf you prefer you can view the route on our website instead at http://ecc.oliver-bilbie.co.uk.s3-website-eu-west-1.amazonaws.com/upcoming\n\nThis week's route:\n{route_name}\nDistance:{distance} - Elevation: {elevation_gain}\n{description.replace('$NEWLINE', newLineChar)}\n\nPlease do not reply to this email. You are receiving this email because you signed up for alerts from Exeter Cycling Club. If you no longer wish to receive these updates then you may unsubscribe using the link below.\nhttp://ecc.oliver-bilbie.co.uk.s3-website-eu-west-1.amazonaws.com/unsubscribe?id={RECIPIENT_ID}"
-        BODY_HTML = f"""\
-<html>
-<body>
-<table style="height: 187px; width: 100%; border-collapse: collapse; border-style: none; cellpadding=0; cellspacing=0; border=0">
-<tbody>
-<tr style="height: 73px;">
-<td style="width: 15%; height: 73px;">&nbsp;</td>
-<td style="width: 70%; height: 73px; text-align: center;">
-<h1><strong>{route_name}</strong></h1>
-</td>
-<td style="width: 15%; height: 73px;">&nbsp;</td>
-</tr>
-<tr style="height: 18px;">
-<td style="width: 15%; height: 18px;">&nbsp;</td>
-<td style="width: 70%; height: 18px; text-align: center;"><img src="{map_url}" alt="Strava Map" width="453" height="189" /></td>
-<td style="width: 15%; height: 18px;">&nbsp;</td>
-</tr>
-<tr style="height: 18px;">
-<td style="width: 15%; height: 55px;">&nbsp;</td>
-<td style="width: 70%; height: 55px; text-align: center;">
-<h3><strong>Distance:</strong> {distance} - <strong>Elevation:</strong> {elevation_gain}</h3>
-</td>
-<td style="width: 15%; height: 55px;">&nbsp;</td>
-</tr>
-<tr style="height: 18px;">
-<td style="width: 15%; height: 18px;">&nbsp;</td>
-<td style="width: 70%; height: 18px; text-align: center;">{description.replace("$NEWLINE", "<br>")}</td>
-<td style="width: 15%; height: 18px;">&nbsp;</td>
-</tr>
-<tr style="height: 23px;">
-<td style="width: 15%; height: 23px;">&nbsp;</td>
-<td style="width: 70%; text-align: center; height: 23px;"><a title="View" href="http://ecc.oliver-bilbie.co.uk.s3-website-eu-west-1.amazonaws.com/upcoming" target="_blank">View on our website</a></td>
-<td style="width: 15%; height: 23px;">&nbsp;</td>
-</tr>
-<tr style="height: 30px;">
-<td style="width: 15%; height: 30px;">&nbsp;</td>
-<td style="width: 70%; text-align: center; height: 30px;">&nbsp;</td>
-<td style="width: 15%; height: 30px;">&nbsp;</td>
-</tr>
-<tr style="height: 73px;">
-<td style="width: 15%; height: 73px;">&nbsp;</td>
-<td style="width: 70%; height: 73px; text-align: center;">
-<h2><strong>Let us know you're coming</strong></h2>
-</td>
-<td style="width: 15%; height: 73px;">&nbsp;</td>
-</tr>
-<tr style="height: 23px;">
-<td style="width: 15%; height: 23px;">&nbsp;</td>
-<td style="width: 70%; text-align: center; height: 23px;"><a title="YesStatus" href="http://ecc.oliver-bilbie.co.uk.s3-website-eu-west-1.amazonaws.com/status?id={RECIPIENT_ID}&status=Y" target="_blank">I'll be there!</a></td>
-<td style="width: 15%; height: 23px;">&nbsp;</td>
-</tr>
-<tr style="height: 23px;">
-<td style="width: 15%; height: 23px;">&nbsp;</td>
-<td style="width: 70%; text-align: center; height: 23px;"><a title="MaybeStatus" href="http://ecc.oliver-bilbie.co.uk.s3-website-eu-west-1.amazonaws.com/status?id={RECIPIENT_ID}&status=M" target="_blank">Maybe</a></td>
-<td style="width: 15%; height: 23px;">&nbsp;</td>
-</tr>
-<tr style="height: 30px;">
-<td style="width: 15%; height: 30px;">&nbsp;</td>
-<td style="width: 70%; text-align: center; height: 30px;">&nbsp;</td>
-<td style="width: 15%; height: 30px;">&nbsp;</td>
-</tr>
-<tr style="height: 23px;">
-<td style="width: 15%; height: 23px;">&nbsp;</td>
-<td style="width: 70%; text-align: center; height: 23px;">Please do not reply to this email. You are receiving this email because you signed up for alerts from Exeter Cycling Club. If you no longer wish to receive these updates then you may unsubscribe using the link below.</td>
-<td style="width: 15%; height: 23px;">&nbsp;</td>
-</tr>
-<tr style="height: 23px;">
-<td style="width: 15%; height: 23px;">&nbsp;</td>
-<td style="width: 70%; text-align: center; height: 23px;"><a title="Unsubscribe" href="http://ecc.oliver-bilbie.co.uk.s3-website-eu-west-1.amazonaws.com/unsubscribe?id={RECIPIENT_ID}" target="_blank">Unsubscribe</a></td>
-<td style="width: 15%; height: 23px;">&nbsp;</td>
-</tr>
-</tbody>
-</table>
-</body>
-</html>
-    """
+
+        with open("src/templates/update.txt", "r") as text_file:
+            BODY_TEXT = text_file.read()
+        with open("src/templates/update.html", "r") as html_file:
+            BODY_HTML = html_file.read()
+
+        BODY_TEXT = BODY_TEXT.replace(r"%ROUTE_NAME%", route_name)
+        BODY_TEXT = BODY_TEXT.replace(r"%DISTANCE%", distance)
+        BODY_TEXT = BODY_TEXT.replace(r"%ELEVATION_GAIN%", elevation_gain)
+        BODY_TEXT = BODY_TEXT.replace(r"%DESCRIPTION%", description.replace("$NEWLINE", "\n"))
+        BODY_TEXT = BODY_TEXT.replace(r"%RECIPIENT_ID%", RECIPIENT_ID)
+
+        BODY_HTML = BODY_HTML.replace(r"%ROUTE_NAME%", route_name)
+        BODY_HTML = BODY_HTML.replace(r"%MAP_URL%", map_url)
+        BODY_HTML = BODY_HTML.replace(r"%DISTANCE%", distance)
+        BODY_HTML = BODY_HTML.replace(r"%ELEVATION_GAIN%", elevation_gain)
+        BODY_HTML = BODY_HTML.replace(r"%DESCRIPTION%", description.replace("$NEWLINE", "<br />"))
+        BODY_HTML = BODY_HTML.replace(r"%RECIPIENT_ID%", RECIPIENT_ID)
 
         msg = MIMEMultipart("mixed")
         msg["Subject"] = SUBJECT
@@ -239,7 +221,7 @@ def send_email_notifications(
         msg_body.attach(htmlpart)
         msg.attach(msg_body)
 
-        ses_response = ses_client.send_raw_email(
+        ses_client.send_raw_email(
             Source=SENDER,
             Destinations=[RECIPIENT],
             RawMessage={
