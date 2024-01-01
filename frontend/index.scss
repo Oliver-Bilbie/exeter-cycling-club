@@ -1,0 +1,35 @@
+@charset "utf-8";
+
+// Custom fonts
+@import url('https://fonts.googleapis.com/css?family=Cairo|Ubuntu');
+$family-primary: "Ubuntu", Helvetica, Arial, sans-serif;
+$title-family: "Cairo", Helvetica, Arial, sans-serif;
+
+// Custom colors
+$primary: #a30008;
+$info: $primary;
+$link: $primary;
+$dark: #7b0b0b;
+$text: #000000;
+$text-light: #ffffff;
+$background: #e0e0e0;
+$strava: #FC4C02;
+
+// Responsive image background
+.bg {
+  background-image: url("images/header1.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+// Import Bulma
+@import "public/bulma/sass/utilities/_all.sass";
+@import "public/bulma/sass/base/_all.sass";
+@import "public/bulma/sass/elements/button.sass";
+@import "public/bulma/sass/elements/container.sass";
+@import "public/bulma/sass/elements/title.sass";
+@import "public/bulma/sass/form/_all.sass";
+@import "public/bulma/sass/components/navbar.sass";
+@import "public/bulma/sass/layout/hero.sass";
+@import "public/bulma/sass/layout/section.sass";

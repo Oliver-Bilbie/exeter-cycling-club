@@ -1,0 +1,8 @@
+[package]
+name = "ecc_frontend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+yew = { git = "https://github.com/yewstack/yew/", features = ["csr", "ssr"] }
+yew-router = { git = "https://github.com/yewstack/yew.git" }
