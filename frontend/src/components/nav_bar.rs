@@ -4,16 +4,26 @@ use yew_router::prelude::*;
 use crate::components::app::Route;
 use crate::helpers::go_to_page::go_to_page;
 
+#[derive(Properties, PartialEq)]
+pub struct Props {
+    pub is_sticky: bool,
+}
+
 #[function_component(NavBar)]
-pub fn nav_bar() -> Html {
+pub fn nav_bar(props: &Props) -> Html {
     let menu_open = use_state(|| false);
     let navigator = use_navigator().unwrap();
 
+    let nav_styles = match props.is_sticky {
+        true => "height: 52px; position: -webkit-sticky; position: sticky; top: 0;",
+        false => "height: 52px;",
+    };
+
     html! {
-        <nav class="navbar" role="navigation" aria-label="main navigation" style="height: 52px;">
-            <div class="navbar-brand" style="">
+        <nav class="navbar" role="navigation" aria-label="main navigation" style={nav_styles}>
+            <div class="navbar-brand">
                 <a class="navbar-item pt-0" onclick={ go_to_page(navigator.clone(), Route::Home) }>
-                    <img class="m-0" src="images/logo.png" style="max-height: 120px; align-self: start;" />
+                    <img class="logo-button" src="images/logo.png" style="max-height: 120px; align-self: start;" />
                 </a>
 
                 <a

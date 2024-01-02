@@ -15,12 +15,35 @@ $text-light: #ffffff;
 $background: #e0e0e0;
 $strava: #FC4C02;
 
-// Responsive image background
-.bg {
+// Responsive image background to fill the parent container
+.fullheight-bg {
   background-image: url("images/header1.jpg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+}
+
+// Tiling textures for backgrounds
+.texture-light {
+  background: url("images/texture-light.png") repeat 0 0;
+}
+.texture-dark {
+  background: url("images/texture-dark.png") repeat 0 0;
+}
+
+// Logo button
+.logo-button:hover{
+  filter: drop-shadow(0 0 0.75rem #bfbfbf);
+}
+.logo-button:active{
+  transform: translateY(2px);
+}
+
+// Stick elements to the top of the page
+.sticky {
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 0;
 }
 
 // Import Bulma
