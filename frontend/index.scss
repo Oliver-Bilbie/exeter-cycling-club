@@ -39,6 +39,14 @@ $strava: #FC4C02;
   transform: translateY(2px);
 }
 
+// Recolor svg icons to match the theme
+.icon {
+  filter: invert(100%) sepia(0%) saturate(7463%) hue-rotate(51deg) brightness(96%) contrast(108%);
+}
+.icon:hover {
+  filter: invert(99%) sepia(1%) saturate(972%) hue-rotate(344deg) brightness(112%) contrast(76%);
+}
+
 // Stick elements to the top of the page
 .sticky {
   position: -webkit-sticky; /* Safari */

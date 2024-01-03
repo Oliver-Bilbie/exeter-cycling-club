@@ -22,9 +22,11 @@ pub fn nav_bar(props: &Props) -> Html {
     html! {
         <nav class="navbar" role="navigation" aria-label="main navigation" style={nav_styles}>
             <div class="navbar-brand">
-                <a class="navbar-item pt-0" onclick={ go_to_page(navigator.clone(), Route::Home) }>
-                    <img class="logo-button" src="images/logo.png" style="max-height: 120px; align-self: start;" />
-                </a>
+                if !*menu_open {
+                    <a class="navbar-item pt-0" onclick={ go_to_page(navigator.clone(), Route::Home) }>
+                        <img class="logo-button" src="images/logo.png" style="max-height: 120px; align-self: start;" />
+                    </a>
+                }
 
                 <a
                     role="button"
