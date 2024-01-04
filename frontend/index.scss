@@ -22,6 +22,12 @@ $strava: #FC4C02;
   background-repeat: no-repeat;
   background-size: cover;
 }
+.fullheight-bg-2 {
+  background-image: url("images/header3.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
 
 // Tiling textures for backgrounds
 .texture-light {
@@ -52,6 +58,10 @@ $strava: #FC4C02;
   position: -webkit-sticky; /* Safari */
   position: sticky;
   top: 0;
+}
+
+iframe {
+  border-radius: 4%;
 }
 
 // Import Bulma

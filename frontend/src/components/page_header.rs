@@ -1,42 +1,19 @@
 use yew::prelude::*;
 
-#[function_component(PageHeader)]
-pub fn page_header() -> Html {
-    let images = vec![
-        "images/header1.jpg",
-        "images/header2.jpg",
-        "images/header3.jpg",
-    ];
-    html! {
-        <div>
-            <figure class="image">
-                <img src="images/header1.jpg" />
-            </figure>
-        </div>
-    }
-}
-
 #[derive(Properties, PartialEq)]
-pub struct CarouselProps {
-    pub images: Vec<&'static str>,
+pub struct PageHeaderProps {
+    pub title: &'static str,
 }
 
-#[function_component(Carousel)]
-pub fn carousel(CarouselProps { images }: &CarouselProps) -> Html {
-    let images_html = images
-        .iter()
-        .map(|image| {
-            html! {
-                <div class="column">
-                    <img src={ *image } />
-                </div>
-            }
-        })
-        .collect::<Html>();
-
+#[function_component(PageHeader)]
+pub fn page_header(props: &PageHeaderProps) -> Html {
     html! {
-        <div class="columns is-desktop">
-            { images_html }
-        </div>
+        <section class="hero is-medium">
+            <div class="hero-body fullheight-bg-2 is-vcentered">
+                <h1 class="title is-1 has-text-white">
+                        { props.title }
+                </h1>
+            </div>
+        </section>
     }
 }
