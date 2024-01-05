@@ -1,5 +1,4 @@
 pub mod about_section;
-pub mod app;
 pub mod contact_us;
 pub mod footer;
 pub mod framed_image;

@@ -2,7 +2,7 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 
 use crate::components::about_section::AboutSection;
-use crate::components::app::Route;
+use crate::Route;
 use crate::components::footer::Footer;
 use crate::components::nav_bar::NavBar;
 use crate::helpers::about_us::*;
