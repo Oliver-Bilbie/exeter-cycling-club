@@ -4,5 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+regex = "1.10.2"
 yew = { git = "https://github.com/yewstack/yew/", features = ["csr", "ssr"] }
 yew-router = { git = "https://github.com/yewstack/yew.git" }

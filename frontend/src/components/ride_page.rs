@@ -8,11 +8,11 @@ use crate::components::page_header::PageHeader;
 pub fn ride_page() -> Html {
     html! {
         <section class="is-fullheight">
-            <NavBar is_sticky={true} />
+            <NavBar is_sticky={false} />
             <PageHeader title="Upcoming ride" />
 
             <section class="section texture-light pt-8">
-                <div class="columns is-desktop is-vcentered">
+                <div class="container columns is-desktop is-vcentered">
                     <div class="column has-text-centered my-4">
                         <h1 class="title is-1">{ "Culmstock, Dunkeswell" }</h1>
                         <p>{ "Some text can go here to describe the ride." }</p>
