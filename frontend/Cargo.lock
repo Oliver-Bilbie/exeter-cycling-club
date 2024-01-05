@@ -116,6 +116,8 @@ name = "exeter_cycling_club"
 version = "0.1.0"
 dependencies = [
  "regex",
+ "wasm-bindgen",
+ "web-sys",
  "yew",
  "yew-router",
 ]

@@ -67,10 +67,6 @@ pub fn nav_bar(props: &Props) -> Html {
                 }
             >
                 <div class="navbar-start">
-                    <a class="navbar-item" onclick={ go_to_page(navigator.clone(), Route::Home) }>
-                        { "Home" }
-                    </a>
-
                     <a class="navbar-item" onclick={ go_to_page(navigator.clone(), Route::About) }>
                         { "About Us" }
                     </a>

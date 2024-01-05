@@ -23,8 +23,8 @@ pub enum Route {
 
 fn switch(routes: Route) -> Html {
     match routes {
-        Route::Home => html! { <Home /> },
-        Route::About => html! { <h1>{ "About" }</h1> },
+        Route::Home => html! { <Home header_visible={true} /> },
+        Route::About => html! { <Home header_visible={false} /> },
         Route::Contact => html! { <ContactUs /> },
         Route::RidePage => html! { <RidePage /> },
         Route::NotFound => html! { <h1>{ "404" }</h1> },

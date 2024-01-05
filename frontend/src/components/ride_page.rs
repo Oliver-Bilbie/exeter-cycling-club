@@ -7,7 +7,7 @@ use crate::components::page_header::PageHeader;
 #[function_component(RidePage)]
 pub fn ride_page() -> Html {
     html! {
-        <section class="is-fullheight">
+        <section class="hero is-fullheight">
             <NavBar is_sticky={false} />
             <PageHeader title="Upcoming ride" />
 

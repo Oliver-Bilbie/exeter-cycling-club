@@ -46,10 +46,10 @@ $strava: #FC4C02;
 }
 
 // Recolor svg icons to match the theme
-.icon {
+.light-icon {
   filter: invert(100%) sepia(0%) saturate(7463%) hue-rotate(51deg) brightness(96%) contrast(108%);
 }
-.icon:hover {
+.light-icon:hover {
   filter: invert(99%) sepia(1%) saturate(972%) hue-rotate(344deg) brightness(112%) contrast(76%);
 }
 
@@ -60,6 +60,7 @@ $strava: #FC4C02;
   top: 0;
 }
 
+// Round the edges of iframes
 iframe {
   border-radius: 4%;
 }
@@ -74,3 +75,4 @@ iframe {
 @import "public/bulma/sass/components/navbar.sass";
 @import "public/bulma/sass/layout/hero.sass";
 @import "public/bulma/sass/layout/section.sass";
+@import "public/bulma/sass/elements/notification.sass";
