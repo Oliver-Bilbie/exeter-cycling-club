@@ -1,8 +1,8 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::Route;
 use crate::helpers::go_to_page::go_to_page;
+use crate::Route;
 
 #[derive(Properties, PartialEq)]
 pub struct Props {

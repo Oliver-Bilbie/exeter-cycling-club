@@ -2,11 +2,11 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 
 use crate::components::about_section::AboutSection;
-use crate::Route;
 use crate::components::footer::Footer;
 use crate::components::nav_bar::NavBar;
 use crate::helpers::about_us::*;
 use crate::helpers::go_to_page::go_to_page;
+use crate::Route;
 
 #[derive(Properties, PartialEq)]
 pub struct HomeProps {

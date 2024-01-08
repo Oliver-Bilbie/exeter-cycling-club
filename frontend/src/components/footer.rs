@@ -1,9 +1,9 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::Route;
-use crate::helpers::external_links::{STRAVA_URL, FACEBOOK_URL};
+use crate::helpers::external_links::{FACEBOOK_URL, STRAVA_URL};
 use crate::helpers::go_to_page::go_to_page;
+use crate::Route;
 
 #[function_component(Footer)]
 pub fn footer() -> Html {
@@ -42,7 +42,7 @@ pub fn footer() -> Html {
                         </a>
                     </span>
                 </div>
-                    
+
             </div>
         </footer>
     }

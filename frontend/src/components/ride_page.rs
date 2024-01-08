@@ -19,12 +19,12 @@ pub fn ride_page() -> Html {
                         <p>{ "Something about meeting at Sainsbury's at 8 I guess." }</p>
                     </div>
                     <div class="column">
-                        <div 
+                        <iframe
                             class="strava-embed-placeholder"
                             data-embed-type="route"
                             data-embed-id="3177284926916691964"
                             data-units="metric"
-                            data-full-width="true" 
+                            data-full-width="true"
                             data-style="standard"
                         />
                     </div>
@@ -32,7 +32,7 @@ pub fn ride_page() -> Html {
             </section>
 
             <Footer />
-            <script src="https://strava-embeds.com/embed.js" />
+            <script async={true} src="https://strava-embeds.com/embed.js" />
         </section>
     }
 }
