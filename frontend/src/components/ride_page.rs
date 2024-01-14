@@ -1,5 +1,9 @@
+// TODO: Sign up for email alerts form
+// TODO: Retrieve route data on page load
+
 use yew::prelude::*;
 
+use crate::components::email_sign_up::EmailSignUp;
 use crate::components::footer::Footer;
 use crate::components::nav_bar::NavBar;
 use crate::components::page_header::PageHeader;
@@ -11,7 +15,7 @@ pub fn ride_page() -> Html {
             <NavBar is_sticky={false} />
             <PageHeader title="Upcoming ride" />
 
-            <section class="section texture-light pt-8">
+            <section class="section texture-light pt-8 is-flex-grow-5">
                 <div class="container columns is-desktop is-vcentered">
                     <div class="column has-text-centered my-4">
                         <h1 class="title is-1">{ "Culmstock, Dunkeswell" }</h1>
@@ -29,6 +33,8 @@ pub fn ride_page() -> Html {
                         />
                     </div>
                 </div>
+
+                <EmailSignUp />
             </section>
 
             <Footer />
