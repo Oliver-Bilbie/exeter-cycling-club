@@ -16,16 +16,15 @@ pub async fn send_email(contact_email: String, message: String) -> Result<String
     let client = Client::new();
     let response = client
         // TODO: Refactor this to use environment variables
-        .post("https://nyxlz4uure.execute-api.eu-west-1.amazonaws.com/contact")
+        .post("https://3u7ify9w39.execute-api.eu-west-1.amazonaws.com/contact")
         .json(&map)
         .send()
         .await
         .expect("An error occurred while sending your message. Please try again later or contact us via Facebook.");
 
-    let json_response: SendEmailResponse = response
-        .json()
-        .await
-        .expect("Unexpected response from server. Please try again later or contact us via Facebook.");
+    let json_response: SendEmailResponse = response.json().await.expect(
+        "Unexpected response from server. Please try again later or contact us via Facebook.",
+    );
 
     match json_response.status {
         200 => Ok(json_response.body),

@@ -1,7 +1,7 @@
-use yew::prelude::*;
-use yew::platform::spawn_local;
 use wasm_bindgen::JsCast;
 use web_sys::{EventTarget, HtmlInputElement};
+use yew::platform::spawn_local;
+use yew::prelude::*;
 
 use crate::components::notification::Notification;
 use crate::helpers::sign_up::sign_up;
@@ -61,10 +61,10 @@ pub fn email_sign_up() -> Html {
             let target: Option<EventTarget> = e.target();
             let user_input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
             if let Some(input) = user_input {
-            form_data.set(SignUpData {
-                email: form_data.email.clone(),
-                name: input.value(),
-            });
+                form_data.set(SignUpData {
+                    email: form_data.email.clone(),
+                    name: input.value(),
+                });
             }
         })
     };
@@ -97,8 +97,8 @@ pub fn email_sign_up() -> Html {
         };
         let notification_data = notification_data.clone();
 
-        let notification_cb = Callback::from(move |response: Result<String, String>| {
-            match response {
+        let notification_cb =
+            Callback::from(move |response: Result<String, String>| match response {
                 Ok(_) => {
                     notification_data.set(NotificationData {
                         message: "".to_string(),
@@ -115,8 +115,7 @@ pub fn email_sign_up() -> Html {
                     });
                     set_form_ready();
                 }
-            }
-        });
+            });
 
         move |_| {
             set_form_loading();

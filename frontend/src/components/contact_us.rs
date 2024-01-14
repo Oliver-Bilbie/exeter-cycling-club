@@ -17,6 +17,7 @@ struct NotificationData {
     visible: bool,
 }
 
+#[derive(PartialEq)]
 enum FormState {
     Ready,
     Loading,
@@ -34,7 +35,7 @@ pub fn contact_us() -> Html {
         color: "".to_string(),
         visible: false,
     });
-    let form_state = use_state(|| FormState::Ready);
+    let form_state = use_state_eq(|| FormState::Ready);
 
     let handle_submit = {
         let set_form_loading = {
@@ -64,8 +65,8 @@ pub fn contact_us() -> Html {
         };
         let notification_data = notification_data.clone();
 
-        let notification_cb = Callback::from(move |response: Result<String, String>| {
-            match response {
+        let notification_cb =
+            Callback::from(move |response: Result<String, String>| match response {
                 Ok(_) => {
                     notification_data.set(NotificationData {
                         message: "".to_string(),
@@ -82,8 +83,7 @@ pub fn contact_us() -> Html {
                     });
                     set_form_ready();
                 }
-            }
-        });
+            });
 
         move |_| {
             set_form_loading();

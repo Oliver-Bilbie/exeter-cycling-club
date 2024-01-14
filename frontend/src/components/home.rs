@@ -31,7 +31,7 @@ pub fn home(props: &HomeProps) -> Html {
                                         {"Exeter Cycling Club" }
                                 </h1>
                                 <h3 class="subtitle is-4 has-text-light">
-                                    { "The best cycling club in the world!" }
+                                    { "Group rides in East Devon and Dartmoor" }
                                 </h3>
                                 <div class="block">
                                     <button
