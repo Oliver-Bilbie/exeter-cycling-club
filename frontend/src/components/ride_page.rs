@@ -1,4 +1,3 @@
-// TODO: Sign up for email alerts form
 // TODO: Retrieve route data on page load
 
 use yew::prelude::*;
@@ -16,7 +15,7 @@ pub fn ride_page() -> Html {
             <PageHeader title="Upcoming ride" />
 
             <section class="section texture-light pt-8 is-flex-grow-5">
-                <div class="container columns is-desktop is-vcentered">
+                <div class="container columns is-desktop is-vcentered mb-6">
                     <div class="column has-text-centered my-4">
                         <h1 class="title is-1">{ "Culmstock, Dunkeswell" }</h1>
                         <p>{ "Some text can go here to describe the ride." }</p>

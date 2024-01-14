@@ -101,7 +101,6 @@ pub fn contact_us() -> Html {
         }
     };
 
-
     let handle_hide_notification = {
         let notification_data = notification_data.clone();
         Callback::from(move |_| {

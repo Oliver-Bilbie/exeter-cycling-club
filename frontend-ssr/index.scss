@@ -60,6 +60,16 @@ $strava: #FC4C02;
   top: 0;
 }
 
+// Spinning animation for loading icons
+.spin {
+  animation: spin 2s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(359deg);
+  }
+}
+
 // Round the edges of iframes
 iframe {
   border-radius: 4%;

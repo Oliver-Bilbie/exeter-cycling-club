@@ -8,15 +8,15 @@ struct SendEmailResponse {
     body: String,
 }
 
-pub async fn send_email(contact_email: String, message: String) -> Result<String, String> {
+pub async fn sign_up(email: String, name: String) -> Result<String, String> {
     let mut map = HashMap::new();
-    map.insert("contact_email", contact_email);
-    map.insert("message", message);
+    map.insert("email", email);
+    map.insert("name", name);
 
     let client = Client::new();
     let response = client
         // TODO: Refactor this to use environment variables
-        .post("https://nyxlz4uure.execute-api.eu-west-1.amazonaws.com/contact")
+        .put("https://nyxlz4uure.execute-api.eu-west-1.amazonaws.com/email")
         .json(&map)
         .send()
         .await
