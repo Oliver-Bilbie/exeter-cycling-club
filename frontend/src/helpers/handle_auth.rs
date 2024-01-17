@@ -1,7 +1,7 @@
 use reqwest::get;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, PartialEq)]
 pub struct UserData {
     pub id: String,
     pub name: String,

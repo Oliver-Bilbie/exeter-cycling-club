@@ -1,12 +1,13 @@
 use serde::{Deserialize, Serialize};
+use bounce::prelude::*;
 use yew::platform::spawn_local;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
 use crate::components::loading_spinner::LoadingSpinner;
 use crate::helpers::handle_auth::{handle_auth, UserData};
+use crate::helpers::auth_state::AuthState;
 
-// http://localhost:8000/redirect?state=&code=643368b762e18fb4dcdd99183ae91f1348ea91ca&scope=read
 #[derive(Serialize, Deserialize)]
 struct OauthParameters {
     state: String,
@@ -16,6 +17,7 @@ struct OauthParameters {
 
 #[function_component(Redirect)]
 pub fn redirect() -> Html {
+    let auth_state = use_atom::<AuthState>();
     let location = use_location();
     let oauth_params = match location {
         Some(location) => location.query::<OauthParameters>().unwrap_or(
@@ -23,31 +25,21 @@ pub fn redirect() -> Html {
         ),
         None => OauthParameters { state: String::new(), code: String::new(), scope: String::new() },
     };
-
-    // TODO: Remove this
-    let user_data = use_state(|| UserData {
-        id: String::new(),
-        name: String::new(),
-        access_token: String::new(),
-        admin: false,
-    });
-
     let is_loading = use_state(|| true);
 
     {
-        // TODO: Remove this
-        let user_data = user_data.clone();
-
+        let auth_state = auth_state.clone();
         let oauth_code = oauth_params.code.clone();
         let is_loading = is_loading.clone();
         let status_callback =
             Callback::from(move |response: Result<UserData, String>| {
                 match response {
                     Ok(resp) => {
-                        user_data.set(resp);
+                        auth_state.set(AuthState { user_data: Some(resp) });
                         is_loading.set(false);
                     },
                     Err(_) => {
+                        auth_state.set(AuthState { user_data: None });
                         is_loading.set(false);
                     },
                 }
@@ -77,7 +69,13 @@ pub fn redirect() -> Html {
                             </div>
                         }} else { html! {
                             <h1 class="title is-1 has-text-centered">
-                                {format!("Welcome, {}!", user_data.name)}
+                                {format!(
+                                    "Welcome, {}!",
+                                    match auth_state.user_data {
+                                        Some(ref user_data) => user_data.name.clone(),
+                                        None => String::from("unknown user"),
+                                    }
+                                )}
                             </h1>
                         }}}
                     </div>

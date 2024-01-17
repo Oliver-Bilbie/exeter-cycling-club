@@ -12,7 +12,7 @@ name = "server"
 required-features = ["ssr"]
 
 [dependencies]
-yew = { git = "https://github.com/yewstack/yew/" }
+yew = "0.21.0"
 exeter_cycling_club = { path = "../frontend" }
 log = "0.4"
 futures = { version = "0.3", features = ["std"], default-features = false }

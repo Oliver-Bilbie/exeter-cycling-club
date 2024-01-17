@@ -1,5 +1,5 @@
+use bounce::BounceRoot;
 use std::collections::HashMap;
-
 use yew::prelude::*;
 use yew_router::history::{AnyHistory, History, MemoryHistory};
 use yew_router::prelude::*;
@@ -7,11 +7,11 @@ use yew_router::prelude::*;
 use crate::components::contact_us::ContactUs;
 use crate::components::home::Home;
 use crate::components::not_found::NotFound;
+use crate::components::redirect::Redirect;
 use crate::components::ride_page::RidePage;
 use crate::components::set_status::SetStatus;
-use crate::components::unsubscribe::Unsubscribe;
 use crate::components::sign_in::SignIn;
-use crate::components::redirect::Redirect;
+use crate::components::unsubscribe::Unsubscribe;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -59,7 +59,9 @@ fn switch(routes: Route) -> Html {
 pub fn app() -> Html {
     html! {
         <BrowserRouter>
-            <Switch<Route> render={switch} />
+            <BounceRoot>
+                <Switch<Route> render={switch} />
+            </BounceRoot>
         </BrowserRouter>
     }
 }
@@ -79,7 +81,9 @@ pub fn server_app(props: &ServerAppProps) -> Html {
 
     html! {
         <Router history={history}>
-            <Switch<Route> render={switch} />
+            <BounceRoot>
+                <Switch<Route> render={switch} />
+            </BounceRoot>
         </Router>
     }
 }
