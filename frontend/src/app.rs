@@ -4,10 +4,12 @@ use yew::prelude::*;
 use yew_router::history::{AnyHistory, History, MemoryHistory};
 use yew_router::prelude::*;
 
-use crate::components::{
-    contact_us::ContactUs, home::Home, not_found::NotFound, ride_page::RidePage,
-    unsubscribe::Unsubscribe,
-};
+use crate::components::contact_us::ContactUs;
+use crate::components::home::Home;
+use crate::components::not_found::NotFound;
+use crate::components::ride_page::RidePage;
+use crate::components::set_status::SetStatus;
+use crate::components::unsubscribe::Unsubscribe;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -19,14 +21,14 @@ pub enum Route {
     RidePage,
     #[at("/contact")]
     Contact,
-    #[at("/signin/:id")]
-    SignIn { id: String },
-    #[at("/redirect/:id")]
-    Redirect { id: String },
+    #[at("/signin")]
+    SignIn,
+    #[at("/redirect")]
+    Redirect,
     #[at("/unsubscribe")]
     Unsubscribe,
-    #[at("/status/:id")]
-    SetStatus { id: String },
+    #[at("/status")]
+    SetStatus,
     #[at("/select")]
     RouteSelect,
     #[at("/cancel")]
@@ -42,6 +44,7 @@ fn switch(routes: Route) -> Html {
         Route::About => html! { <Home header_visible={false} /> },
         Route::Contact => html! { <ContactUs /> },
         Route::RidePage => html! { <RidePage /> },
+        Route::SetStatus => html! { <SetStatus /> },
         Route::Unsubscribe => html! { <Unsubscribe /> },
         Route::NotFound => html! { <NotFound /> },
         _ => html! { <h1>{ "404" }</h1> },

@@ -13,4 +13,5 @@ pub mod notification;
 pub mod page_header;
 pub mod ride_page;
 pub mod route_display;
+pub mod set_status;
 pub mod unsubscribe;
