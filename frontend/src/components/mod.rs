@@ -7,6 +7,7 @@ pub mod framed_image;
 pub mod home;
 pub mod loading_spinner;
 pub mod nav_bar;
+pub mod no_route_display;
 pub mod not_found;
 pub mod notification;
 pub mod page_header;

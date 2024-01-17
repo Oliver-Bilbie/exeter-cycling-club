@@ -27,12 +27,12 @@ enum FormState {
 #[function_component(ContactUs)]
 pub fn contact_us() -> Html {
     let form_data = use_state(|| MessageData {
-        email: "".to_string(),
-        message: "".to_string(),
+        email: String::new(),
+        message: String::new(),
     });
     let notification_data = use_state(|| NotificationData {
-        message: "".to_string(),
-        color: "".to_string(),
+        message: String::new(),
+        color: String::new(),
         visible: false,
     });
     let form_state = use_state_eq(|| FormState::Ready);
@@ -44,7 +44,7 @@ pub fn contact_us() -> Html {
             move || {
                 form_state.set(FormState::Loading);
                 notification_data.set(NotificationData {
-                    message: "".to_string(),
+                    message: String::new(),
                     color: "primary".to_string(),
                     visible: false,
                 });
@@ -69,8 +69,8 @@ pub fn contact_us() -> Html {
             Callback::from(move |response: Result<String, String>| match response {
                 Ok(_) => {
                     notification_data.set(NotificationData {
-                        message: "".to_string(),
-                        color: "".to_string(),
+                        message: String::new(),
+                        color: String::new(),
                         visible: false,
                     });
                     set_form_complete();
@@ -105,8 +105,8 @@ pub fn contact_us() -> Html {
         let notification_data = notification_data.clone();
         Callback::from(move |_| {
             notification_data.set(NotificationData {
-                message: "".to_string(),
-                color: "".to_string(),
+                message: String::new(),
+                color: String::new(),
                 visible: false,
             });
         })

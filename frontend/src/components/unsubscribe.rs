@@ -18,8 +18,8 @@ struct UnsubscribeQuery {
 pub fn unsubscribe() -> Html {
     let location = use_location();
     let unsubscribe_id = match location {
-        Some(location) => location.query::<UnsubscribeQuery>().unwrap_or(UnsubscribeQuery { id: "".to_string() }),
-        None => UnsubscribeQuery { id: "".to_string() },
+        Some(location) => location.query::<UnsubscribeQuery>().unwrap_or(UnsubscribeQuery { id: String::new() }),
+        None => UnsubscribeQuery { id: String::new() },
     };
 
     let unsubscribe_status = use_state_eq(|| UnsubscribeStatus::Loading);
@@ -30,11 +30,16 @@ pub fn unsubscribe() -> Html {
         let status_callback =
             Callback::from(move |response: UnsubscribeStatus| unsubscribe_status.set(response));
 
+        // Request unsubscribe only once
         use_effect_with(unsubscribe_id.clone(), move |_| {
-            spawn_local(async move {
-                let resp = request_unsubscribe(unsubscribe_id).await;
-                status_callback.emit(resp);
-            });
+            if unsubscribe_id.is_empty() {
+                status_callback.emit(UnsubscribeStatus::Failure);
+            } else {
+                spawn_local(async move {
+                    let resp = request_unsubscribe(unsubscribe_id).await;
+                    status_callback.emit(resp);
+                });
+            }
         });
     }
 

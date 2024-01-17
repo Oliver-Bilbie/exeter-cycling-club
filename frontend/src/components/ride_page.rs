@@ -5,6 +5,7 @@ use crate::components::email_sign_up::EmailSignUp;
 use crate::components::footer::Footer;
 use crate::components::loading_spinner::LoadingSpinner;
 use crate::components::nav_bar::NavBar;
+use crate::components::no_route_display::NoRouteDisplay;
 use crate::components::page_header::PageHeader;
 use crate::components::route_display::RouteDisplay;
 use crate::helpers::get_route::{get_route, RouteStatus};
@@ -18,9 +19,12 @@ pub fn ride_page() -> Html {
         let status_callback =
             Callback::from(move |response: RouteStatus| route_status.set(response));
 
-        spawn_local(async move {
-            let resp = get_route().await;
-            status_callback.emit(resp);
+        // Load the route data only once
+        use_effect_with(true, move |_| {
+            spawn_local(async move {
+                let resp = get_route().await;
+                status_callback.emit(resp);
+            });
         });
     }
 
@@ -50,23 +54,5 @@ pub fn ride_page() -> Html {
 
             <Footer />
         </section>
-    }
-}
-
-#[derive(Properties, PartialEq)]
-pub struct NoRouteDisplayProps {
-    pub message: String,
-}
-
-#[function_component(NoRouteDisplay)]
-pub fn no_route_display(props: &NoRouteDisplayProps) -> Html {
-    html! {
-        <div class="container is-vcentered mb-6">
-            {props.message.split("\n").map(|paragraph| html! {
-                <h2 class="title is-2 has-text-centered">
-                    {paragraph}
-                </h2>
-            }).collect::<Html>()}
-        </div>
     }
 }

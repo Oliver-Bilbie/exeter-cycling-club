@@ -3,6 +3,7 @@ use web_sys::{EventTarget, HtmlInputElement};
 use yew::platform::spawn_local;
 use yew::prelude::*;
 
+use crate::components::loading_spinner::LoadingSpinner;
 use crate::components::notification::Notification;
 use crate::helpers::sign_up::sign_up;
 use crate::helpers::validate_email::validate_email;
@@ -29,13 +30,13 @@ enum FormState {
 #[function_component(EmailSignUp)]
 pub fn email_sign_up() -> Html {
     let form_data = use_state(|| SignUpData {
-        email: "".to_string(),
-        name: "".to_string(),
+        email: String::new(),
+        name: String::new(),
     });
 
     let notification_data = use_state(|| NotificationData {
-        message: "".to_string(),
-        color: "".to_string(),
+        message: String::new(),
+        color: String::new(),
         visible: false,
     });
 
@@ -76,7 +77,7 @@ pub fn email_sign_up() -> Html {
             move || {
                 form_state.set(FormState::Loading);
                 notification_data.set(NotificationData {
-                    message: "".to_string(),
+                    message: String::new(),
                     color: "primary".to_string(),
                     visible: false,
                 });
@@ -101,8 +102,8 @@ pub fn email_sign_up() -> Html {
             Callback::from(move |response: Result<String, String>| match response {
                 Ok(_) => {
                     notification_data.set(NotificationData {
-                        message: "".to_string(),
-                        color: "".to_string(),
+                        message: String::new(),
+                        color: String::new(),
                         visible: false,
                     });
                     set_form_complete();
@@ -137,11 +138,60 @@ pub fn email_sign_up() -> Html {
         let notification_data = notification_data.clone();
         Callback::from(move |_| {
             notification_data.set(NotificationData {
-                message: "".to_string(),
-                color: "".to_string(),
+                message: String::new(),
+                color: String::new(),
                 visible: false,
             });
         })
+    };
+
+    let form_body = {
+        move |form_state: &FormState| match form_state {
+            FormState::Ready => { html! {
+                <form>
+                    <div class="field">
+                        <div class="control">
+                            <input
+                                class="input is-medium"
+                                onchange={handle_update_message}
+                                placeholder="Name"
+                                type="text"
+                            />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control has-icons-left has-icons-right">
+                            <input
+                                class="input is-medium"
+                                onchange={handle_update_email}
+                                placeholder="Email"
+                                type="email"
+                            />
+                            <span class="icon is-small is-left p-2">
+                                <img src="images/email.svg" />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="has-text-centered">
+                        <button class="button is-primary is-medium" onclick={handle_submit} type="button" >
+                            {"Sign up"}
+                        </button>
+                    </div>
+                </form>
+            }},
+            FormState::Loading => { html! {
+                <div class="container is-vcentered mb-6" style="display: grid;">
+                    <LoadingSpinner size={100} />
+                </div>
+            }},
+            FormState::Complete => { html! {
+                <div class="container is-vcentered mb-6" style="display: grid;">
+                    <h2 class="title is-2 has-text-centered">
+                        {"Thanks for signing up!"}
+                    </h2>
+                </div>
+            }},
+        }
     };
 
     html!(
@@ -149,38 +199,9 @@ pub fn email_sign_up() -> Html {
             <h4 class="title is-4 has-text-centered">
                 {"Subscribe to email alerts"}
             </h4>
-            <form>
-                <div class="field">
-                    <div class="control">
-                        <input
-                            class="input is-medium"
-                            onchange={handle_update_message}
-                            placeholder="Name"
-                            type="text"
-                        />
-                    </div>
-                </div>
 
-                <div class="field">
-                    <div class="control has-icons-left has-icons-right">
-                        <input
-                            class="input is-medium"
-                            onchange={handle_update_email}
-                            placeholder="Email"
-                            type="email"
-                        />
-                        <span class="icon is-small is-left p-2">
-                            <img src="images/email.svg" />
-                        </span>
-                    </div>
-                </div>
+            {form_body(&form_state)}
 
-                <div class="has-text-centered">
-                    <button class="button is-primary is-medium" onclick={handle_submit} type="button" >
-                        {"Sign up"}
-                    </button>
-                </div>
-            </form>
             if notification_data.visible {
                 <Notification
                     message={notification_data.message.clone()}
