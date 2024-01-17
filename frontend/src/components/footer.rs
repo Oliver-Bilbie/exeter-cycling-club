@@ -25,7 +25,7 @@ pub fn footer() -> Html {
                     <a class="has-text-light" onclick={ go_to_page(navigator.clone(), Route::Contact) }>
                         <p> { "Contact us" } </p>
                     </a>
-                    <a class="has-text-light">
+                    <a class="has-text-light" onclick={ go_to_page(navigator.clone(), Route::SignIn) }>
                         <p> { "Sign in" } </p>
                     </a>
                 </section>
@@ -42,7 +42,6 @@ pub fn footer() -> Html {
                         </a>
                     </span>
                 </div>
-
             </div>
         </footer>
     }

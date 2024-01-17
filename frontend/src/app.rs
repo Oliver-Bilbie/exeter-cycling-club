@@ -10,6 +10,8 @@ use crate::components::not_found::NotFound;
 use crate::components::ride_page::RidePage;
 use crate::components::set_status::SetStatus;
 use crate::components::unsubscribe::Unsubscribe;
+use crate::components::sign_in::SignIn;
+use crate::components::redirect::Redirect;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -21,14 +23,14 @@ pub enum Route {
     RidePage,
     #[at("/contact")]
     Contact,
-    #[at("/signin")]
-    SignIn,
-    #[at("/redirect")]
-    Redirect,
     #[at("/unsubscribe")]
     Unsubscribe,
     #[at("/status")]
     SetStatus,
+    #[at("/signin")]
+    SignIn,
+    #[at("/redirect")]
+    Redirect,
     #[at("/select")]
     RouteSelect,
     #[at("/cancel")]
@@ -46,6 +48,8 @@ fn switch(routes: Route) -> Html {
         Route::RidePage => html! { <RidePage /> },
         Route::SetStatus => html! { <SetStatus /> },
         Route::Unsubscribe => html! { <Unsubscribe /> },
+        Route::SignIn => html! { <SignIn /> },
+        Route::Redirect => html! { <Redirect /> },
         Route::NotFound => html! { <NotFound /> },
         _ => html! { <h1>{ "404" }</h1> },
     }
