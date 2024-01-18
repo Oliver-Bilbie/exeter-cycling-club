@@ -1,6 +1,8 @@
+use bounce::prelude::*;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
+use crate::helpers::auth_state::AuthState;
 use crate::helpers::go_to_page::go_to_page;
 use crate::Route;
 
@@ -11,8 +13,9 @@ pub struct Props {
 
 #[function_component(NavBar)]
 pub fn nav_bar(props: &Props) -> Html {
-    let menu_open = use_state(|| false);
+    let auth_state = use_atom_value::<AuthState>();
     let navigator = use_navigator().unwrap();
+    let menu_open = use_state(|| false);
 
     let nav_styles = match props.is_sticky {
         true => "height: 52px; position: -webkit-sticky; position: sticky; top: 0;",
@@ -22,11 +25,18 @@ pub fn nav_bar(props: &Props) -> Html {
     html! {
         <nav class="navbar" role="navigation" aria-label="main navigation" style={nav_styles}>
             <div class="navbar-brand">
-                if !*menu_open {
-                    <a class="navbar-item pt-0" onclick={ go_to_page(navigator.clone(), Route::Home) }>
-                        <img class="logo-button" src="images/logo.png" style="max-height: 120px; align-self: start;" />
-                    </a>
-                }
+                <a
+                    // For formatting purposes the logo is hidden on small displays when the menu is open.
+                    // This is handled through CSS so that the logo does not disappear when the
+                    // menu is opened and then the screen is resized to a larger size.
+                    class={ match *menu_open {
+                        true => "navbar-item is-hidden-touch pt-0",
+                        false => "navbar-item pt-0",
+                    }}
+                    onclick={ go_to_page(navigator.clone(), Route::Home) }
+                >
+                    <img class="logo-button" src="images/logo.png" style="max-height: 120px; align-self: start;" />
+                </a>
 
                 <a
                     role="button"
@@ -58,7 +68,6 @@ pub fn nav_bar(props: &Props) -> Html {
             </div>
 
             <div
-                id="navbarBasicExample"
                 class={
                     match *menu_open {
                         true => "navbar-menu is-active",
@@ -70,27 +79,46 @@ pub fn nav_bar(props: &Props) -> Html {
                     <a class="navbar-item" onclick={ go_to_page(navigator.clone(), Route::About) }>
                         { "About Us" }
                     </a>
-
                     <a class="navbar-item" onclick={ go_to_page(navigator.clone(), Route::RidePage) }>
                         { "Upcoming Ride" }
                     </a>
-
                     <a class="navbar-item" onclick={ go_to_page(navigator.clone(), Route::Contact) }>
                         { "Contact Us" }
                     </a>
 
+                    {match auth_state.user_data {
+                        Some(ref user_data) => {
+                            if user_data.admin {
+                                html! {
+                                    <a class="navbar-item" onclick={ go_to_page(navigator.clone(), Route::RouteSelect) }>
+                                        { "Set route" }
+                                    </a>
+                                }
+                            } else {
+                                html! {}
+                            }
+                        },
+                        None => html! {}
+                    }}
                 </div>
 
                 <div class="navbar-end">
-                    <div class="navbar-item">
-                        <div class="buttons">
-                            <a class="button is-primary">
-                                <strong>{ "Sign up" }</strong>
-                            </a>
-                            <a class="button is-light">
-                                { "Log in" }
-                            </a>
-                        </div>
+                    <div class="navbar-item is-flex is-flex-direction-row is-align-items-center">
+                        {match auth_state.user_data {
+                            Some(ref user_data) => html! {
+                                <>
+                                    <strong class="is-vcentered m-2">{ user_data.name.clone() }</strong>
+                                    <a class="button is-light m-2" onclick={ go_to_page(navigator.clone(), Route::SignOut) }>
+                                        { "Sign out" }
+                                    </a>
+                                </>
+                            },
+                            None => html! {
+                                <a class="button is-primary" onclick={ go_to_page(navigator.clone(), Route::SignIn) }>
+                                    <strong>{ "Sign in" }</strong>
+                                </a>
+                            }
+                        }}
                     </div>
                 </div>
             </div>
