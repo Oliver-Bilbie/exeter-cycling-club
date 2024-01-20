@@ -2,6 +2,8 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+use crate::constants::application_endpoints::APPLICATION_API_BASE_URL;
+
 #[derive(Serialize, Deserialize)]
 struct SendEmailResponse {
     status: u16,
@@ -15,8 +17,7 @@ pub async fn send_email(contact_email: String, message: String) -> Result<String
 
     let client = Client::new();
     let response = client
-        // TODO: Refactor this to use environment variables
-        .post("https://3u7ify9w39.execute-api.eu-west-1.amazonaws.com/contact")
+        .post(format!("{}/contact", APPLICATION_API_BASE_URL))
         .json(&map)
         .send()
         .await

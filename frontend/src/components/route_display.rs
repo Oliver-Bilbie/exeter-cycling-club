@@ -14,7 +14,13 @@ pub fn route_display(props: &RouteDataProps) -> Html {
         <div class="container columns is-desktop is-vcentered mb-6">
             <div class="column has-text-centered my-4">
                 <h1 class="title is-1">{route_data.name}</h1>
-                {route_data.message.split("$NEWLINE").map(|paragraph| html! {<p class="is-4 m-3">{paragraph}</p>}).collect::<Html>()}
+                {route_data.message.split("$NEWLINE").map(
+                    |paragraph| html! {
+                        <p class="is-4 m-3" style="word-wrap: break-word;">
+                            {paragraph}
+                        </p>
+                    })
+                    .collect::<Html>()}
             </div>
             <div class="column">
                 <iframe

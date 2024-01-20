@@ -2,6 +2,8 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+use crate::constants::application_endpoints::APPLICATION_API_BASE_URL;
+
 #[derive(Serialize, Deserialize, Debug)]
 struct SetRouteResponse {
     status: u16,
@@ -17,9 +19,6 @@ pub struct SetRouteData {
 }
 
 pub async fn set_route(set_route_data: SetRouteData) -> Result<String, String> {
-    // TODO: Refactor this to use environment variables
-    const ROUTE_ENDPOINT: &str = "https://3u7ify9w39.execute-api.eu-west-1.amazonaws.com/route";
-
     let formatted_message = set_route_data.message.replace("\n", "$NEWLINE");
 
     let mut body = HashMap::new();
@@ -29,7 +28,11 @@ pub async fn set_route(set_route_data: SetRouteData) -> Result<String, String> {
     body.insert("message", formatted_message);
 
     let client = Client::new();
-    let response = client.put(ROUTE_ENDPOINT).json(&body).send().await;
+    let response = client
+        .put(format!("{}/route", APPLICATION_API_BASE_URL))
+        .json(&body)
+        .send()
+        .await;
     let response = match response {
         Ok(response) => response,
         Err(_) => return Err("Error sending request".to_string()),

@@ -1,7 +1,7 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::helpers::external_links::{FACEBOOK_URL, STRAVA_URL};
+use crate::constants::external_links::{FACEBOOK_URL, STRAVA_URL};
 use crate::helpers::go_to_page::go_to_page;
 use crate::Route;
 

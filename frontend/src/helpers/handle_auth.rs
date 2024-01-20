@@ -1,6 +1,8 @@
 use reqwest::get;
 use serde::{Deserialize, Serialize};
 
+use crate::constants::application_endpoints::APPLICATION_API_BASE_URL;
+
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct UserData {
     pub id: String,
@@ -16,10 +18,7 @@ struct AuthResponse {
 }
 
 pub async fn handle_auth(auth_code: String) -> Result<UserData, String> {
-    // TODO: Refactor this to use environment variables
-    const AUTH_ENDPOINT: &str = "https://3u7ify9w39.execute-api.eu-west-1.amazonaws.com/auth";
-
-    let response = get(format!("{}/{}", AUTH_ENDPOINT, auth_code)).await;
+    let response = get(format!("{}/auth/{}", APPLICATION_API_BASE_URL, auth_code)).await;
 
     let response = match response {
         Ok(response) => response,

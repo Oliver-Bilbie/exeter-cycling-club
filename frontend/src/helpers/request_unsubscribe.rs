@@ -2,6 +2,8 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+use crate::constants::application_endpoints::APPLICATION_API_BASE_URL;
+
 #[derive(PartialEq, Clone)]
 pub enum UnsubscribeStatus {
     Loading,
@@ -16,15 +18,15 @@ struct UnsubscribeResponse {
 }
 
 pub async fn request_unsubscribe(id: String) -> UnsubscribeStatus {
-    // TODO: Refactor this to use environment variables
-    const UNSUBSCRIBE_ENDPOINT: &str =
-        "https://3u7ify9w39.execute-api.eu-west-1.amazonaws.com/email";
-
     let mut body = HashMap::new();
     body.insert("id", id);
 
     let client = Client::new();
-    let response = client.delete(UNSUBSCRIBE_ENDPOINT).json(&body).send().await;
+    let response = client
+        .delete(format!("{}/email", APPLICATION_API_BASE_URL))
+        .json(&body)
+        .send()
+        .await;
     let response = match response {
         Ok(response) => response,
         Err(_) => return UnsubscribeStatus::Failure,

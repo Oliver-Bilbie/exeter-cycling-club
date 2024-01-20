@@ -1,5 +1,4 @@
 use bounce::prelude::*;
-use log::info;
 use yew::platform::spawn_local;
 use yew::prelude::*;
 

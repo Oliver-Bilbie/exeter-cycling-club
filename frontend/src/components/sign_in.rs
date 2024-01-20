@@ -3,20 +3,24 @@ use yew::prelude::*;
 use crate::components::footer::Footer;
 use crate::components::nav_bar::NavBar;
 use crate::components::page_header::PageHeader;
+use crate::constants::application_endpoints::APPLICATION_URL;
+use crate::constants::strava_endpoints::{STRAVA_CLIENT_ID, STRAVA_OAUTH_ENDPOINT};
 
 #[function_component(SignIn)]
 pub fn set_status() -> Html {
-    const STRAVA_AUTHORIZE_URL: &str = "https://www.strava.com/oauth/authorize";
-    // TODO: Use production URL
-    const REDIRECT_URI: &str = "http://localhost:8080/redirect";
-    const CLIENT_ID: &str = "102998";
+    let redirect_uri = format!("{}/redirect", APPLICATION_URL);
     const SCOPE: &str = "read";
     const RESPONSE_TYPE: &str = "code";
     const APPROVAL_PROMPT: &str = "auto";
 
     let strava_authorize_url_with_params = format!(
         "{}?client_id={}&redirect_uri={}&response_type={}&approval_prompt={}&scope={}",
-        STRAVA_AUTHORIZE_URL, CLIENT_ID, REDIRECT_URI, RESPONSE_TYPE, APPROVAL_PROMPT, SCOPE
+        STRAVA_OAUTH_ENDPOINT,
+        STRAVA_CLIENT_ID,
+        redirect_uri,
+        RESPONSE_TYPE,
+        APPROVAL_PROMPT,
+        SCOPE
     );
 
     html! {

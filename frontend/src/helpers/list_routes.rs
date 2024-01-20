@@ -1,6 +1,8 @@
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
+use crate::constants::strava_endpoints::STRAVA_API_BASE_URL;
+
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 pub struct RouteData {
     pub id_str: String,
@@ -22,8 +24,8 @@ pub async fn list_routes(user_id: String, user_token: String) -> Result<Vec<Rout
 
     loop {
         let endpoint = format!(
-            "https://www.strava.com/api/v3/athletes/{}/routes?page={}",
-            user_id, page_num
+            "{}/athletes/{}/routes?page={}",
+            STRAVA_API_BASE_URL, user_id, page_num
         );
 
         let response = match Client::new()

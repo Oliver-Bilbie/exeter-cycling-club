@@ -1,6 +1,8 @@
 use reqwest::get;
 use serde::{Deserialize, Serialize};
 
+use crate::constants::application_endpoints::ROUTE_DATA_ENDPOINT;
+
 #[derive(PartialEq, Clone, Debug)]
 pub enum RouteStatus {
     Ready(RouteData),
@@ -43,8 +45,6 @@ struct RouteDataResponse {
 }
 
 pub async fn get_route() -> RouteStatus {
-    const ROUTE_DATA_ENDPOINT: &str =
-        "https://s3.eu-west-1.amazonaws.com/eccv2.oliver-bilbie.co.uk/routeData.json";
     let response = match get(ROUTE_DATA_ENDPOINT).await {
         Ok(response) => response,
         Err(_) => {
