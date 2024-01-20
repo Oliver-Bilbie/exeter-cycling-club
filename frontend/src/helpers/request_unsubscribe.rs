@@ -17,17 +17,14 @@ struct UnsubscribeResponse {
 
 pub async fn request_unsubscribe(id: String) -> UnsubscribeStatus {
     // TODO: Refactor this to use environment variables
-    const UNSUBSCRIBE_ENDPOINT: &str = "https://3u7ify9w39.execute-api.eu-west-1.amazonaws.com/email";
+    const UNSUBSCRIBE_ENDPOINT: &str =
+        "https://3u7ify9w39.execute-api.eu-west-1.amazonaws.com/email";
 
     let mut body = HashMap::new();
     body.insert("id", id);
 
     let client = Client::new();
-    let response = client
-        .delete(UNSUBSCRIBE_ENDPOINT)
-        .json(&body)
-        .send()
-        .await;
+    let response = client.delete(UNSUBSCRIBE_ENDPOINT).json(&body).send().await;
     let response = match response {
         Ok(response) => response,
         Err(_) => return UnsubscribeStatus::Failure,
@@ -35,11 +32,10 @@ pub async fn request_unsubscribe(id: String) -> UnsubscribeStatus {
 
     let json_response: Result<UnsubscribeResponse, _> = response.json().await;
     match json_response {
-        Ok(resp) => {
-            match resp.status {
-                200 => UnsubscribeStatus::Success,
-                _ => UnsubscribeStatus::Failure,
-            }},
+        Ok(resp) => match resp.status {
+            200 => UnsubscribeStatus::Success,
+            _ => UnsubscribeStatus::Failure,
+        },
         Err(_) => UnsubscribeStatus::Failure,
     }
 }

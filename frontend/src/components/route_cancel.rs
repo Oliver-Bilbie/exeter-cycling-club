@@ -1,5 +1,5 @@
-use yew::prelude::*;
 use yew::platform::spawn_local;
+use yew::prelude::*;
 
 use crate::components::email_sign_up::EmailSignUp;
 use crate::components::footer::Footer;
@@ -30,15 +30,21 @@ pub fn route_cancel() -> Html {
 
     let page_body = {
         move |route_status: &RouteStatus| match route_status {
-            RouteStatus::Ready(route_data) => html! {<RouteDisplay route_data={route_data.clone()} />},
-            RouteStatus::Unavailable(message) => html! { <NoRouteDisplay message={message.clone()} /> },
-            RouteStatus::Cancelled(message) => html! { <NoRouteDisplay message={message.clone()} /> },
+            RouteStatus::Ready(route_data) => {
+                html! {<RouteDisplay route_data={route_data.clone()} />}
+            }
+            RouteStatus::Unavailable(message) => {
+                html! { <NoRouteDisplay message={message.clone()} /> }
+            }
+            RouteStatus::Cancelled(message) => {
+                html! { <NoRouteDisplay message={message.clone()} /> }
+            }
             RouteStatus::Error(message) => html! { <NoRouteDisplay message={message.clone()} /> },
-            RouteStatus::Loading => html! { 
+            RouteStatus::Loading => html! {
                 <div class="container is-vcentered mb-6" style="display: grid;">
                     <LoadingSpinner size={200} />
                 </div>
-            }
+            },
         }
     };
 

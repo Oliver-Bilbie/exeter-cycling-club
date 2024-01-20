@@ -60,6 +60,19 @@ $strava: #FC4C02;
   top: 0;
 }
 
+// Dynamic grid for containing route cards
+.route-grid {
+  display: grid;
+  gap: 20px;
+  justify-content: center;
+  grid-template-columns: repeat(auto-fit, min(350px, 90vw));
+}
+
+.route-card-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0.75rem #bfbfbf;
+}
+
 // Spinning animation for loading icons
 .spin {
   animation: spin 2s linear infinite;

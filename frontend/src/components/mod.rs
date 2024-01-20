@@ -1,4 +1,5 @@
 pub mod about_section;
+pub mod confirm_route;
 pub mod contact_form;
 pub mod contact_us;
 pub mod email_sign_up;
@@ -16,6 +17,7 @@ pub mod ride_page;
 pub mod route_cancel;
 pub mod route_card;
 pub mod route_display;
+pub mod route_form;
 pub mod route_select;
 pub mod set_status;
 pub mod sign_in;

@@ -147,50 +147,59 @@ pub fn email_sign_up() -> Html {
 
     let form_body = {
         move |form_state: &FormState| match form_state {
-            FormState::Ready => { html! {
-                <form>
-                    <div class="field">
-                        <div class="control">
-                            <input
-                                class="input is-medium"
-                                onchange={handle_update_message}
-                                placeholder="Name"
-                                type="text"
-                            />
+            FormState::Ready => {
+                html! {
+                    <form>
+                        <div class="field">
+                            <div class="control has-icons-left has-icons-right">
+                                <input
+                                    class="input is-medium"
+                                    onchange={handle_update_message}
+                                    placeholder="Name"
+                                    type="text"
+                                />
+                                <span class="icon is-small is-left p-2">
+                                    <img src="/images/user_icon.svg" />
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="field">
-                        <div class="control has-icons-left has-icons-right">
-                            <input
-                                class="input is-medium"
-                                onchange={handle_update_email}
-                                placeholder="Email"
-                                type="email"
-                            />
-                            <span class="icon is-small is-left p-2">
-                                <img src="images/email.svg" />
-                            </span>
+                        <div class="field">
+                            <div class="control has-icons-left has-icons-right">
+                                <input
+                                    class="input is-medium"
+                                    onchange={handle_update_email}
+                                    placeholder="Email"
+                                    type="email"
+                                />
+                                <span class="icon is-small is-left p-2">
+                                    <img src="/images/email.svg" />
+                                </span>
+                            </div>
                         </div>
+                        <div class="has-text-centered">
+                            <button class="button is-primary is-medium" onclick={handle_submit} type="button" >
+                                {"Sign up"}
+                            </button>
+                        </div>
+                    </form>
+                }
+            }
+            FormState::Loading => {
+                html! {
+                    <div class="container is-vcentered mb-6" style="display: grid;">
+                        <LoadingSpinner size={100} />
                     </div>
-                    <div class="has-text-centered">
-                        <button class="button is-primary is-medium" onclick={handle_submit} type="button" >
-                            {"Sign up"}
-                        </button>
+                }
+            }
+            FormState::Complete => {
+                html! {
+                    <div class="container is-vcentered mb-6" style="display: grid;">
+                        <h2 class="title is-2 has-text-centered">
+                            {"Thanks for signing up!"}
+                        </h2>
                     </div>
-                </form>
-            }},
-            FormState::Loading => { html! {
-                <div class="container is-vcentered mb-6" style="display: grid;">
-                    <LoadingSpinner size={100} />
-                </div>
-            }},
-            FormState::Complete => { html! {
-                <div class="container is-vcentered mb-6" style="display: grid;">
-                    <h2 class="title is-2 has-text-centered">
-                        {"Thanks for signing up!"}
-                    </h2>
-                </div>
-            }},
+                }
+            }
         }
     };
 

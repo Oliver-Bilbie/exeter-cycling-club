@@ -27,7 +27,9 @@ impl RouteStatus {
             }),
             "unavailable" => RouteStatus::Unavailable(response.message),
             "cancelled" => RouteStatus::Cancelled(response.message),
-            _ => RouteStatus::Error("Unexpected response from server.\nPlease try again later.".to_string()),
+            _ => RouteStatus::Error(
+                "Unexpected response from server.\nPlease try again later.".to_string(),
+            ),
         }
     }
 }
@@ -41,17 +43,22 @@ struct RouteDataResponse {
 }
 
 pub async fn get_route() -> RouteStatus {
-    const ROUTE_DATA_ENDPOINT: &str = "https://s3.eu-west-1.amazonaws.com/eccv2.oliver-bilbie.co.uk/routeData.json";
+    const ROUTE_DATA_ENDPOINT: &str =
+        "https://s3.eu-west-1.amazonaws.com/eccv2.oliver-bilbie.co.uk/routeData.json";
     let response = match get(ROUTE_DATA_ENDPOINT).await {
         Ok(response) => response,
-        Err(_) => return RouteStatus::Error("An error occurred while loading the route.\nPlease try again later.".to_string())
+        Err(_) => {
+            return RouteStatus::Error(
+                "An error occurred while loading the route.\nPlease try again later.".to_string(),
+            )
+        }
     };
 
     let json_response: Result<RouteDataResponse, _> = response.json().await;
     match json_response {
-        Ok(route_data_response) => {
-            RouteStatus::from_route_data_response(route_data_response)
-        },
-        Err(_) => RouteStatus::Error("Unexpected response from server.\nPlease try again later.".to_string())
+        Ok(route_data_response) => RouteStatus::from_route_data_response(route_data_response),
+        Err(_) => RouteStatus::Error(
+            "Unexpected response from server.\nPlease try again later.".to_string(),
+        ),
     }
 }

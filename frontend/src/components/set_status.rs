@@ -1,7 +1,7 @@
-use yew::prelude::*;
-use yew::platform::spawn_local;
-use yew_router::prelude::*;
 use serde::{Deserialize, Serialize};
+use yew::platform::spawn_local;
+use yew::prelude::*;
+use yew_router::prelude::*;
 
 use crate::components::footer::Footer;
 use crate::components::loading_spinner::LoadingSpinner;
@@ -19,10 +19,16 @@ struct SetStatusQuery {
 pub fn set_status() -> Html {
     let location = use_location();
     let status_query = match location {
-        Some(location) => location.query::<SetStatusQuery>().unwrap_or(
-            SetStatusQuery { id: String::new(), status: String::new() }
-        ),
-        None => SetStatusQuery { id: String::new(), status: String::new() },
+        Some(location) => location
+            .query::<SetStatusQuery>()
+            .unwrap_or(SetStatusQuery {
+                id: String::new(),
+                status: String::new(),
+            }),
+        None => SetStatusQuery {
+            id: String::new(),
+            status: String::new(),
+        },
     };
 
     let request_status = use_state_eq(|| AttendanceStatus::Loading);
@@ -64,11 +70,11 @@ pub fn set_status() -> Html {
                     {"An error occurred while trying to update your status. Please try again later, or contact us if this persists."}
                 </h2>
             },
-            AttendanceStatus::Loading => html! { 
+            AttendanceStatus::Loading => html! {
                 <div class="container is-vcentered mb-6" style="display: grid;">
                     <LoadingSpinner size={200} />
                 </div>
-            }
+            },
         }
     };
 

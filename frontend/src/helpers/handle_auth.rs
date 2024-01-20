@@ -28,11 +28,9 @@ pub async fn handle_auth(auth_code: String) -> Result<UserData, String> {
 
     let json_response: Result<AuthResponse, _> = response.json().await;
     match json_response {
-        Ok(auth_response) => {
-            match auth_response.status {
-                200 => Ok(auth_response.body),
-                _ => return Err(String::from("Authentication failed.")),
-            }
+        Ok(auth_response) => match auth_response.status {
+            200 => Ok(auth_response.body),
+            _ => return Err(String::from("Authentication failed.")),
         },
         Err(_) => Err(String::from("Unexpected response from server.")),
     }

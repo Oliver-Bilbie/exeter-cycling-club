@@ -1,7 +1,7 @@
-use yew::prelude::*;
-use yew::platform::spawn_local;
-use yew_router::prelude::*;
 use serde::{Deserialize, Serialize};
+use yew::platform::spawn_local;
+use yew::prelude::*;
+use yew_router::prelude::*;
 
 use crate::components::footer::Footer;
 use crate::components::loading_spinner::LoadingSpinner;
@@ -18,7 +18,9 @@ struct UnsubscribeQuery {
 pub fn unsubscribe() -> Html {
     let location = use_location();
     let unsubscribe_id = match location {
-        Some(location) => location.query::<UnsubscribeQuery>().unwrap_or(UnsubscribeQuery { id: String::new() }),
+        Some(location) => location
+            .query::<UnsubscribeQuery>()
+            .unwrap_or(UnsubscribeQuery { id: String::new() }),
         None => UnsubscribeQuery { id: String::new() },
     };
 
@@ -55,11 +57,11 @@ pub fn unsubscribe() -> Html {
                     {"An error occurred while trying to unsubscribe. Please try again later, or contact us if this persists."}
                 </h2>
             },
-            UnsubscribeStatus::Loading => html! { 
+            UnsubscribeStatus::Loading => html! {
                 <div class="container is-vcentered mb-6" style="display: grid;">
                     <LoadingSpinner size={200} />
                 </div>
-            }
+            },
         }
     };
 

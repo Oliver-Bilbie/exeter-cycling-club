@@ -12,9 +12,7 @@ pub fn sign_out() -> Html {
     let navigator = use_navigator().unwrap();
 
     use_effect(move || {
-        auth_setter(AuthState {
-            user_data: None,
-        });
+        auth_setter(AuthState { user_data: None });
         navigator.push(&Route::Home);
     });
 

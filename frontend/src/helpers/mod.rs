@@ -8,5 +8,6 @@ pub mod list_routes;
 pub mod put_status;
 pub mod request_unsubscribe;
 pub mod send_email;
+pub mod set_route;
 pub mod sign_up;
 pub mod validate_email;

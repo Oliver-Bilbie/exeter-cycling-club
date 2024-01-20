@@ -24,11 +24,7 @@ pub async fn put_status(id: String, status: String) -> AttendanceStatus {
     body.insert("status", status);
 
     let client = Client::new();
-    let response = client
-        .put(STATUS_ENDPOINT)
-        .json(&body)
-        .send()
-        .await;
+    let response = client.put(STATUS_ENDPOINT).json(&body).send().await;
     let response = match response {
         Ok(response) => response,
         Err(_) => return AttendanceStatus::Failure,
@@ -36,11 +32,10 @@ pub async fn put_status(id: String, status: String) -> AttendanceStatus {
 
     let json_response: Result<PutStatusResponse, _> = response.json().await;
     match json_response {
-        Ok(resp) => {
-            match resp.status {
-                200 => AttendanceStatus::Success,
-                _ => AttendanceStatus::Failure,
-            }},
+        Ok(resp) => match resp.status {
+            200 => AttendanceStatus::Success,
+            _ => AttendanceStatus::Failure,
+        },
         Err(_) => AttendanceStatus::Failure,
     }
 }
