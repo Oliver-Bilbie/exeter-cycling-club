@@ -18,6 +18,7 @@ $strava: #FC4C02;
 // Responsive image background to fill the parent container
 .fullheight-bg {
   background-image: url("images/header1.jpg");
+  background-attachment: fixed;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -58,6 +59,19 @@ $strava: #FC4C02;
   position: -webkit-sticky; /* Safari */
   position: sticky;
   top: 0;
+}
+
+// Dynamic grid for containing route cards
+.route-grid {
+  display: grid;
+  gap: 20px;
+  justify-content: center;
+  grid-template-columns: repeat(auto-fit, min(350px, 90vw));
+}
+
+.route-card-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0.75rem #bfbfbf;
 }
 
 // Spinning animation for loading icons
