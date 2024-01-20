@@ -19,9 +19,10 @@ pub fn about_section(props: &AboutSectionProps) -> Html {
         true => "texture-light",
         false => "texture-dark",
     };
+    let id = props.content.title.replace(" ", "-").to_lowercase();
 
     html! {
-        <section class={format!("section {}", texture)}>
+        <section id={id} class={format!("section {}", texture)}>
             <div class="container columns is-desktop">
                 // We only want to reverse in the left-right direction, not in the
                 // up-down direction which will be used on smaller displays.

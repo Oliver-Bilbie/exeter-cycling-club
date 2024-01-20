@@ -1,3 +1,4 @@
+use log::info;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
@@ -18,10 +19,18 @@ pub fn home(props: &HomeProps) -> Html {
     let header_visible = use_state(|| props.header_visible);
     let navigator = use_navigator().unwrap();
 
+    let scroll_to_about_us = |_| {
+        let document = web_sys::window().unwrap().document().unwrap();
+        let about_us = document.get_element_by_id("about-us").unwrap();
+        about_us.scroll_into_view_with_scroll_into_view_options(
+            &web_sys::ScrollIntoViewOptions::new().behavior(web_sys::ScrollBehavior::Smooth),
+        );
+    };
+
     html! {
-        <div>
+        <>
             <section class="is-fullheight">
-                <NavBar is_sticky={true} />
+                <NavBar is_sticky={*header_visible} />
 
                 if *header_visible {
                     <section class="fullheight-bg hero is-fullheight-with-navbar" style="overflow: hidden;">
@@ -36,9 +45,7 @@ pub fn home(props: &HomeProps) -> Html {
                                 <div class="block">
                                     <button
                                         class="button is-primary m-2"
-                                        onclick={
-                                            move |_| header_visible.set(false)
-                                        }
+                                        onclick={ scroll_to_about_us }
                                     >
                                         { "About Us" }
                                     </button>
@@ -62,6 +69,6 @@ pub fn home(props: &HomeProps) -> Html {
             <AboutSection content={RIDING_GUIDELINES} image="images/home3.jpg" reverse={true} />
 
             <Footer />
-        </div>
+        </>
     }
 }
