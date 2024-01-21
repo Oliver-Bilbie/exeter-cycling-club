@@ -1,6 +1,8 @@
+use wasm_bindgen::JsCast;
 use bounce::prelude::*;
 use yew::platform::spawn_local;
 use yew::prelude::*;
+use web_sys::{EventTarget, HtmlInputElement};
 
 use crate::components::confirm_route::{ConfirmRoute, ConfirmRouteProps};
 use crate::components::footer::Footer;
@@ -24,6 +26,7 @@ enum FormStatus {
 pub fn route_select() -> Html {
     let auth_state = use_atom_value::<AuthState>();
     let form_status = use_state_eq(|| FormStatus::Loading);
+    let search_value = use_state_eq(String::new);
 
     {
         let auth_state = auth_state.clone();
@@ -52,6 +55,17 @@ pub fn route_select() -> Html {
         });
     }
 
+    let handle_search = {
+        let search_value = search_value.clone();
+        Callback::from(move |e: Event| {
+            let target: Option<EventTarget> = e.target();
+            let user_input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
+            if let Some(input) = user_input {
+                search_value.set(input.value());
+            }
+        })
+    };
+
     let handle_select_route = |route_id: String, route_name: String| {
         let route_id = route_id.clone();
         let route_name = route_name.clone();
@@ -67,14 +81,30 @@ pub fn route_select() -> Html {
     let page_body = {
         move |form_status: &FormStatus| match form_status {
             FormStatus::Ready(route_data) => html! {
-                <div class="route-grid">
-                {
-                    route_data.iter().map(|route| html! {
-                        <a class="route-card-button" onclick={handle_select_route(route.id_str.clone(), route.name.clone())}>
-                            <RouteCard route_data={route.clone()} />
-                        </a>
-                    }).collect::<Html>()
-                }
+                <div>
+                    <div class="field container pb-5" style="max-width: 350px;">
+                        <label class="label is-size-5">
+                            {"Search"}
+                        </label>
+                        <div class="control">
+                            <input
+                                class="input is-medium"
+                                onchange={handle_search}
+                                placeholder="Route name"
+                                type="text"
+                            />
+                        </div>
+                    </div>
+                    <div class="route-grid">
+                        {route_data
+                            .iter()
+                            .filter(|route| {route.name.to_lowercase().contains(&search_value.to_lowercase())})
+                            .map(|route| html! {
+                                <a class="route-card-button" onclick={handle_select_route(route.id_str.clone(), route.name.clone())}>
+                                    <RouteCard route_data={route.clone()} />
+                                </a>
+                            }).collect::<Html>()}
+                    </div>
                 </div>
             },
             FormStatus::Confirm(route_info) => {

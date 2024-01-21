@@ -63,6 +63,7 @@ pub fn confirm_route(props: &ConfirmRouteProps) -> Html {
                     set_form_complete();
                 }
                 Err(_) => {
+                    // TODO: Show error message
                     set_form_ready();
                 }
             });
