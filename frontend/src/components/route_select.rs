@@ -142,7 +142,7 @@ pub fn route_select() -> Html {
     html! {
         <section class="hero is-fullheight">
             <NavBar is_sticky={false} />
-            <PageHeader title="Upcoming ride" />
+            <PageHeader title="Set route" />
 
             <section class="section texture-light pt-8 is-flex is-flex-grow-5 is-flex-direction-column is-align-content-center">
                 {page_body(&form_status)}

@@ -124,7 +124,7 @@ pub fn route_cancel() -> Html {
     html! {
         <section class="hero is-fullheight">
             <NavBar is_sticky={false} />
-            <PageHeader title="Upcoming ride" />
+            <PageHeader title="Cancel ride" />
 
             <div class="hero texture-light is-flex-grow-5" style="min-height: 600px;">
                 <div class="container">
