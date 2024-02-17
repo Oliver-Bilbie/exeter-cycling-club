@@ -4,7 +4,6 @@ This directory contains the source code for the frontend of the Exeter Cycling C
 The interface is written in Rust using the Yew framework.
 
 ### To Do
-- Add the ability to cancel routes
 - Add "home" buttons to screens which display after API calls
 - Add meta tags using the helmet API
 - Only read HTML form state on submit

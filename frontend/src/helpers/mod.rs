@@ -1,5 +1,6 @@
 pub mod about_us;
 pub mod auth_state;
+pub mod cancel_route;
 pub mod get_route;
 pub mod go_to_page;
 pub mod handle_auth;

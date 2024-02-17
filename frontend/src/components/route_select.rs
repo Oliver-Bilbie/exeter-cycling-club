@@ -2,6 +2,7 @@ use wasm_bindgen::JsCast;
 use bounce::prelude::*;
 use yew::platform::spawn_local;
 use yew::prelude::*;
+use yew_router::prelude::*;
 use web_sys::{EventTarget, HtmlInputElement};
 
 use crate::components::confirm_route::{ConfirmRoute, ConfirmRouteProps};
@@ -9,10 +10,12 @@ use crate::components::footer::Footer;
 use crate::components::loading_spinner::LoadingSpinner;
 use crate::components::nav_bar::NavBar;
 use crate::components::no_route_display::NoRouteDisplay;
+use crate::components::notification::NotificationState;
 use crate::components::page_header::PageHeader;
 use crate::components::route_card::RouteCard;
 use crate::helpers::auth_state::AuthState;
 use crate::helpers::list_routes::{list_routes, RouteData};
+use crate::Route;
 
 #[derive(PartialEq)]
 enum FormStatus {
@@ -24,7 +27,9 @@ enum FormStatus {
 
 #[function_component(RouteSelect)]
 pub fn route_select() -> Html {
+    let dispatch_notification = use_atom_setter::<NotificationState>();
     let auth_state = use_atom_value::<AuthState>();
+    let navigator = use_navigator().unwrap();
     let form_status = use_state_eq(|| FormStatus::Loading);
     let search_value = use_state_eq(String::new);
 
@@ -42,6 +47,16 @@ pub fn route_select() -> Html {
         // Load the route data only once
         use_effect_with(auth_state.clone(), move |_| match auth_state.user_data {
             Some(ref user_data) => {
+                let is_admin = user_data.admin;
+                if !is_admin {
+                    dispatch_notification(NotificationState {
+                        message: "You are not authorized to set routes.".to_string(),
+                        color: "primary".to_string(),
+                        visible: true,
+                    });
+                    navigator.push(&Route::Home);
+                }
+
                 let id = user_data.id.clone();
                 let access_token = user_data.access_token.clone();
                 spawn_local(async move {
@@ -49,9 +64,14 @@ pub fn route_select() -> Html {
                     status_callback.emit(resp);
                 });
             }
-            None => status_callback.emit(Err(
-                "You need to log in before setting a new route.".to_string()
-            )),
+            None => {
+                dispatch_notification(NotificationState {
+                    message: "Please sign in before attempting to set a route.".to_string(),
+                    color: "primary".to_string(),
+                    visible: true,
+                });
+                navigator.push(&Route::Home);
+            }
         });
     }
 

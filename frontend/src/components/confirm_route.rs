@@ -3,6 +3,7 @@ use yew::platform::spawn_local;
 use yew::prelude::*;
 
 use crate::components::loading_spinner::LoadingSpinner;
+use crate::components::notification::NotificationState;
 use crate::components::route_form::RouteForm;
 use crate::helpers::auth_state::AuthState;
 use crate::helpers::set_route::{set_route, SetRouteData};
@@ -22,7 +23,9 @@ pub struct ConfirmRouteProps {
 
 #[function_component(ConfirmRoute)]
 pub fn confirm_route(props: &ConfirmRouteProps) -> Html {
+    let dispatch_notification = use_atom_setter::<NotificationState>();
     let auth_state = use_atom_value::<AuthState>();
+
     let access_token = match auth_state.user_data {
         Some(ref user_data) => user_data.access_token.clone(),
         None => String::new(),
@@ -60,10 +63,19 @@ pub fn confirm_route(props: &ConfirmRouteProps) -> Html {
         let notification_cb =
             Callback::from(move |response: Result<String, String>| match response {
                 Ok(_) => {
+                    dispatch_notification(NotificationState {
+                        message: String::new(),
+                        color: "primary".to_string(),
+                        visible: false,
+                    });
                     set_form_complete();
                 }
-                Err(_) => {
-                    // TODO: Show error message
+                Err(message) => {
+                    dispatch_notification(NotificationState {
+                        message,
+                        color: "primary".to_string(),
+                        visible: true,
+                    });
                     set_form_ready();
                 }
             });

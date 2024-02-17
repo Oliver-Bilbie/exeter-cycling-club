@@ -9,7 +9,7 @@ pub struct NoRouteDisplayProps {
 pub fn no_route_display(props: &NoRouteDisplayProps) -> Html {
     html! {
         <div class="container is-vcentered mb-6">
-            {props.message.split("\n").map(|paragraph| html! {
+            {props.message.split("$NEWLINE").map(|paragraph| html! {
                 <h2 class="title is-2 has-text-centered">
                     {paragraph}
                 </h2>

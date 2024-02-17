@@ -95,9 +95,14 @@ pub fn nav_bar(props: &Props) -> Html {
                         Some(ref user_data) => {
                             if user_data.admin {
                                 html! {
-                                    <a class="navbar-item" onclick={ go_to_page(navigator.clone(), Route::RouteSelect) }>
-                                        { "Set route" }
-                                    </a>
+                                    <>
+                                        <a class="navbar-item" onclick={ go_to_page(navigator.clone(), Route::RouteSelect) }>
+                                            { "Set route" }
+                                        </a>
+                                        <a class="navbar-item" onclick={ go_to_page(navigator.clone(), Route::RouteCancel) }>
+                                            { "Cancel ride" }
+                                        </a>
+                                    </>
                                 }
                             } else {
                                 html! {}

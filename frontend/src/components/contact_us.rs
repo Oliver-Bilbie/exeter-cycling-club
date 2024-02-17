@@ -11,13 +11,6 @@ use crate::helpers::send_email::send_email;
 use crate::helpers::validate_email::validate_email;
 use crate::components::notification::NotificationState;
 
-#[derive(Clone)]
-struct NotificationData {
-    message: String,
-    color: String,
-    visible: bool,
-}
-
 #[derive(PartialEq)]
 enum FormState {
     Ready,
