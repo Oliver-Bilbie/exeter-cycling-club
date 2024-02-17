@@ -14,12 +14,10 @@ required-features = ["ssr"]
 [dependencies]
 yew = "0.21.0"
 exeter_cycling_club = { path = "../frontend" }
-log = "0.4"
 futures = { version = "0.3", features = ["std"], default-features = false }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen-futures = "0.4"
-wasm-logger = "0.2"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tokio = { version = "1.33.0", features = ["full"] }

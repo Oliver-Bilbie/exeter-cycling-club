@@ -65,7 +65,6 @@ fn switch(routes: Route) -> Html {
 
 #[function_component(App)]
 pub fn app() -> Html {
-    wasm_logger::init(wasm_logger::Config::default());
     html! {
         <BrowserRouter>
             <BounceRoot>
