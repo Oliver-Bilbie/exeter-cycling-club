@@ -20,8 +20,8 @@ pub fn notification() -> Html {
             Callback::from(move |_| {
                 notification_state.set(NotificationState {
                     visible: false,
-                    message: "".to_string(),
-                    color: "".to_string(),
+                    message: String::new(),
+                    color: String::new(),
                 });
             })
         };

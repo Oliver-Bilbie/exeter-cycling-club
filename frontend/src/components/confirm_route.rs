@@ -1,19 +1,14 @@
 use bounce::prelude::*;
 use yew::platform::spawn_local;
 use yew::prelude::*;
+use yew_router::prelude::*;
 
 use crate::components::loading_spinner::LoadingSpinner;
 use crate::components::notification::NotificationState;
 use crate::components::route_form::RouteForm;
 use crate::helpers::auth_state::AuthState;
 use crate::helpers::set_route::{set_route, SetRouteData};
-
-#[derive(PartialEq)]
-enum FormState {
-    Ready,
-    Loading,
-    Complete,
-}
+use crate::Route;
 
 #[derive(Properties, PartialEq)]
 pub struct ConfirmRouteProps {
@@ -25,6 +20,7 @@ pub struct ConfirmRouteProps {
 pub fn confirm_route(props: &ConfirmRouteProps) -> Html {
     let dispatch_notification = use_atom_setter::<NotificationState>();
     let auth_state = use_atom_value::<AuthState>();
+    let navigator = use_navigator().unwrap();
 
     let access_token = match auth_state.user_data {
         Some(ref user_data) => user_data.access_token.clone(),
@@ -37,20 +33,28 @@ pub fn confirm_route(props: &ConfirmRouteProps) -> Html {
         message: String::new(),
         access_token,
     });
-    let form_state = use_state_eq(|| FormState::Ready);
+    let is_loading = use_state_eq(|| false);
 
     let handle_submit = {
         let set_form_loading = {
-            let form_state = form_state.clone();
-            move || form_state.set(FormState::Loading)
+            let is_loading = is_loading.clone();
+            move || is_loading.set(true)
         };
         let set_form_complete = {
-            let form_state = form_state.clone();
-            move || form_state.set(FormState::Complete)
+            let dispatch_notification = dispatch_notification.clone();
+            let navigator = navigator.clone();
+            move || {
+                dispatch_notification(NotificationState {
+                    message: "Route set successfully".to_string(),
+                    color: "success".to_string(),
+                    visible: true,
+                });
+                navigator.push(&Route::Home);
+            }
         };
         let set_form_ready = {
-            let form_state = form_state.clone();
-            move || form_state.set(FormState::Ready)
+            let is_loading = is_loading.clone();
+            move || is_loading.set(false)
         };
 
         let set_route_data = SetRouteData {
@@ -95,21 +99,16 @@ pub fn confirm_route(props: &ConfirmRouteProps) -> Html {
         <div class="hero texture-light is-flex-grow-5" style="min-height: 600px;">
             <div class="container">
                 <div class="my-6 mx-4">
-                    {match *form_state {
-                        FormState::Ready => html!(
+                    {match *is_loading {
+                        true => html! {
+                            <LoadingSpinner size={200} />
+                        },
+                        false => html!(
                             <RouteForm
                                 route_data={set_route_data.clone()}
                                 on_submit={handle_submit}
                             />
                         ),
-                        FormState::Loading => html! {
-                            <LoadingSpinner size={128} />
-                        },
-                        FormState::Complete => html! {
-                            <h2 class="title is-2 has-text-centered">
-                                {"Route set successfully"}
-                            </h2>
-                        },
                     }}
                 </div>
             </div>

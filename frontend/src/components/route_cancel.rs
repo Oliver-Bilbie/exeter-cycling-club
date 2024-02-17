@@ -13,13 +13,6 @@ use crate::helpers::auth_state::AuthState;
 use crate::helpers::cancel_route::{cancel_route, CancelRouteData};
 use crate::Route;
 
-#[derive(PartialEq)]
-enum FormState {
-    Ready,
-    Loading,
-    Complete,
-}
-
 #[function_component(RouteCancel)]
 pub fn route_cancel() -> Html {
     let dispatch_notification = use_atom_setter::<NotificationState>();
@@ -32,12 +25,13 @@ pub fn route_cancel() -> Html {
     };
 
     let cancellation_message = use_state(|| String::new());
-    let form_status = use_state_eq(|| FormState::Ready);
+    let is_loading = use_state_eq(|| false);
 
     // Redirect unauthorized users to the home page
     {
         let dispatch_notification = dispatch_notification.clone();
         let auth_state = auth_state.clone();
+        let navigator = navigator.clone();
         use_effect_with(auth_state.clone(), move |_| match auth_state.user_data {
             Some(ref user_data) => {
                 let is_admin = user_data.admin;
@@ -63,10 +57,10 @@ pub fn route_cancel() -> Html {
 
     let handle_submit = {
         let set_form_loading = {
-            let form_state = form_status.clone();
+            let is_loading = is_loading.clone();
             let dispatch_notification = dispatch_notification.clone();
             move || {
-                form_state.set(FormState::Loading);
+                is_loading.set(true);
                 dispatch_notification(NotificationState {
                     message: String::new(),
                     color: "primary".to_string(),
@@ -75,12 +69,20 @@ pub fn route_cancel() -> Html {
             }
         };
         let set_form_complete = {
-            let form_state = form_status.clone();
-            move || form_state.set(FormState::Complete)
+            let dispatch_notification = dispatch_notification.clone();
+            let navigator = navigator.clone();
+            move || {
+                dispatch_notification(NotificationState {
+                    message: "Route set successfully".to_string(),
+                    color: "success".to_string(),
+                    visible: true,
+                });
+                navigator.push(&Route::Home);
+            }
         };
         let set_form_ready = {
-            let form_state = form_status.clone();
-            move || form_state.set(FormState::Ready)
+            let is_loading = is_loading.clone();
+            move || is_loading.set(false)
         };
 
         let notification_cb =
@@ -127,18 +129,11 @@ pub fn route_cancel() -> Html {
             <div class="hero texture-light is-flex-grow-5" style="min-height: 600px;">
                 <div class="container">
                     <div class="my-6 mx-4">
-                        {match *form_status {
-                            FormState::Ready => html!(
+                        {match *is_loading {
+                            true => html! { <LoadingSpinner size={200} /> },
+                            false => html!(
                                 <CancelForm cancellation_message={cancellation_message} on_submit={handle_submit} />
                             ),
-                            FormState::Loading => html! {
-                                <LoadingSpinner size={128} />
-                            },
-                            FormState::Complete => html! {
-                                <h2 class="title is-2 has-text-centered">
-                                    {"Route cancelled successfully"}
-                                </h2>
-                            },
                         }}
                     </div>
                 </div>
