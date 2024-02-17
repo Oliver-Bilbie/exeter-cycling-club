@@ -6,6 +6,8 @@ use crate::helpers::auth_state::AuthState;
 use crate::helpers::go_to_page::go_to_page;
 use crate::Route;
 
+pub const NAVBAR_HEIGHT: f64 = 52.0;
+
 #[derive(Properties, PartialEq)]
 pub struct Props {
     pub is_sticky: bool,
@@ -18,8 +20,11 @@ pub fn nav_bar(props: &Props) -> Html {
     let menu_open = use_state(|| false);
 
     let nav_styles = match props.is_sticky {
-        true => "height: 52px; position: -webkit-sticky; position: sticky; top: 0;",
-        false => "height: 52px;",
+        true => format!(
+            "height: {}px; position: -webkit-sticky; position: sticky; top: 0;",
+            NAVBAR_HEIGHT
+        ),
+        false => format!("height: {}px;", NAVBAR_HEIGHT),
     };
 
     html! {

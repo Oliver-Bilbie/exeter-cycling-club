@@ -3,7 +3,7 @@ use yew_router::prelude::*;
 
 use crate::components::about_section::AboutSection;
 use crate::components::footer::Footer;
-use crate::components::nav_bar::NavBar;
+use crate::components::nav_bar::{NavBar, NAVBAR_HEIGHT};
 use crate::helpers::about_us::*;
 use crate::helpers::go_to_page::go_to_page;
 use crate::Route;
@@ -19,10 +19,17 @@ pub fn home(props: &HomeProps) -> Html {
     let navigator = use_navigator().unwrap();
 
     let scroll_to_about_us = |_| {
-        let document = web_sys::window().unwrap().document().unwrap();
+        let window = web_sys::window().unwrap();
+        let document = window.document().unwrap();
         let about_us = document.get_element_by_id("about-us").unwrap();
-        about_us.scroll_into_view_with_scroll_into_view_options(
-            &web_sys::ScrollIntoViewOptions::new().behavior(web_sys::ScrollBehavior::Smooth),
+
+        let about_us_top = about_us.get_bounding_client_rect().top();
+        let y_offset = window.scroll_y().unwrap();
+
+        window.scroll_with_scroll_to_options(
+            &web_sys::ScrollToOptions::new()
+            .top(about_us_top + y_offset - NAVBAR_HEIGHT)
+            .behavior(web_sys::ScrollBehavior::Smooth)
         );
     };
 
