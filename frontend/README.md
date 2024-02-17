@@ -7,5 +7,5 @@ The interface is written in Rust using the Yew framework.
 - Add the ability to cancel routes
 - Add "home" buttons to screens which display after API calls
 - Add meta tags using the helmet API
-- Refactor the notification mechanism into its own component
 - Only read HTML form state on submit
+- Fix the card size on the route select screen

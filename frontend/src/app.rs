@@ -7,6 +7,7 @@ use yew_router::prelude::*;
 use crate::components::contact_us::ContactUs;
 use crate::components::home::Home;
 use crate::components::not_found::NotFound;
+use crate::components::notification::Notification;
 use crate::components::redirect::Redirect;
 use crate::components::ride_page::RidePage;
 use crate::components::route_cancel::RouteCancel;
@@ -69,6 +70,7 @@ pub fn app() -> Html {
         <BrowserRouter>
             <BounceRoot>
                 <Switch<Route> render={switch} />
+                <Notification />
             </BounceRoot>
         </BrowserRouter>
     }
@@ -91,6 +93,7 @@ pub fn server_app(props: &ServerAppProps) -> Html {
         <Router history={history}>
             <BounceRoot>
                 <Switch<Route> render={switch} />
+                <Notification />
             </BounceRoot>
         </Router>
     }

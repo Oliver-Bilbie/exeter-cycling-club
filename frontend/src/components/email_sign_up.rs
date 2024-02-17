@@ -2,23 +2,17 @@ use wasm_bindgen::JsCast;
 use web_sys::{EventTarget, HtmlInputElement};
 use yew::platform::spawn_local;
 use yew::prelude::*;
+use bounce::use_atom_setter;
 
 use crate::components::loading_spinner::LoadingSpinner;
-use crate::components::notification::Notification;
 use crate::helpers::sign_up::sign_up;
 use crate::helpers::validate_email::validate_email;
+use crate::components::notification::NotificationState;
 
 #[derive(Clone)]
 struct SignUpData {
     email: String,
     name: String,
-}
-
-#[derive(Clone)]
-struct NotificationData {
-    message: String,
-    color: String,
-    visible: bool,
 }
 
 enum FormState {
@@ -29,15 +23,11 @@ enum FormState {
 
 #[function_component(EmailSignUp)]
 pub fn email_sign_up() -> Html {
+    let dispatch_notification = use_atom_setter::<NotificationState>();
+
     let form_data = use_state(|| SignUpData {
         email: String::new(),
         name: String::new(),
-    });
-
-    let notification_data = use_state(|| NotificationData {
-        message: String::new(),
-        color: String::new(),
-        visible: false,
     });
 
     let form_state = use_state(|| FormState::Ready);
@@ -73,10 +63,10 @@ pub fn email_sign_up() -> Html {
     let handle_submit = {
         let set_form_loading = {
             let form_state = form_state.clone();
-            let notification_data = notification_data.clone();
+            let dispatch_notification = dispatch_notification.clone();
             move || {
                 form_state.set(FormState::Loading);
-                notification_data.set(NotificationData {
+                dispatch_notification(NotificationState {
                     message: String::new(),
                     color: "primary".to_string(),
                     visible: false,
@@ -96,20 +86,19 @@ pub fn email_sign_up() -> Html {
             email: form_data.email.clone(),
             name: form_data.name.clone(),
         };
-        let notification_data = notification_data.clone();
 
         let notification_cb =
             Callback::from(move |response: Result<String, String>| match response {
                 Ok(_) => {
-                    notification_data.set(NotificationData {
+                    dispatch_notification(NotificationState {
                         message: String::new(),
-                        color: String::new(),
+                        color: "primary".to_string(),
                         visible: false,
                     });
                     set_form_complete();
                 }
                 Err(message) => {
-                    notification_data.set(NotificationData {
+                    dispatch_notification(NotificationState {
                         message,
                         color: "primary".to_string(),
                         visible: true,
@@ -132,17 +121,6 @@ pub fn email_sign_up() -> Html {
                 }
             }
         }
-    };
-
-    let handle_hide_notification = {
-        let notification_data = notification_data.clone();
-        Callback::from(move |_| {
-            notification_data.set(NotificationData {
-                message: String::new(),
-                color: String::new(),
-                visible: false,
-            });
-        })
     };
 
     let form_body = {
@@ -208,16 +186,7 @@ pub fn email_sign_up() -> Html {
             <h4 class="title is-4 has-text-centered">
                 {"Subscribe to email alerts"}
             </h4>
-
             {form_body(&form_state)}
-
-            if notification_data.visible {
-                <Notification
-                    message={notification_data.message.clone()}
-                    color={notification_data.color.clone()}
-                    on_close={handle_hide_notification}
-                />
-            }
         </div>
     )
 }

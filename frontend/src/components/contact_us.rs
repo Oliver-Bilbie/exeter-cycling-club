@@ -1,14 +1,15 @@
 use yew::platform::spawn_local;
 use yew::prelude::*;
+use bounce::use_atom_setter;
 
 use crate::components::contact_form::{ContactForm, MessageData};
 use crate::components::footer::Footer;
 use crate::components::loading_spinner::LoadingSpinner;
 use crate::components::nav_bar::NavBar;
-use crate::components::notification::Notification;
 use crate::components::page_header::PageHeader;
 use crate::helpers::send_email::send_email;
 use crate::helpers::validate_email::validate_email;
+use crate::components::notification::NotificationState;
 
 #[derive(Clone)]
 struct NotificationData {
@@ -26,24 +27,21 @@ enum FormState {
 
 #[function_component(ContactUs)]
 pub fn contact_us() -> Html {
+    let dispatch_notification = use_atom_setter::<NotificationState>();
+
     let form_data = use_state(|| MessageData {
         email: String::new(),
         message: String::new(),
-    });
-    let notification_data = use_state(|| NotificationData {
-        message: String::new(),
-        color: String::new(),
-        visible: false,
     });
     let form_state = use_state_eq(|| FormState::Ready);
 
     let handle_submit = {
         let set_form_loading = {
             let form_state = form_state.clone();
-            let notification_data = notification_data.clone();
+            let dispatch_notification = dispatch_notification.clone();
             move || {
                 form_state.set(FormState::Loading);
-                notification_data.set(NotificationData {
+                dispatch_notification(NotificationState {
                     message: String::new(),
                     color: "primary".to_string(),
                     visible: false,
@@ -63,20 +61,19 @@ pub fn contact_us() -> Html {
             email: form_data.email.clone(),
             message: form_data.message.clone(),
         };
-        let notification_data = notification_data.clone();
 
         let notification_cb =
             Callback::from(move |response: Result<String, String>| match response {
                 Ok(_) => {
-                    notification_data.set(NotificationData {
+                    dispatch_notification(NotificationState {
                         message: String::new(),
-                        color: String::new(),
+                        color: "primary".to_string(),
                         visible: false,
                     });
                     set_form_complete();
                 }
                 Err(message) => {
-                    notification_data.set(NotificationData {
+                    dispatch_notification(NotificationState {
                         message,
                         color: "primary".to_string(),
                         visible: true,
@@ -99,17 +96,6 @@ pub fn contact_us() -> Html {
                 }
             }
         }
-    };
-
-    let handle_hide_notification = {
-        let notification_data = notification_data.clone();
-        Callback::from(move |_| {
-            notification_data.set(NotificationData {
-                message: String::new(),
-                color: String::new(),
-                visible: false,
-            });
-        })
     };
 
     html! {
@@ -136,15 +122,6 @@ pub fn contact_us() -> Html {
                     </div>
                 </div>
             </div>
-
-
-            if notification_data.visible {
-                <Notification
-                    message={notification_data.message.clone()}
-                    color={notification_data.color.clone()}
-                    on_close={handle_hide_notification}
-                />
-            }
 
             <Footer />
         </section>
