@@ -1,0 +1,144 @@
+openapi: 3.0.1
+
+info:
+  title: Exeter Cycling Club API
+  description: APIs for the Exeter Cycling Club WebApp
+  version: 1.0.0
+  contact:
+    name: Oliver Bilbie
+    email: OliverBilbie@tuta.io
+
+servers:
+  # TODO: Update this to the production domain
+  - url: https://api.ecc.oliver-bilbie.co.uk
+
+paths:
+  /email:
+    put:
+      responses:
+        default:
+          description: "Default response for PUT /email"
+      # BEGIN-IGNORE
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: ${email_subscribe_lambda_arn}
+        connectionType: "INTERNET"
+        timeoutInMillis: 30000
+      # END-IGNORE
+    delete:
+      responses:
+        default:
+          description: "Default response for DELETE /email"
+      # BEGIN-IGNORE
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: ${email_unsubscribe_lambda_arn}
+        connectionType: "INTERNET"
+        timeoutInMillis: 30000
+      # END-IGNORE
+
+  # /route:
+  #   put:
+  #     responses:
+  #       default:
+  #         description: "Default response for PUT /route"
+  #     # BEGIN-IGNORE
+  #     x-amazon-apigateway-integration:
+  #       payloadFormatVersion: "2.0"
+  #       type: "aws_proxy"
+  #       httpMethod: "POST"
+  #       uri: {route_select_lambda_arn}
+  #       connectionType: "INTERNET"
+  #       timeoutInMillis: 30000
+  #     # END-IGNORE
+  #   delete:
+  #     responses:
+  #       default:
+  #         description: "Default response for DELETE /route"
+  #     # BEGIN-IGNORE
+  #     x-amazon-apigateway-integration:
+  #       payloadFormatVersion: "2.0"
+  #       type: "aws_proxy"
+  #       httpMethod: "POST"
+  #       uri: {route_cancel_lambda_arn}
+  #       connectionType: "INTERNET"
+  #       timeoutInMillis: 30000
+  #     # END-IGNORE
+
+  # /auth/{code}:
+  #   get:
+  #     responses:
+  #       default:
+  #         description: "Default response for GET /auth/{code}"
+  #     # BEGIN-IGNORE
+  #     x-amazon-apigateway-integration:
+  #       payloadFormatVersion: "2.0"
+  #       type: "aws_proxy"
+  #       httpMethod: "POST"
+  #       uri: {auth_lambda_arn}
+  #       connectionType: "INTERNET"
+  #       timeoutInMillis: 30000
+  #     # END-IGNORE
+  #   parameters:
+  #     - name: "code"
+  #       in: "path"
+  #       description: "Generated path parameter for code"
+  #       required: true
+  #       schema:
+  #         type: "string"
+
+  /contact:
+    post:
+      responses:
+        default:
+          description: "Default response for POST /contact"
+      # BEGIN-IGNORE
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: ${contact_lambda_arn}
+        connectionType: "INTERNET"
+        timeoutInMillis: 30000
+      # END-IGNORE
+
+  # /status:
+  #   put:
+  #     responses:
+  #       default:
+  #         description: "Default response for PUT /status"
+  #     # BEGIN-IGNORE
+  #     x-amazon-apigateway-integration:
+  #       payloadFormatVersion: "2.0"
+  #       type: "aws_proxy"
+  #       httpMethod: "POST"
+  #       uri: {status_lambda_arn}
+  #       connectionType: "INTERNET"
+  #       timeoutInMillis: 30000
+  #     # END-IGNORE
+
+# BEGIN-IGNORE
+x-amazon-apigateway-importexport-version: "1.0"
+x-amazon-apigateway-cors:
+  allowMethods:
+    - "DELETE"
+    - "GET"
+    - "POST"
+    - "PUT"
+  allowHeaders:
+    - "authorization"
+    - "content-type"
+    - "x-amz-date"
+    - "x-amz-security-token"
+    - "x-amz-user-agent"
+    - "x-amzn-trace-id"
+    - "x-api-key"
+  maxAge: -42
+  allowCredentials: false
+  allowOrigins:
+    - "*"
+# END-IGNORE

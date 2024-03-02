@@ -1,11 +1,6 @@
 .DEFAULT_GOAL := all
 
-all: build deploy
+all: build
 
 build:
-	@cargo lambda build --release
-
-deploy:
-	@cargo lambda deploy ecc-api-contact
-	@cargo lambda deploy ecc-api-subscribe
-	@cargo lambda deploy ecc-api-unsubscribe
+	@cargo lambda build --release --output-format zip
