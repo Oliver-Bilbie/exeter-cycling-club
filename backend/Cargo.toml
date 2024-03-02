@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 aws-config = "1.1.1"
+aws-sdk-dynamodb = "1.16.0"
 aws-sdk-sesv2 = "1.15.0"
 aws-sdk-ssm = "1.17.0"
 lambda_http = "0.8.3"
@@ -13,7 +14,16 @@ serde_json = "1.0.108"
 tokio = { version = "1", features = ["macros"] }
 tracing = { version = "0.1", features = ["log"] }
 tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt"] }
+uuid = { version = "1.7.0", features = ["v4"] }
 
 [[bin]]
 name = "ecc-api-contact"
 path = "src/lambda/contact.rs"
+
+[[bin]]
+name = "ecc-api-subscribe"
+path = "src/lambda/subscribe.rs"
+
+[[bin]]
+name = "ecc-api-unsubscribe"
+path = "src/lambda/unsubscribe.rs"
