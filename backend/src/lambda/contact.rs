@@ -25,7 +25,7 @@ async fn contact_us(event: Request) -> Result<Response<Body>, Error> {
     let ssm_client = ssm::Client::new(&aws_config);
     let ses_client = ses::Client::new(&aws_config);
 
-    let recipients = get_admin_list(ssm_client).await?;
+    let recipients = get_admin_list(&ssm_client).await?;
 
     let message = format!("Message from: {}\n\n{}", contact_email, message);
     send_email(&ses_client, recipients, message).await?;
@@ -41,7 +41,7 @@ async fn contact_us(event: Request) -> Result<Response<Body>, Error> {
         .map_err(Box::new)?)
 }
 
-async fn get_admin_list(ssm_client: ssm::Client) -> Result<Vec<String>, Error> {
+async fn get_admin_list(ssm_client: &ssm::Client) -> Result<Vec<String>, Error> {
     let ssm_resp = ssm_client
         .get_parameter()
         .name("ecc-admin-emails")
