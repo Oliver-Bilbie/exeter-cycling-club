@@ -1,3 +1,18 @@
+resource "aws_iam_role" "authenticate_lambda_role" {
+  name               = "${var.app-name}-authenticate-lambda-role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
+
+  inline_policy {
+    name   = "${var.app-name}-authenticate-lambda-policy"
+    policy = data.aws_iam_policy_document.authenticate_lambda_policy.json
+  }
+
+  inline_policy {
+    name   = "${var.app-name}-lambda-logging"
+    policy = data.aws_iam_policy_document.lambda_logging.json
+  }
+}
+
 resource "aws_iam_role" "contact_lambda_role" {
   name               = "${var.app-name}-contact-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
@@ -61,6 +76,23 @@ data "aws_iam_policy_document" "lambda_logging" {
     ]
 
     resources = ["arn:aws:logs:*:*:*"]
+  }
+}
+
+data "aws_iam_policy_document" "authenticate_lambda_policy" {
+  statement {
+    effect  = "Allow"
+    actions = ["ssm:GetParameters"]
+    resources = [
+      "arn:aws:ssm:*:*:parameter/ecc-strava-client-id",
+      "arn:aws:ssm:*:*:parameter/ecc-strava-client-secret",
+    ]
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["ssm:GetParameter"]
+    resources = ["arn:aws:ssm:*:*:parameter/ecc-admin-strava-ids"]
   }
 }
 
