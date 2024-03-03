@@ -69,27 +69,27 @@ paths:
   #       timeoutInMillis: 30000
   #     # END-IGNORE
 
-  # /auth/{code}:
-  #   get:
-  #     responses:
-  #       default:
-  #         description: "Default response for GET /auth/{code}"
-  #     # BEGIN-IGNORE
-  #     x-amazon-apigateway-integration:
-  #       payloadFormatVersion: "2.0"
-  #       type: "aws_proxy"
-  #       httpMethod: "POST"
-  #       uri: {auth_lambda_arn}
-  #       connectionType: "INTERNET"
-  #       timeoutInMillis: 30000
-  #     # END-IGNORE
-  #   parameters:
-  #     - name: "code"
-  #       in: "path"
-  #       description: "Generated path parameter for code"
-  #       required: true
-  #       schema:
-  #         type: "string"
+  /auth/{code}:
+    get:
+      responses:
+        default:
+          description: "Default response for GET /auth/{code}"
+      # BEGIN-IGNORE
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: ${auth_lambda_arn}
+        connectionType: "INTERNET"
+        timeoutInMillis: 30000
+      # END-IGNORE
+    parameters:
+      - name: "code"
+        in: "path"
+        description: "Generated path parameter for code"
+        required: true
+        schema:
+          type: "string"
 
   /contact:
     post:
@@ -122,23 +122,11 @@ paths:
   #     # END-IGNORE
 
 # BEGIN-IGNORE
-x-amazon-apigateway-importexport-version: "1.0"
 x-amazon-apigateway-cors:
   allowMethods:
-    - "DELETE"
-    - "GET"
-    - "POST"
-    - "PUT"
-  allowHeaders:
-    - "authorization"
-    - "content-type"
-    - "x-amz-date"
-    - "x-amz-security-token"
-    - "x-amz-user-agent"
-    - "x-amzn-trace-id"
-    - "x-api-key"
-  maxAge: -42
-  allowCredentials: false
-  allowOrigins:
-    - "*"
+  - "*"
+  maxAge: 0
+  allowCredentials: true
+
+x-amazon-apigateway-importexport-version: "1.0"
 # END-IGNORE
