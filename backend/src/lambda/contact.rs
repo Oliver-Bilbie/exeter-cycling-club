@@ -2,8 +2,8 @@ use aws_config::{load_defaults, BehaviorVersion};
 use aws_sdk_sesv2 as ses;
 use aws_sdk_ssm as ssm;
 use lambda_http::{run, service_fn, Body, Error, Request, Response};
-use serde_json::json;
 use serde::Deserialize;
+use serde_json::json;
 
 #[derive(Deserialize)]
 struct ContactUsRequest {
