@@ -28,6 +28,21 @@ resource "aws_iam_role" "contact_lambda_role" {
   }
 }
 
+resource "aws_iam_role" "set_route_lambda_role" {
+  name               = "${var.app-name}-set-route-lambda-role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
+
+  inline_policy {
+    name   = "${var.app-name}-set-route-lambda-policy"
+    policy = data.aws_iam_policy_document.set_route_lambda_policy.json
+  }
+
+  inline_policy {
+    name   = "${var.app-name}-lambda-logging"
+    policy = data.aws_iam_policy_document.lambda_logging.json
+  }
+}
+
 resource "aws_iam_role" "email_subscribe_lambda_role" {
   name               = "${var.app-name}-email-subscribe-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
@@ -100,6 +115,29 @@ data "aws_iam_policy_document" "contact_lambda_policy" {
   statement {
     effect    = "Allow"
     actions   = ["ses:SendRawEmail"]
+    resources = ["*"]
+  }
+}
+
+data "aws_iam_policy_document" "set_route_lambda_policy" {
+  statement {
+    effect    = "Allow"
+    actions   = ["ssm:GetParameter"]
+    resources = ["arn:aws:ssm:*:*:parameter/ecc-admin-strava-ids"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["ssm:PutParameter"]
+    resources = ["arn:aws:ssm:*:*:parameter/ecc-route-data"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:Scan"]
+    resources = [aws_dynamodb_table.mailing_list.arn]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["ses:SendEmail"]
     resources = ["*"]
   }
 }

@@ -25,7 +25,7 @@ resource "aws_dynamodb_table" "mailing_list" {
 
   tags = {
     Name        = "${var.app-name}-mailing-list"
-    Description = "Mailing list for ${var.domain}"
+    Description = "Mailing list for ${var.app-name}"
     Environment = "production"
   }
 }

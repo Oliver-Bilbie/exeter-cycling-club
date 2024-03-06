@@ -1,5 +1,6 @@
 resource "aws_s3_bucket" "host_bucket" {
-  bucket = var.domain
+  # TODO: Remove the prefix for production
+  bucket = "ecc.${var.domain}"
 }
 
 resource "aws_s3_bucket_policy" "allow_access" {
