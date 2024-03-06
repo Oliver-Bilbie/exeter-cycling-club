@@ -3,8 +3,14 @@ use aws_sdk_dynamodb as ddb;
 use aws_sdk_sesv2 as ses;
 use lambda_http::{run, service_fn, Body, Error, Request, Response};
 use serde_json::json;
-use serde_json::Value as JsonValue;
+use serde::Deserialize;
 use uuid::Uuid;
+
+#[derive(Deserialize)]
+struct SubscribeRequest {
+    name: String,
+    email: String,
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -19,8 +25,8 @@ async fn main() -> Result<(), Error> {
 
 async fn subscribe(event: Request) -> Result<Response<Body>, Error> {
     let body = read_event_body(event)?;
-    let name = body["name"].as_str().expect("No name provided");
-    let email = body["email"].as_str().expect("No email provided");
+    let name = body.name;
+    let email = body.email;
 
     let aws_config = load_defaults(BehaviorVersion::latest()).await;
     let ddb_client = ddb::Client::new(&aws_config);
@@ -54,7 +60,7 @@ async fn subscribe(event: Request) -> Result<Response<Body>, Error> {
     // Once this is done, move the dynamodb write to the email verification lambda
     ses_client
         .create_email_identity()
-        .email_identity(email)
+        .email_identity(&email)
         .send()
         .await?;
 
@@ -81,9 +87,9 @@ async fn subscribe(event: Request) -> Result<Response<Body>, Error> {
         .map_err(Box::new)?)
 }
 
-fn read_event_body(event: Request) -> Result<JsonValue, Error> {
-    let body: JsonValue = match event.body() {
-        Body::Text(text) => serde_json::from_str(text).expect("Unable to parse body"),
+fn read_event_body(event: Request) -> Result<SubscribeRequest, Error> {
+    let body = match event.body() {
+        Body::Text(text) => serde_json::from_str(&text).expect("Unable to parse text body"),
         Body::Binary(input) => {
             let text = String::from_utf8(input.to_vec()).expect("Unable to parse binary body");
             serde_json::from_str(&text).expect("Unable to parse body")
