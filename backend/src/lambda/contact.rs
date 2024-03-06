@@ -3,7 +3,13 @@ use aws_sdk_sesv2 as ses;
 use aws_sdk_ssm as ssm;
 use lambda_http::{run, service_fn, Body, Error, Request, Response};
 use serde_json::json;
-use serde_json::Value as JsonValue;
+use serde::Deserialize;
+
+#[derive(Deserialize)]
+struct ContactUsRequest {
+    contact_email: String,
+    message: String,
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -18,8 +24,8 @@ async fn main() -> Result<(), Error> {
 
 async fn contact_us(event: Request) -> Result<Response<Body>, Error> {
     let body = read_event_body(event)?;
-    let contact_email = body["contact_email"].as_str().expect("No email provided");
-    let message = body["message"].as_str().expect("No message provided");
+    let contact_email = body.contact_email;
+    let message = body.message;
 
     let aws_config = load_defaults(BehaviorVersion::latest()).await;
     let ssm_client = ssm::Client::new(&aws_config);
@@ -101,8 +107,8 @@ async fn send_email(
     Ok(())
 }
 
-fn read_event_body(event: Request) -> Result<JsonValue, Error> {
-    let body: JsonValue = match event.body() {
+fn read_event_body(event: Request) -> Result<ContactUsRequest, Error> {
+    let body = match event.body() {
         Body::Text(text) => serde_json::from_str(text).expect("Unable to parse body"),
         Body::Binary(input) => {
             let text = String::from_utf8(input.to_vec()).expect("Unable to parse binary body");
