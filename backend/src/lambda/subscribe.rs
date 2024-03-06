@@ -2,8 +2,8 @@ use aws_config::{load_defaults, BehaviorVersion};
 use aws_sdk_dynamodb as ddb;
 use aws_sdk_sesv2 as ses;
 use lambda_http::{run, service_fn, Body, Error, Request, Response};
-use serde_json::json;
 use serde::Deserialize;
+use serde_json::json;
 use uuid::Uuid;
 
 #[derive(Deserialize)]

@@ -25,3 +25,10 @@ resource "aws_ssm_parameter" "admin_emails_ssm" {
   type        = "SecureString"
   value       = var.admin-emails
 }
+
+resource "aws_ssm_parameter" "route_data" {
+  name        = "${var.app-name}-route-data"
+  description = "Route data for the ${var.app-name} webapp"
+  type        = "String"
+  value       = "{\"status\": \"unavailable\", \"message\": \"Subscribe to email updates to find out when a route is announced\"}"
+}

@@ -19,8 +19,16 @@ tracing-subscriber = { version = "0.3", default-features = false, features = ["f
 uuid = { version = "1.7.0", features = ["v4"] }
 
 [[bin]]
+name = "ecc-api-authenticate"
+path = "src/lambda/authenticate.rs"
+
+[[bin]]
 name = "ecc-api-contact"
 path = "src/lambda/contact.rs"
+
+[[bin]]
+name = "ecc-api-set-route"
+path = "src/lambda/set_route.rs"
 
 [[bin]]
 name = "ecc-api-subscribe"
@@ -29,7 +37,3 @@ path = "src/lambda/subscribe.rs"
 [[bin]]
 name = "ecc-api-unsubscribe"
 path = "src/lambda/unsubscribe.rs"
-
-[[bin]]
-name = "ecc-api-authenticate"
-path = "src/lambda/authenticate.rs"
