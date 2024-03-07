@@ -31,6 +31,10 @@ name = "ecc-api-set-route"
 path = "src/lambda/set_route.rs"
 
 [[bin]]
+name = "ecc-api-get-route"
+path = "src/lambda/get_route.rs"
+
+[[bin]]
 name = "ecc-api-subscribe"
 path = "src/lambda/subscribe.rs"
 
