@@ -43,6 +43,19 @@ resource "aws_iam_role" "set_route_lambda_role" {
   }
 }
 
+resource "aws_iam_role" "get_route_lambda_role" {
+  name               = "${var.app-name}-get-route-lambda-role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
+  inline_policy {
+    name   = "${var.app-name}-get-route-lambda-policy"
+    policy = data.aws_iam_policy_document.get_route_lambda_policy.json
+  }
+  inline_policy {
+    name   = "${var.app-name}-lambda-logging"
+    policy = data.aws_iam_policy_document.lambda_logging.json
+  }
+}
+
 resource "aws_iam_role" "email_subscribe_lambda_role" {
   name               = "${var.app-name}-email-subscribe-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
@@ -139,6 +152,14 @@ data "aws_iam_policy_document" "set_route_lambda_policy" {
     effect    = "Allow"
     actions   = ["ses:SendEmail"]
     resources = ["*"]
+  }
+}
+
+data "aws_iam_policy_document" "get_route_lambda_policy" {
+  statement {
+    effect    = "Allow"
+    actions   = ["ssm:GetParameter"]
+    resources = ["arn:aws:ssm:*:*:parameter/ecc-route-data"]
   }
 }
 
