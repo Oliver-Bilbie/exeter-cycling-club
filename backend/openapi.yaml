@@ -133,13 +133,3 @@ paths:
   #       connectionType: "INTERNET"
   #       timeoutInMillis: 30000
   #     # END-IGNORE
-
-# BEGIN-IGNORE
-x-amazon-apigateway-cors:
-  allowMethods:
-  - "*"
-  maxAge: 0
-  allowCredentials: true
-
-x-amazon-apigateway-importexport-version: "1.0"
-# END-IGNORE
