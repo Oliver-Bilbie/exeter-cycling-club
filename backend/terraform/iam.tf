@@ -28,6 +28,19 @@ resource "aws_iam_role" "contact_lambda_role" {
   }
 }
 
+resource "aws_iam_role" "get_route_lambda_role" {
+  name               = "${var.app-name}-get-route-lambda-role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
+  inline_policy {
+    name   = "${var.app-name}-get-route-lambda-policy"
+    policy = data.aws_iam_policy_document.get_route_lambda_policy.json
+  }
+  inline_policy {
+    name   = "${var.app-name}-lambda-logging"
+    policy = data.aws_iam_policy_document.lambda_logging.json
+  }
+}
+
 resource "aws_iam_role" "set_route_lambda_role" {
   name               = "${var.app-name}-set-route-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
@@ -43,13 +56,15 @@ resource "aws_iam_role" "set_route_lambda_role" {
   }
 }
 
-resource "aws_iam_role" "get_route_lambda_role" {
-  name               = "${var.app-name}-get-route-lambda-role"
+resource "aws_iam_role" "cancel_route_lambda_role" {
+  name               = "${var.app-name}-cancel-route-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
+
   inline_policy {
-    name   = "${var.app-name}-get-route-lambda-policy"
-    policy = data.aws_iam_policy_document.get_route_lambda_policy.json
+    name   = "${var.app-name}-cancel-route-lambda-policy"
+    policy = data.aws_iam_policy_document.cancel_route_lambda_policy.json
   }
+
   inline_policy {
     name   = "${var.app-name}-lambda-logging"
     policy = data.aws_iam_policy_document.lambda_logging.json
@@ -137,6 +152,14 @@ data "aws_iam_policy_document" "contact_lambda_policy" {
   }
 }
 
+data "aws_iam_policy_document" "get_route_lambda_policy" {
+  statement {
+    effect    = "Allow"
+    actions   = ["ssm:GetParameter"]
+    resources = [aws_ssm_parameter.route_data.arn]
+  }
+}
+
 data "aws_iam_policy_document" "set_route_lambda_policy" {
   statement {
     effect    = "Allow"
@@ -160,11 +183,29 @@ data "aws_iam_policy_document" "set_route_lambda_policy" {
   }
 }
 
-data "aws_iam_policy_document" "get_route_lambda_policy" {
+data "aws_iam_policy_document" "cancel_route_lambda_policy" {
+  statement {
+    effect  = "Allow"
+    actions = ["ssm:GetParameter"]
+    resources = [
+      aws_ssm_parameter.route_data.arn,
+      aws_ssm_parameter.admin_strava_ids_ssm.arn
+    ]
+  }
   statement {
     effect    = "Allow"
-    actions   = ["ssm:GetParameter"]
+    actions   = ["ssm:PutParameter"]
     resources = [aws_ssm_parameter.route_data.arn]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:Scan"]
+    resources = [aws_dynamodb_table.mailing_list.arn]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["ses:SendEmail"]
+    resources = ["*"]
   }
 }
 

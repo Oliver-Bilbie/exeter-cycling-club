@@ -67,19 +67,19 @@ paths:
         connectionType: "INTERNET"
         timeoutInMillis: 30000
       # END-IGNORE
-  #   delete:
-  #     responses:
-  #       default:
-  #         description: "Default response for DELETE /route"
-  #     # BEGIN-IGNORE
-  #     x-amazon-apigateway-integration:
-  #       payloadFormatVersion: "2.0"
-  #       type: "aws_proxy"
-  #       httpMethod: "POST"
-  #       uri: {route_cancel_lambda_arn}
-  #       connectionType: "INTERNET"
-  #       timeoutInMillis: 30000
-  #     # END-IGNORE
+    delete:
+      responses:
+        default:
+          description: "Default response for DELETE /route"
+      # BEGIN-IGNORE
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: ${cancel_route_lambda_arn}
+        connectionType: "INTERNET"
+        timeoutInMillis: 30000
+      # END-IGNORE
 
   /auth/{code}:
     get:
