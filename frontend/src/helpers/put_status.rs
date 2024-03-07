@@ -1,4 +1,4 @@
-use reqwest::Client;
+use reqwest::{Client, StatusCode};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -13,8 +13,7 @@ pub enum AttendanceStatus {
 
 #[derive(Serialize, Deserialize, Debug)]
 struct PutStatusResponse {
-    status: u16,
-    body: String,
+    message: String,
 }
 
 pub async fn put_status(id: String, status: String) -> AttendanceStatus {
@@ -23,22 +22,25 @@ pub async fn put_status(id: String, status: String) -> AttendanceStatus {
     body.insert("status", status);
 
     let client = Client::new();
+
     let response = client
         .put(format!("{}/status", APPLICATION_API_BASE_URL))
         .json(&body)
         .send()
         .await;
+
     let response = match response {
         Ok(response) => response,
         Err(_) => return AttendanceStatus::Failure,
     };
 
+    if response.status() != StatusCode::OK {
+        return AttendanceStatus::Failure;
+    }
+
     let json_response: Result<PutStatusResponse, _> = response.json().await;
     match json_response {
-        Ok(resp) => match resp.status {
-            200 => AttendanceStatus::Success,
-            _ => AttendanceStatus::Failure,
-        },
+        Ok(_) => AttendanceStatus::Success,
         Err(_) => AttendanceStatus::Failure,
     }
 }

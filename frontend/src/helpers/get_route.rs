@@ -1,7 +1,7 @@
-use reqwest::get;
+use reqwest::{get, StatusCode};
 use serde::{Deserialize, Serialize};
 
-use crate::constants::application_endpoints::ROUTE_DATA_ENDPOINT;
+use crate::constants::application_endpoints::APPLICATION_API_BASE_URL;
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum RouteStatus {
@@ -45,14 +45,21 @@ struct RouteDataResponse {
 }
 
 pub async fn get_route() -> RouteStatus {
-    let response = match get(ROUTE_DATA_ENDPOINT).await {
+    let response = match get(format!("{}/route", APPLICATION_API_BASE_URL)).await {
         Ok(response) => response,
         Err(_) => {
             return RouteStatus::Error(
-                "An error occurred while loading the route.\nPlease try again later.".to_string(),
+                "An error occurred while requesting the route.\nPlease try again later."
+                    .to_string(),
             )
         }
     };
+
+    if response.status() != StatusCode::OK {
+        return RouteStatus::Error(
+            "An error occurred while loading the route.\nPlease try again later.".to_string(),
+        );
+    }
 
     let json_response: Result<RouteDataResponse, _> = response.json().await;
     match json_response {

@@ -1,9 +1,9 @@
-use wasm_bindgen::JsCast;
 use bounce::prelude::*;
+use wasm_bindgen::JsCast;
+use web_sys::{EventTarget, HtmlInputElement};
 use yew::platform::spawn_local;
 use yew::prelude::*;
 use yew_router::prelude::*;
-use web_sys::{EventTarget, HtmlInputElement};
 
 use crate::components::confirm_route::{ConfirmRoute, ConfirmRouteProps};
 use crate::components::footer::Footer;
