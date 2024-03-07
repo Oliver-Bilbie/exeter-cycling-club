@@ -32,8 +32,9 @@ resource "aws_lambda_function" "set_route" {
 
   environment {
     variables = {
-      "TABLE_NAME"  = aws_dynamodb_table.mailing_list.id
-      "BUCKET_NAME" = aws_s3_bucket.host_bucket.id
+      "MAILING_LIST_TABLE_NAME" = aws_dynamodb_table.mailing_list.id
+      "ADMIN_IDS_SSM"           = aws_ssm_parameter.admin_strava_ids_ssm.name
+      "ROUTE_DATA_SSM"          = aws_ssm_parameter.route_data.name
     }
   }
 }

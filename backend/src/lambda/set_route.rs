@@ -6,6 +6,7 @@ use lambda_http::{run, service_fn, Body, Error, Request, Response};
 use reqwest::Client as ReqwestClient;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use std::env;
 
 #[derive(Deserialize)]
 struct SetRouteRequest {
@@ -143,9 +144,11 @@ async fn get_user_id(
 }
 
 async fn get_admin_list(ssm_client: &ssm::Client) -> Result<Vec<String>, Error> {
+    let admin_list_ssm_id = env::var("ADMIN_IDS_SSM").expect("ADMIN_IDS_SSM not set");
+
     let ssm_resp = ssm_client
         .get_parameter()
-        .name("ecc-admin-strava-ids")
+        .name(admin_list_ssm_id)
         .with_decryption(true)
         .send()
         .await?;
@@ -196,10 +199,12 @@ async fn get_route_data(
 }
 
 async fn update_route_data(ssm_client: &ssm::Client, route: &Route) -> Result<(), Error> {
+    let route_data_ssm_id = env::var("ROUTE_DATA_SSM").expect("ROUTE_DATA_SSM not set");
     let route_json = serde_json::to_string(route).expect("Unable to serialize route data");
+
     ssm_client
         .put_parameter()
-        .name("ecc-route-data")
+        .name(route_data_ssm_id)
         .value(route_json)
         .overwrite(true)
         .send()
@@ -223,9 +228,11 @@ async fn send_email_notifications(
 }
 
 async fn get_mailing_list(ddb_client: &ddb::Client) -> Result<Vec<EmailRecipient>, Error> {
+    let mailing_list_ddb_id =
+        env::var("MAILING_LIST_TABLE_NAME").expect("MAILING_LIST_TABLE_NAME not set");
     let ddb_items = ddb_client
         .scan()
-        .table_name("ecc-mailing-list")
+        .table_name(mailing_list_ddb_id)
         .send()
         .await?
         .items
