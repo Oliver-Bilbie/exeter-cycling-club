@@ -45,3 +45,7 @@ path = "src/lambda/subscribe.rs"
 [[bin]]
 name = "ecc-api-unsubscribe"
 path = "src/lambda/unsubscribe.rs"
+
+[[bin]]
+name = "ecc-process-clear-route"
+path = "src/lambda/clear_route.rs"
