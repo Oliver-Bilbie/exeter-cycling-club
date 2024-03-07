@@ -1,6 +1,7 @@
 resource "aws_apigatewayv2_api" "api_gw" {
   name          = "Exeter Cycling Club API"
   protocol_type = "HTTP"
+
   body = templatefile("${path.module}/../openapi.yaml", {
     auth_lambda_arn              = aws_lambda_function.authenticate.invoke_arn,
     contact_lambda_arn           = aws_lambda_function.contact.invoke_arn,
@@ -12,8 +13,10 @@ resource "aws_apigatewayv2_api" "api_gw" {
     # status_lambda_arn = aws_lambda_function.status.invoke_arn,
   })
 
-  lifecycle {
-    replace_triggered_by = [terraform_data.deploy_api_gw]
+  cors_configuration {
+    allow_origins = ["*"]
+    allow_methods = ["*"]
+    allow_headers = ["*"]
   }
 }
 
@@ -21,10 +24,6 @@ resource "aws_apigatewayv2_stage" "v1" {
   api_id      = aws_apigatewayv2_api.api_gw.id
   name        = "v1"
   auto_deploy = true
-}
-
-resource "terraform_data" "deploy_api_gw" {
-  triggers_replace = filesha256("${path.module}/../openapi.yaml")
 }
 
 resource "aws_lambda_permission" "apigw_invoke_authenticate" {

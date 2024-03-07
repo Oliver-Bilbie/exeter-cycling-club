@@ -112,22 +112,27 @@ data "aws_iam_policy_document" "authenticate_lambda_policy" {
     effect  = "Allow"
     actions = ["ssm:GetParameters"]
     resources = [
-      "arn:aws:ssm:*:*:parameter/ecc-strava-client-id",
-      "arn:aws:ssm:*:*:parameter/ecc-strava-client-secret",
+      aws_ssm_parameter.strava_client_id_ssm.arn,
+      aws_ssm_parameter.strava_client_secret_ssm.arn
     ]
   }
 
   statement {
     effect    = "Allow"
     actions   = ["ssm:GetParameter"]
-    resources = ["arn:aws:ssm:*:*:parameter/ecc-admin-strava-ids"]
+    resources = [aws_ssm_parameter.admin_strava_ids_ssm.arn]
   }
 }
 
 data "aws_iam_policy_document" "contact_lambda_policy" {
   statement {
     effect    = "Allow"
-    actions   = ["ses:SendRawEmail"]
+    actions   = ["ssm:GetParameter"]
+    resources = [aws_ssm_parameter.admin_emails_ssm.arn]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["ses:SendEmail"]
     resources = ["*"]
   }
 }
@@ -136,12 +141,12 @@ data "aws_iam_policy_document" "set_route_lambda_policy" {
   statement {
     effect    = "Allow"
     actions   = ["ssm:GetParameter"]
-    resources = ["arn:aws:ssm:*:*:parameter/ecc-admin-strava-ids"]
+    resources = [aws_ssm_parameter.admin_strava_ids_ssm.arn]
   }
   statement {
     effect    = "Allow"
     actions   = ["ssm:PutParameter"]
-    resources = ["arn:aws:ssm:*:*:parameter/ecc-route-data"]
+    resources = [aws_ssm_parameter.route_data.arn]
   }
   statement {
     effect    = "Allow"
@@ -159,7 +164,7 @@ data "aws_iam_policy_document" "get_route_lambda_policy" {
   statement {
     effect    = "Allow"
     actions   = ["ssm:GetParameter"]
-    resources = ["arn:aws:ssm:*:*:parameter/ecc-route-data"]
+    resources = [aws_ssm_parameter.route_data.arn]
   }
 }
 
