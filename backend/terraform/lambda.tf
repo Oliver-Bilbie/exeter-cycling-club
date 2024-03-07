@@ -75,6 +75,22 @@ resource "aws_lambda_function" "cancel_route" {
   }
 }
 
+resource "aws_lambda_function" "clear_route" {
+  function_name    = "${var.app-name}-process-clear-route"
+  filename         = "${path.module}/../target/lambda/ecc-process-clear-route/bootstrap.zip"
+  source_code_hash = filesha256("${path.module}/../src/lambda/clear_route.rs")
+  role             = aws_iam_role.clear_route_lambda_role.arn
+  handler          = "bootstrap"
+  runtime          = "provided.al2"
+  timeout          = 25
+  memory_size      = 128
+  environment {
+    variables = {
+      "ROUTE_DATA_SSM" = aws_ssm_parameter.route_data.name
+    }
+  }
+}
+
 resource "aws_lambda_function" "email_subscribe" {
   function_name    = "${var.app-name}-api-email-subscribe"
   filename         = "${path.module}/../target/lambda/ecc-api-subscribe/bootstrap.zip"

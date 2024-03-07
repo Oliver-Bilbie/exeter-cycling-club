@@ -71,6 +71,21 @@ resource "aws_iam_role" "cancel_route_lambda_role" {
   }
 }
 
+resource "aws_iam_role" "clear_route_lambda_role" {
+  name               = "${var.app-name}-clear-route-lambda-role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
+
+  inline_policy {
+    name   = "${var.app-name}-clear-route-lambda-policy"
+    policy = data.aws_iam_policy_document.clear_route_lambda_policy.json
+  }
+
+  inline_policy {
+    name   = "${var.app-name}-lambda-logging"
+    policy = data.aws_iam_policy_document.lambda_logging.json
+  }
+}
+
 resource "aws_iam_role" "email_subscribe_lambda_role" {
   name               = "${var.app-name}-email-subscribe-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
@@ -206,6 +221,14 @@ data "aws_iam_policy_document" "cancel_route_lambda_policy" {
     effect    = "Allow"
     actions   = ["ses:SendEmail"]
     resources = ["*"]
+  }
+}
+
+data "aws_iam_policy_document" "clear_route_lambda_policy" {
+  statement {
+    effect    = "Allow"
+    actions   = ["ssm:PutParameter"]
+    resources = [aws_ssm_parameter.route_data.arn]
   }
 }
 

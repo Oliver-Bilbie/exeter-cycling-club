@@ -30,5 +30,9 @@ resource "aws_ssm_parameter" "route_data" {
   name        = "${var.app-name}-route-data"
   description = "Route data for the ${var.app-name} webapp"
   type        = "String"
-  value       = "{\"status\": \"unavailable\", \"message\": \"Subscribe to email updates to find out when a route is announced\"}"
+  value       = "{\"status\": \"unavailable\", \"message\": \"Subscribe to email updates to find out when a route is announced\", \"id\": \"\", \"name\": \"\", \"distance\": \"\", \"elevation_gain\": \"\", \"map_url\": \"\"}"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
