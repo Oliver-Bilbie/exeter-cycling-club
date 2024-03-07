@@ -1,8 +1,0 @@
-This email is not being displayed correctly.\n
-If you prefer you can view the route on our website instead at http://eccv2.oliver-bilbie.co.uk.s3-website-eu-west-1.amazonaws.com/ride\n\n
-This week's route:\n
-%ROUTE_NAME%\n
-Distance:%DISTANCE% - Elevation: %ELEVATION_GAIN%\n
-%DESCRIPTION%\n\n
-Please do not reply to this email. You are receiving this email because you signed up for alerts from Exeter Cycling Club. If you no longer wish to receive these updates then you may unsubscribe using the link below.\n
-http://eccv2.oliver-bilbie.co.uk.s3-website-eu-west-1.amazonaws.com/unsubscribe?id=%RECIPIENT_ID%

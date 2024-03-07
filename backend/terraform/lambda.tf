@@ -20,25 +20,6 @@ resource "aws_lambda_function" "contact" {
   memory_size      = 128
 }
 
-resource "aws_lambda_function" "set_route" {
-  function_name    = "${var.app-name}-api-set-route"
-  filename         = "${path.module}/../target/lambda/ecc-api-set-route/bootstrap.zip"
-  source_code_hash = filesha256("${path.module}/../src/lambda/set_route.rs")
-  role             = aws_iam_role.set_route_lambda_role.arn
-  handler          = "bootstrap"
-  runtime          = "provided.al2"
-  timeout          = 20
-  memory_size      = 128
-
-  environment {
-    variables = {
-      "MAILING_LIST_TABLE_NAME" = aws_dynamodb_table.mailing_list.id
-      "ADMIN_IDS_SSM"           = aws_ssm_parameter.admin_strava_ids_ssm.name
-      "ROUTE_DATA_SSM"          = aws_ssm_parameter.route_data.name
-    }
-  }
-}
-
 resource "aws_lambda_function" "get_route" {
   function_name    = "${var.app-name}-api-get-route"
   filename         = "${path.module}/../target/lambda/ecc-api-get-route/bootstrap.zip"
@@ -52,6 +33,44 @@ resource "aws_lambda_function" "get_route" {
   environment {
     variables = {
       "ROUTE_DATA_SSM" = aws_ssm_parameter.route_data.name
+    }
+  }
+}
+
+resource "aws_lambda_function" "set_route" {
+  function_name    = "${var.app-name}-api-set-route"
+  filename         = "${path.module}/../target/lambda/ecc-api-set-route/bootstrap.zip"
+  source_code_hash = filesha256("${path.module}/../src/lambda/set_route.rs")
+  role             = aws_iam_role.set_route_lambda_role.arn
+  handler          = "bootstrap"
+  runtime          = "provided.al2"
+  timeout          = 25
+  memory_size      = 256
+
+  environment {
+    variables = {
+      "MAILING_LIST_TABLE_NAME" = aws_dynamodb_table.mailing_list.id
+      "ADMIN_IDS_SSM"           = aws_ssm_parameter.admin_strava_ids_ssm.name
+      "ROUTE_DATA_SSM"          = aws_ssm_parameter.route_data.name
+    }
+  }
+}
+
+resource "aws_lambda_function" "cancel_route" {
+  function_name    = "${var.app-name}-api-cancel-route"
+  filename         = "${path.module}/../target/lambda/ecc-api-cancel-route/bootstrap.zip"
+  source_code_hash = filesha256("${path.module}/../src/lambda/cancel_route.rs")
+  role             = aws_iam_role.cancel_route_lambda_role.arn
+  handler          = "bootstrap"
+  runtime          = "provided.al2"
+  timeout          = 25
+  memory_size      = 256
+
+  environment {
+    variables = {
+      "MAILING_LIST_TABLE_NAME" = aws_dynamodb_table.mailing_list.id
+      "ADMIN_IDS_SSM"           = aws_ssm_parameter.admin_strava_ids_ssm.name
+      "ROUTE_DATA_SSM"          = aws_ssm_parameter.route_data.name
     }
   }
 }
