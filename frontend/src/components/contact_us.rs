@@ -1,15 +1,15 @@
+use bounce::use_atom_setter;
 use yew::platform::spawn_local;
 use yew::prelude::*;
-use bounce::use_atom_setter;
 
 use crate::components::contact_form::{ContactForm, MessageData};
 use crate::components::footer::Footer;
 use crate::components::loading_spinner::LoadingSpinner;
 use crate::components::nav_bar::NavBar;
+use crate::components::notification::NotificationState;
 use crate::components::page_header::PageHeader;
 use crate::helpers::send_email::send_email;
 use crate::helpers::validate_email::validate_email;
-use crate::components::notification::NotificationState;
 
 #[derive(PartialEq)]
 enum FormState {

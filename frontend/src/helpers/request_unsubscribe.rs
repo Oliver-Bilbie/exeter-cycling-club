@@ -1,4 +1,4 @@
-use reqwest::Client;
+use reqwest::{Client, StatusCode};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -13,8 +13,7 @@ pub enum UnsubscribeStatus {
 
 #[derive(Serialize, Deserialize, Debug)]
 struct UnsubscribeResponse {
-    status: u16,
-    body: String,
+    message: String,
 }
 
 pub async fn request_unsubscribe(id: String) -> UnsubscribeStatus {
@@ -22,22 +21,25 @@ pub async fn request_unsubscribe(id: String) -> UnsubscribeStatus {
     body.insert("id", id);
 
     let client = Client::new();
+
     let response = client
         .delete(format!("{}/email", APPLICATION_API_BASE_URL))
         .json(&body)
         .send()
         .await;
+
     let response = match response {
         Ok(response) => response,
         Err(_) => return UnsubscribeStatus::Failure,
     };
 
+    if response.status() != StatusCode::OK {
+        return UnsubscribeStatus::Failure;
+    }
+
     let json_response: Result<UnsubscribeResponse, _> = response.json().await;
     match json_response {
-        Ok(resp) => match resp.status {
-            200 => UnsubscribeStatus::Success,
-            _ => UnsubscribeStatus::Failure,
-        },
+        Ok(_) => UnsubscribeStatus::Success,
         Err(_) => UnsubscribeStatus::Failure,
     }
 }

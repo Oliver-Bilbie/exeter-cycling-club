@@ -28,8 +28,8 @@ pub fn home(props: &HomeProps) -> Html {
 
         window.scroll_with_scroll_to_options(
             &web_sys::ScrollToOptions::new()
-            .top(about_us_top + y_offset - NAVBAR_HEIGHT)
-            .behavior(web_sys::ScrollBehavior::Smooth)
+                .top(about_us_top + y_offset - NAVBAR_HEIGHT)
+                .behavior(web_sys::ScrollBehavior::Smooth),
         );
     };
 

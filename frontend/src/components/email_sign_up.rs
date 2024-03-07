@@ -1,13 +1,13 @@
+use bounce::use_atom_setter;
 use wasm_bindgen::JsCast;
 use web_sys::{EventTarget, HtmlInputElement};
 use yew::platform::spawn_local;
 use yew::prelude::*;
-use bounce::use_atom_setter;
 
 use crate::components::loading_spinner::LoadingSpinner;
+use crate::components::notification::NotificationState;
 use crate::helpers::sign_up::sign_up;
 use crate::helpers::validate_email::validate_email;
-use crate::components::notification::NotificationState;
 
 #[derive(Clone)]
 struct SignUpData {

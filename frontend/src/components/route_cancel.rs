@@ -1,7 +1,7 @@
+use bounce::prelude::*;
 use yew::platform::spawn_local;
 use yew::prelude::*;
 use yew_router::prelude::*;
-use bounce::prelude::*;
 
 use crate::components::cancel_form::CancelForm;
 use crate::components::footer::Footer;
@@ -73,7 +73,7 @@ pub fn route_cancel() -> Html {
             let navigator = navigator.clone();
             move || {
                 dispatch_notification(NotificationState {
-                    message: "Route set successfully".to_string(),
+                    message: "Route cancelled successfully".to_string(),
                     color: "success".to_string(),
                     visible: true,
                 });
