@@ -71,9 +71,9 @@ pub fn route_cancel() -> Html {
         let set_form_complete = {
             let dispatch_notification = dispatch_notification.clone();
             let navigator = navigator.clone();
-            move || {
+            move |message: String| {
                 dispatch_notification(NotificationState {
-                    message: "Route cancelled successfully".to_string(),
+                    message,
                     color: "success".to_string(),
                     visible: true,
                 });
@@ -87,13 +87,13 @@ pub fn route_cancel() -> Html {
 
         let notification_cb =
             Callback::from(move |response: Result<String, String>| match response {
-                Ok(_) => {
+                Ok(message) => {
                     dispatch_notification(NotificationState {
                         message: String::new(),
                         color: "primary".to_string(),
                         visible: false,
                     });
-                    set_form_complete();
+                    set_form_complete(message);
                 }
                 Err(message) => {
                     dispatch_notification(NotificationState {
