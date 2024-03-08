@@ -41,7 +41,7 @@ pub async fn cancel_route(cancel_route_data: CancelRouteData) -> Result<String, 
 
     let json_response: Result<SetRouteResponse, _> = response.json().await;
     match json_response {
-        Ok(_) => Ok("Route cancelled successfully".to_string()),
+        Ok(resp) => Ok(resp.message),
         Err(_) => Err("Unexpected response from server".to_string()),
     }
 }
