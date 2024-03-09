@@ -10,8 +10,7 @@ resource "aws_apigatewayv2_api" "api_gw" {
     cancel_route_lambda_arn      = aws_lambda_function.cancel_route.invoke_arn,
     email_subscribe_lambda_arn   = aws_lambda_function.email_subscribe.invoke_arn,
     email_unsubscribe_lambda_arn = aws_lambda_function.email_unsubscribe.invoke_arn,
-    # route_cancel_lambda_arn = aws_lambda_function.route_cancel.invoke_arn,
-    # status_lambda_arn = aws_lambda_function.status.invoke_arn,
+    set_attendance_lambda_arn    = aws_lambda_function.set_attendance.invoke_arn,
   })
 
   cors_configuration {

@@ -47,5 +47,13 @@ name = "ecc-api-unsubscribe"
 path = "src/lambda/unsubscribe.rs"
 
 [[bin]]
+name = "ecc-api-set-attendance"
+path = "src/lambda/set_attendance.rs"
+
+[[bin]]
 name = "ecc-process-clear-route"
 path = "src/lambda/clear_route.rs"
+
+[[bin]]
+name = "ecc-process-attendance-report"
+path = "src/lambda/attendance_report.rs"

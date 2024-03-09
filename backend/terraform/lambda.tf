@@ -82,8 +82,9 @@ resource "aws_lambda_function" "clear_route" {
   role             = aws_iam_role.clear_route_lambda_role.arn
   handler          = "bootstrap"
   runtime          = "provided.al2"
-  timeout          = 25
+  timeout          = 10
   memory_size      = 128
+
   environment {
     variables = {
       "ROUTE_DATA_SSM" = aws_ssm_parameter.route_data.name
@@ -111,4 +112,39 @@ resource "aws_lambda_function" "email_unsubscribe" {
   runtime          = "provided.al2"
   timeout          = 10
   memory_size      = 128
+}
+
+resource "aws_lambda_function" "set_attendance" {
+  function_name    = "${var.app-name}-api-set-attendance"
+  filename         = "${path.module}/../target/lambda/ecc-api-set-attendance/bootstrap.zip"
+  source_code_hash = filesha256("${path.module}/../src/lambda/set_attendance.rs")
+  role             = aws_iam_role.set_attendance_lambda_role.arn
+  handler          = "bootstrap"
+  runtime          = "provided.al2"
+  timeout          = 10
+  memory_size      = 128
+
+  environment {
+    variables = {
+      "ROUTE_DATA_SSM" = aws_ssm_parameter.route_data.name
+    }
+  }
+}
+
+resource "aws_lambda_function" "attendance_report" {
+  function_name    = "${var.app-name}-process-attendance-report"
+  filename         = "${path.module}/../target/lambda/ecc-process-attendance-report/bootstrap.zip"
+  source_code_hash = filesha256("${path.module}/../src/lambda/attendance_report.rs")
+  role             = aws_iam_role.attendance_report_lambda_role.arn
+  handler          = "bootstrap"
+  runtime          = "provided.al2"
+  timeout          = 25
+  memory_size      = 128
+
+  environment {
+    variables = {
+      "MAILING_LIST_TABLE_NAME" = aws_dynamodb_table.mailing_list.id
+      "ADMIN_EMAILS_SSM"        = aws_ssm_parameter.admin_emails_ssm.name
+    }
+  }
 }

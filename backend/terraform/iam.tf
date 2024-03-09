@@ -112,6 +112,36 @@ resource "aws_iam_role" "email_unsubscribe_lambda_role" {
   }
 }
 
+resource "aws_iam_role" "set_attendance_lambda_role" {
+  name               = "${var.app-name}-set-attendance-lambda-role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
+
+  inline_policy {
+    name   = "${var.app-name}-set-attendance-lambda-policy"
+    policy = data.aws_iam_policy_document.set_attendance_lambda_policy.json
+  }
+
+  inline_policy {
+    name   = "${var.app-name}-lambda-logging"
+    policy = data.aws_iam_policy_document.lambda_logging.json
+  }
+}
+
+resource "aws_iam_role" "attendance_report_lambda_role" {
+  name               = "${var.app-name}-attendance-report-lambda-role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
+
+  inline_policy {
+    name   = "${var.app-name}-attendance-report-lambda-policy"
+    policy = data.aws_iam_policy_document.attendance_report_lambda_policy.json
+  }
+
+  inline_policy {
+    name   = "${var.app-name}-lambda-logging"
+    policy = data.aws_iam_policy_document.lambda_logging.json
+  }
+}
+
 data "aws_iam_policy_document" "assume_role_policy" {
   statement {
     effect  = "Allow"
@@ -259,6 +289,34 @@ data "aws_iam_policy_document" "unsubscribe_lambda_policy" {
   statement {
     effect    = "Allow"
     actions   = ["ses:DeleteEmailIdentity"]
+    resources = ["*"]
+  }
+}
+
+data "aws_iam_policy_document" "set_attendance_lambda_policy" {
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:GetItem", "dynamodb:PutItem"]
+    resources = [aws_dynamodb_table.mailing_list.arn]
+  }
+}
+
+data "aws_iam_policy_document" "attendance_report_lambda_policy" {
+  statement {
+    effect    = "Allow"
+    actions   = ["ssm:GetParameter"]
+    resources = [aws_ssm_parameter.admin_emails_ssm.arn]
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:Scan", "dynamodb:UpdateItem"]
+    resources = [aws_dynamodb_table.mailing_list.arn]
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["ses:SendEmail"]
     resources = ["*"]
   }
 }

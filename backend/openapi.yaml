@@ -119,17 +119,17 @@ paths:
         timeoutInMillis: 30000
       # END-IGNORE
 
-  # /status:
-  #   put:
-  #     responses:
-  #       default:
-  #         description: "Default response for PUT /status"
-  #     # BEGIN-IGNORE
-  #     x-amazon-apigateway-integration:
-  #       payloadFormatVersion: "2.0"
-  #       type: "aws_proxy"
-  #       httpMethod: "POST"
-  #       uri: {status_lambda_arn}
-  #       connectionType: "INTERNET"
-  #       timeoutInMillis: 30000
-  #     # END-IGNORE
+  /status:
+    put:
+      responses:
+        default:
+          description: "Default response for PUT /status"
+      # BEGIN-IGNORE
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: ${set_attendance_lambda_arn}
+        connectionType: "INTERNET"
+        timeoutInMillis: 30000
+      # END-IGNORE
