@@ -7,7 +7,9 @@ use crate::components::footer::Footer;
 use crate::components::loading_spinner::LoadingSpinner;
 use crate::components::nav_bar::NavBar;
 use crate::components::page_header::PageHeader;
-use crate::helpers::request_confirm_subscribe::{request_confirm_subscribe, ConfirmSubscribeStatus};
+use crate::helpers::request_confirm_subscribe::{
+    request_confirm_subscribe, ConfirmSubscribeStatus,
+};
 
 #[derive(Serialize, Deserialize)]
 struct ConfirmSubscribeQuery {
@@ -29,8 +31,9 @@ pub fn confirm() -> Html {
     {
         let confirm_subscribe_status = confirm_subscribe_status.clone();
         let user_id = user_id.id.clone();
-        let status_callback =
-            Callback::from(move |response: ConfirmSubscribeStatus| confirm_subscribe_status.set(response));
+        let status_callback = Callback::from(move |response: ConfirmSubscribeStatus| {
+            confirm_subscribe_status.set(response)
+        });
 
         // Request confirmation only once
         use_effect_with(user_id.clone(), move |_| {
