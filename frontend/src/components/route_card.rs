@@ -2,21 +2,6 @@ use yew::prelude::*;
 
 use crate::helpers::list_routes::RouteData;
 
-// #[derive(Serialize, Deserialize, PartialEq, Debug)]
-// pub struct RouteData {
-//     pub id_str: String,
-//     pub name: String,
-//     pub distance: f32,
-//     pub elevation_gain: f32,
-//     pub updated_at: String,
-//     pub map_urls: MapUrls,
-// }
-
-// #[derive(Serialize, Deserialize, PartialEq, Debug)]
-// pub struct MapUrls {
-//     pub url: String,
-// }
-
 #[derive(Properties, PartialEq)]
 pub struct RouteCardProps {
     pub route_data: RouteData,
@@ -34,6 +19,10 @@ pub fn route_card(props: &RouteCardProps) -> Html {
         .split("T")
         .collect::<Vec<&str>>()[0];
     let display_date = format!("Updated: {}", date_without_time);
+
+    fn stop_propagation(event: MouseEvent) {
+        event.stop_propagation();
+    }
 
     html! {
         <div class="card" style="max-width: 350px; display: inline-grid;">
@@ -67,6 +56,11 @@ pub fn route_card(props: &RouteCardProps) -> Html {
                 </div>
                 <div class="media m-2 pt-2">
                     <time>{ display_date }</time>
+                </div>
+                <div class="media m-2 pt-2">
+                    <a href={ format!("https://www.strava.com/routes/{}", props.route_data.id_str) } target="_blank" onclick={stop_propagation}>
+                        <b>{"View on Strava"}</b>
+                    </a>
                 </div>
             </div>
         </div>
