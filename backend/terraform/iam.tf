@@ -190,6 +190,7 @@ data "aws_iam_policy_document" "contact_lambda_policy" {
     actions   = ["ssm:GetParameter"]
     resources = [aws_ssm_parameter.admin_emails_ssm.arn]
   }
+
   statement {
     effect    = "Allow"
     actions   = ["ses:SendEmail"]
@@ -211,16 +212,19 @@ data "aws_iam_policy_document" "set_route_lambda_policy" {
     actions   = ["ssm:GetParameter"]
     resources = [aws_ssm_parameter.admin_strava_ids_ssm.arn]
   }
+
   statement {
     effect    = "Allow"
     actions   = ["ssm:PutParameter"]
     resources = [aws_ssm_parameter.route_data.arn]
   }
+
   statement {
     effect    = "Allow"
     actions   = ["dynamodb:Scan"]
     resources = [aws_dynamodb_table.mailing_list.arn]
   }
+
   statement {
     effect    = "Allow"
     actions   = ["ses:SendEmail"]
@@ -237,16 +241,19 @@ data "aws_iam_policy_document" "cancel_route_lambda_policy" {
       aws_ssm_parameter.admin_strava_ids_ssm.arn
     ]
   }
+
   statement {
     effect    = "Allow"
     actions   = ["ssm:PutParameter"]
     resources = [aws_ssm_parameter.route_data.arn]
   }
+
   statement {
     effect    = "Allow"
     actions   = ["dynamodb:Scan"]
     resources = [aws_dynamodb_table.mailing_list.arn]
   }
+
   statement {
     effect    = "Allow"
     actions   = ["ses:SendEmail"]
@@ -268,14 +275,16 @@ data "aws_iam_policy_document" "subscribe_lambda_policy" {
     actions   = ["dynamodb:Query"]
     resources = ["${aws_dynamodb_table.mailing_list.arn}/index/EmailIndex"]
   }
+
   statement {
     effect    = "Allow"
     actions   = ["dynamodb:PutItem"]
     resources = [aws_dynamodb_table.mailing_list.arn]
   }
+
   statement {
     effect    = "Allow"
-    actions   = ["ses:CreateEmailIdentity"]
+    actions   = ["ses:SendEmail"]
     resources = ["*"]
   }
 }
@@ -285,11 +294,6 @@ data "aws_iam_policy_document" "unsubscribe_lambda_policy" {
     effect    = "Allow"
     actions   = ["dynamodb:GetItem", "dynamodb:DeleteItem"]
     resources = [aws_dynamodb_table.mailing_list.arn]
-  }
-  statement {
-    effect    = "Allow"
-    actions   = ["ses:DeleteEmailIdentity"]
-    resources = ["*"]
   }
 }
 

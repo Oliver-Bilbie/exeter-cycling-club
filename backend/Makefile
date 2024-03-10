@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := all
 
-all: validate build plan apply
+all: build validate plan apply
 
 build:
 	@cargo lambda build --release --output-format zip

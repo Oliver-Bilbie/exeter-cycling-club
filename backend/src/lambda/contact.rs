@@ -34,7 +34,7 @@ async fn contact_us(event: Request) -> Result<Response<Body>, Error> {
     let recipients = get_admin_list(&ssm_client).await?;
 
     let message = format!("Message from: {}\n\n{}", contact_email, message);
-    send_email(&ses_client, recipients, message).await?;
+    send_emails(&ses_client, &recipients, &message).await?;
 
     Ok(Response::builder()
         .status(200)
@@ -66,13 +66,24 @@ async fn get_admin_list(ssm_client: &ssm::Client) -> Result<Vec<String>, Error> 
     Ok(admin_list)
 }
 
+async fn send_emails(
+    ses_client: &ses::Client,
+    recipients: &Vec<String>,
+    message: &String,
+) -> Result<(), Error> {
+    for recipient in recipients {
+        send_email(ses_client, recipient.to_string(), message).await?;
+    }
+    Ok(())
+}
+
 async fn send_email(
     ses_client: &ses::Client,
-    recipients: Vec<String>,
-    message: String,
+    recipient: String,
+    message: &String,
 ) -> Result<(), Error> {
     let mut destination: ses::types::Destination = ses::types::Destination::builder().build();
-    destination.to_addresses = Some(recipients);
+    destination.to_addresses = Some(vec![recipient]);
 
     let subject_content = ses::types::Content::builder()
         .data("Message from website")

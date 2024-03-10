@@ -231,7 +231,7 @@ async fn get_mailing_list(ddb_client: &ddb::Client) -> Result<Vec<EmailRecipient
                 }
             },
             None => {
-                println!("[ERROR] No id found");
+                println!("[ERROR] No email found");
                 continue;
             }
         };
@@ -250,7 +250,23 @@ async fn get_mailing_list(ddb_client: &ddb::Client) -> Result<Vec<EmailRecipient
             }
         };
 
-        mailing_list.push(EmailRecipient { email, id });
+        let verified = match item.get("verified") {
+            Some(value) => match value.as_bool() {
+                Ok(value_bool) => value_bool,
+                Err(err) => {
+                    println!("[ERROR] {:?}", err);
+                    continue;
+                }
+            },
+            None => {
+                println!("[ERROR] No verification status found");
+                continue;
+            }
+        };
+
+        if *verified {
+            mailing_list.push(EmailRecipient { email, id });
+        }
     }
 
     Ok(mailing_list)
@@ -298,7 +314,7 @@ async fn send_email(
 }
 
 fn build_email_body(route: &Route, recipient: &EmailRecipient) -> String {
-    let template_body = include_str!("../templates/cancelled.html");
+    let template_body = include_str!("../../templates/cancelled.html");
 
     let email_body = template_body
         .replace("%MESSAGE%", &route.message)

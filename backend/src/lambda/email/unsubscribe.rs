@@ -4,6 +4,7 @@ use aws_sdk_sesv2 as ses;
 use lambda_http::{run, service_fn, Body, Error, Request, Response};
 use serde::Deserialize;
 use serde_json::json;
+use std::env;
 
 #[derive(Deserialize)]
 struct UnsubscribeRequest {
@@ -31,9 +32,12 @@ async fn unsubscribe(event: Request) -> Result<Response<Body>, Error> {
 
     let email = get_email_address(&ddb_client, &id).await?;
 
+    let mailing_list_ddb_id =
+        env::var("MAILING_LIST_TABLE_NAME").expect("MAILING_LIST_TABLE_NAME not set");
+
     ddb_client
         .delete_item()
-        .table_name("ecc-mailing-list")
+        .table_name(mailing_list_ddb_id)
         .key("id", ddb::types::AttributeValue::S(id.to_string()))
         .send()
         .await?;
@@ -62,9 +66,12 @@ async fn unsubscribe(event: Request) -> Result<Response<Body>, Error> {
 }
 
 async fn get_email_address(ddb_client: &ddb::Client, id: &str) -> Result<String, Error> {
+    let mailing_list_ddb_id =
+        env::var("MAILING_LIST_TABLE_NAME").expect("MAILING_LIST_TABLE_NAME not set");
+
     let ddb_resp = ddb_client
         .get_item()
-        .table_name("ecc-mailing-list")
+        .table_name(mailing_list_ddb_id)
         .key("id", ddb::types::AttributeValue::S(id.to_string()))
         .send()
         .await?;
