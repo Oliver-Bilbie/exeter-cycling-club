@@ -1,6 +1,7 @@
 pub mod about_section;
 pub mod cancel_form;
 pub mod confirm_route;
+pub mod confirm_subscribe;
 pub mod contact_form;
 pub mod contact_us;
 pub mod email_sign_up;

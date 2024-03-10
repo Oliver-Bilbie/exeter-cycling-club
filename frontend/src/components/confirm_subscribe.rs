@@ -7,38 +7,38 @@ use crate::components::footer::Footer;
 use crate::components::loading_spinner::LoadingSpinner;
 use crate::components::nav_bar::NavBar;
 use crate::components::page_header::PageHeader;
-use crate::helpers::request_unsubscribe::{request_unsubscribe, UnsubscribeStatus};
+use crate::helpers::request_confirm_subscribe::{request_confirm_subscribe, ConfirmSubscribeStatus};
 
 #[derive(Serialize, Deserialize)]
-struct UnsubscribeQuery {
+struct ConfirmSubscribeQuery {
     id: String,
 }
 
-#[function_component(Unsubscribe)]
-pub fn unsubscribe() -> Html {
+#[function_component(Confirm)]
+pub fn confirm() -> Html {
     let location = use_location();
     let user_id = match location {
         Some(location) => location
-            .query::<UnsubscribeQuery>()
-            .unwrap_or(UnsubscribeQuery { id: String::new() }),
-        None => UnsubscribeQuery { id: String::new() },
+            .query::<ConfirmSubscribeQuery>()
+            .unwrap_or(ConfirmSubscribeQuery { id: String::new() }),
+        None => ConfirmSubscribeQuery { id: String::new() },
     };
 
-    let unsubscribe_status = use_state_eq(|| UnsubscribeStatus::Loading);
+    let confirm_subscribe_status = use_state_eq(|| ConfirmSubscribeStatus::Loading);
 
     {
-        let unsubscribe_status = unsubscribe_status.clone();
+        let confirm_subscribe_status = confirm_subscribe_status.clone();
         let user_id = user_id.id.clone();
         let status_callback =
-            Callback::from(move |response: UnsubscribeStatus| unsubscribe_status.set(response));
+            Callback::from(move |response: ConfirmSubscribeStatus| confirm_subscribe_status.set(response));
 
-        // Request unsubscribe only once
+        // Request confirmation only once
         use_effect_with(user_id.clone(), move |_| {
             if user_id.is_empty() {
-                status_callback.emit(UnsubscribeStatus::Failure);
+                status_callback.emit(ConfirmSubscribeStatus::Failure);
             } else {
                 spawn_local(async move {
-                    let resp = request_unsubscribe(user_id).await;
+                    let resp = request_confirm_subscribe(user_id).await;
                     status_callback.emit(resp);
                 });
             }
@@ -46,18 +46,18 @@ pub fn unsubscribe() -> Html {
     }
 
     let page_body = {
-        move |unsubscribe_status: &UnsubscribeStatus| match unsubscribe_status {
-            UnsubscribeStatus::Success => html! {
+        move |confirm_subscribe_status: &ConfirmSubscribeStatus| match confirm_subscribe_status {
+            ConfirmSubscribeStatus::Success => html! {
                 <h2 class="title is-2 has-text-centered">
-                    {"You have been unsubscribed successfully"}
+                    {"Subscription confirmed successfully.\nYou will now receive emails about upcoming rides."}
                 </h2>
             },
-            UnsubscribeStatus::Failure => html! {
+            ConfirmSubscribeStatus::Failure => html! {
                 <h2 class="title is-2 has-text-centered">
-                    {"An error occurred while trying to unsubscribe. Please try again later, or contact us if this persists."}
+                    {"Unable to confirm your subscription.\nPlease try subscribing again, or contact us if this persists."}
                 </h2>
             },
-            UnsubscribeStatus::Loading => html! {
+            ConfirmSubscribeStatus::Loading => html! {
                 <div class="container is-vcentered mb-6" style="display: grid;">
                     <LoadingSpinner size={200} />
                 </div>
@@ -73,7 +73,7 @@ pub fn unsubscribe() -> Html {
             <div class="hero texture-light is-flex-grow-5">
                 <div class="container is-flex is-flex-direction-column is-justify-content-center">
                     <div class="my-6 mx-4 is-flex is-flex-direction-column">
-                        {page_body(&unsubscribe_status)}
+                        {page_body(&confirm_subscribe_status)}
                     </div>
                 </div>
             </div>
