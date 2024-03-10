@@ -27,6 +27,19 @@ paths:
         connectionType: "INTERNET"
         timeoutInMillis: 30000
       # END-IGNORE
+    patch:
+      responses:
+        default:
+          description: "Default response for PATCH /email"
+      # BEGIN-IGNORE
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: ${email_confirm_subscribe_lambda_arn}
+        connectionType: "INTERNET"
+        timeoutInMillis: 30000
+      # END-IGNORE
     delete:
       responses:
         default:

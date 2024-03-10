@@ -99,6 +99,21 @@ resource "aws_iam_role" "email_subscribe_lambda_role" {
   }
 }
 
+resource "aws_iam_role" "email_confirm_subscribe_lambda_role" {
+  name               = "${var.app-name}-email-confirm-subscribe-lambda-role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
+
+  inline_policy {
+    name   = "${var.app-name}-confirm-subscribe-lambda-policy"
+    policy = data.aws_iam_policy_document.confirm_subscribe_lambda_policy.json
+  }
+
+  inline_policy {
+    name   = "${var.app-name}-lambda-logging"
+    policy = data.aws_iam_policy_document.lambda_logging.json
+  }
+}
+
 resource "aws_iam_role" "email_unsubscribe_lambda_role" {
   name               = "${var.app-name}-email-unsubscribe-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
@@ -286,6 +301,14 @@ data "aws_iam_policy_document" "subscribe_lambda_policy" {
     effect    = "Allow"
     actions   = ["ses:SendEmail"]
     resources = ["*"]
+  }
+}
+
+data "aws_iam_policy_document" "confirm_subscribe_lambda_policy" {
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:GetItem", "dynamodb:UpdateItem"]
+    resources = [aws_dynamodb_table.mailing_list.arn]
   }
 }
 
