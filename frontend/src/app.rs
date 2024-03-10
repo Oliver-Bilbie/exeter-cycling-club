@@ -4,6 +4,7 @@ use yew::prelude::*;
 use yew_router::history::{AnyHistory, History, MemoryHistory};
 use yew_router::prelude::*;
 
+use crate::components::confirm_subscribe::Confirm;
 use crate::components::contact_us::ContactUs;
 use crate::components::home::Home;
 use crate::components::not_found::NotFound;
@@ -27,6 +28,8 @@ pub enum Route {
     RidePage,
     #[at("/contact")]
     Contact,
+    #[at("/confirm")]
+    Confirm,
     #[at("/unsubscribe")]
     Unsubscribe,
     #[at("/status")]
@@ -51,6 +54,7 @@ fn switch(routes: Route) -> Html {
         Route::Home => html! { <Home header_visible={true} /> },
         Route::About => html! { <Home header_visible={false} /> },
         Route::Contact => html! { <ContactUs /> },
+        Route::Confirm => html! { <Confirm /> },
         Route::RidePage => html! { <RidePage /> },
         Route::SetStatus => html! { <SetStatus /> },
         Route::Unsubscribe => html! { <Unsubscribe /> },
