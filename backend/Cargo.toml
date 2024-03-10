@@ -43,6 +43,10 @@ name = "ecc-api-subscribe"
 path = "src/lambda/email/subscribe.rs"
 
 [[bin]]
+name = "ecc-api-confirm-subscribe"
+path = "src/lambda/email/confirm_subscribe.rs"
+
+[[bin]]
 name = "ecc-api-unsubscribe"
 path = "src/lambda/email/unsubscribe.rs"
 

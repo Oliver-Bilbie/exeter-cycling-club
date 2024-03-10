@@ -109,6 +109,23 @@ resource "aws_lambda_function" "email_subscribe" {
   }
 }
 
+resource "aws_lambda_function" "email_confirm_subscribe" {
+  function_name    = "${var.app-name}-api-email-confirm-subscribe"
+  filename         = "${path.module}/../target/lambda/ecc-api-confirm-subscribe/bootstrap.zip"
+  source_code_hash = filesha256("${path.module}/../target/lambda/ecc-api-confirm-subscribe/bootstrap.zip")
+  role             = aws_iam_role.email_confirm_subscribe_lambda_role.arn
+  handler          = "bootstrap"
+  runtime          = "provided.al2"
+  timeout          = 10
+  memory_size      = 128
+
+  environment {
+    variables = {
+      "MAILING_LIST_TABLE_NAME" = aws_dynamodb_table.mailing_list.id
+    }
+  }
+}
+
 resource "aws_lambda_function" "email_unsubscribe" {
   function_name    = "${var.app-name}-api-email-unsubscribe"
   filename         = "${path.module}/../target/lambda/ecc-api-unsubscribe/bootstrap.zip"

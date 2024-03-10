@@ -3,14 +3,15 @@ resource "aws_apigatewayv2_api" "api_gw" {
   protocol_type = "HTTP"
 
   body = templatefile("${path.module}/../openapi.yaml", {
-    auth_lambda_arn              = aws_lambda_function.authenticate.invoke_arn,
-    contact_lambda_arn           = aws_lambda_function.contact.invoke_arn,
-    get_route_lambda_arn         = aws_lambda_function.get_route.invoke_arn,
-    set_route_lambda_arn         = aws_lambda_function.set_route.invoke_arn,
-    cancel_route_lambda_arn      = aws_lambda_function.cancel_route.invoke_arn,
-    email_subscribe_lambda_arn   = aws_lambda_function.email_subscribe.invoke_arn,
-    email_unsubscribe_lambda_arn = aws_lambda_function.email_unsubscribe.invoke_arn,
-    set_attendance_lambda_arn    = aws_lambda_function.set_attendance.invoke_arn,
+    auth_lambda_arn                    = aws_lambda_function.authenticate.invoke_arn,
+    contact_lambda_arn                 = aws_lambda_function.contact.invoke_arn,
+    get_route_lambda_arn               = aws_lambda_function.get_route.invoke_arn,
+    set_route_lambda_arn               = aws_lambda_function.set_route.invoke_arn,
+    cancel_route_lambda_arn            = aws_lambda_function.cancel_route.invoke_arn,
+    email_subscribe_lambda_arn         = aws_lambda_function.email_subscribe.invoke_arn,
+    email_confirm_subscribe_lambda_arn = aws_lambda_function.email_confirm_subscribe.invoke_arn,
+    email_unsubscribe_lambda_arn       = aws_lambda_function.email_unsubscribe.invoke_arn,
+    set_attendance_lambda_arn          = aws_lambda_function.set_attendance.invoke_arn,
   })
 
   cors_configuration {
@@ -70,6 +71,14 @@ resource "aws_lambda_permission" "apigw_invoke_email_subscribe" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.email_subscribe.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.api_gw.execution_arn}/*"
+}
+
+resource "aws_lambda_permission" "apigw_invoke_email_confirm_subscribe" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.email_confirm_subscribe.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.api_gw.execution_arn}/*"
 }
