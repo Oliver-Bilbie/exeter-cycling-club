@@ -125,6 +125,9 @@ pub fn route_select() -> Html {
                                 </a>
                             }).collect::<Html>()}
                     </div>
+                    <div class="m-6" style="display: flex; justify-content: center; align-content: center;">
+                        <img src="images/api_logo_pwrdBy_strava_horiz_gray.png" />
+                    </div>
                 </div>
             },
             FormStatus::Confirm(route_info) => {
