@@ -1,8 +1,8 @@
 use wasm_bindgen::JsCast;
-use web_sys::{EventTarget, HtmlInputElement, HtmlTextAreaElement};
+use web_sys::{HtmlInputElement, HtmlTextAreaElement};
 use yew::prelude::*;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub struct MessageData {
     pub email: String,
     pub message: String,
@@ -10,44 +10,37 @@ pub struct MessageData {
 
 #[derive(Properties, PartialEq)]
 pub struct ContactFormProps {
-    pub form_data: UseStateHandle<MessageData>,
-    pub on_submit: Callback<()>,
+    pub on_submit: Callback<MessageData>,
 }
 
 #[function_component(ContactForm)]
 pub fn contact_form(props: &ContactFormProps) -> Html {
-    let handle_update_email = {
-        let message_data = props.form_data.clone();
-        Callback::from(move |e: Event| {
-            let target: Option<EventTarget> = e.target();
-            let user_input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
-            if let Some(input) = user_input {
-                message_data.set(MessageData {
-                    email: input.value(),
-                    message: message_data.message.clone(),
-                });
-            }
-        })
-    };
-
-    let handle_update_message = {
-        let message_data = props.form_data.clone();
-        Callback::from(move |e: Event| {
-            let target: Option<EventTarget> = e.target();
-            let user_input = target.and_then(|t| t.dyn_into::<HtmlTextAreaElement>().ok());
-            if let Some(input) = user_input {
-                message_data.set(MessageData {
-                    email: message_data.email.clone(),
-                    message: input.value(),
-                });
-            }
-        })
-    };
-
     let handle_submit = {
         let on_submit = props.on_submit.clone();
+
         Callback::from(move |_| {
-            on_submit.emit(());
+            let window = web_sys::window().unwrap();
+            let document = window.document().unwrap();
+
+            let email_element = document.get_element_by_id("email-input");
+            let email_input = email_element.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
+            let email_value = match email_input {
+                Some(email) => email.value(),
+                None => "".to_string(),
+            };
+
+            let message_element = document.get_element_by_id("message-input");
+            let message_input =
+                message_element.and_then(|t| t.dyn_into::<HtmlTextAreaElement>().ok());
+            let message_value = match message_input {
+                Some(message) => message.value(),
+                None => "".to_string(),
+            };
+
+            on_submit.emit(MessageData {
+                email: email_value.clone(),
+                message: message_value.clone(),
+            });
         })
     };
 
@@ -59,8 +52,8 @@ pub fn contact_form(props: &ContactFormProps) -> Html {
                 </label>
                 <div class="control has-icons-left has-icons-right">
                     <input
+                        id="email-input"
                         class="input is-medium"
-                        onchange={handle_update_email}
                         placeholder="Email"
                         type="email"
                     />
@@ -76,8 +69,8 @@ pub fn contact_form(props: &ContactFormProps) -> Html {
                 </label>
                 <div class="control">
                     <textarea
+                        id="message-input"
                         class="textarea has-fixed-size is-medium"
-                        onchange={handle_update_message}
                         placeholder="Message"
                         style="height: 300px;"
                     />
