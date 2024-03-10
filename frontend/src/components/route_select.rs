@@ -77,13 +77,13 @@ pub fn route_select() -> Html {
 
     let handle_search = {
         let search_value = search_value.clone();
-        Callback::from(move |e: Event| {
+        move |e: InputEvent| {
             let target: Option<EventTarget> = e.target();
             let user_input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
             if let Some(input) = user_input {
                 search_value.set(input.value());
             }
-        })
+        }
     };
 
     let handle_select_route = |route_id: String, route_name: String| {
@@ -109,7 +109,7 @@ pub fn route_select() -> Html {
                         <div class="control">
                             <input
                                 class="input is-medium"
-                                onchange={handle_search}
+                                oninput={handle_search}
                                 placeholder="Route name"
                                 type="text"
                             />
