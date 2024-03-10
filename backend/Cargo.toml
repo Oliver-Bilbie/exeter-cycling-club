@@ -28,32 +28,32 @@ path = "src/lambda/contact.rs"
 
 [[bin]]
 name = "ecc-api-get-route"
-path = "src/lambda/get_route.rs"
+path = "src/lambda/route/get_route.rs"
 
 [[bin]]
 name = "ecc-api-set-route"
-path = "src/lambda/set_route.rs"
+path = "src/lambda/route/set_route.rs"
 
 [[bin]]
 name = "ecc-api-cancel-route"
-path = "src/lambda/cancel_route.rs"
+path = "src/lambda/route/cancel_route.rs"
 
 [[bin]]
 name = "ecc-api-subscribe"
-path = "src/lambda/subscribe.rs"
+path = "src/lambda/email/subscribe.rs"
 
 [[bin]]
 name = "ecc-api-unsubscribe"
-path = "src/lambda/unsubscribe.rs"
+path = "src/lambda/email/unsubscribe.rs"
 
 [[bin]]
 name = "ecc-api-set-attendance"
-path = "src/lambda/set_attendance.rs"
+path = "src/lambda/attendance/set_attendance.rs"
 
 [[bin]]
 name = "ecc-process-clear-route"
-path = "src/lambda/clear_route.rs"
+path = "src/lambda/route/clear_route.rs"
 
 [[bin]]
 name = "ecc-process-attendance-report"
-path = "src/lambda/attendance_report.rs"
+path = "src/lambda/attendance/attendance_report.rs"

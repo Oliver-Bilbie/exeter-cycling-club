@@ -43,8 +43,7 @@ async fn attendance_report(_event: LambdaEvent<Request>) -> Result<(), Error> {
     reset_member_statuses(&ddb_client, &members).await?;
 
     let recipients = get_recipients(&ssm_client).await?;
-    println!("[DEBUG] Recipients: {:?}", recipients);
-    send_email(&ses_client, &recipients, &attendees).await?;
+    send_emails(&ses_client, &recipients, &attendees).await?;
 
     Ok(())
 }
@@ -159,6 +158,7 @@ async fn get_recipients(ssm_client: &ssm::Client) -> Result<Vec<String>, Error> 
     let recipients_param = ssm_client
         .get_parameter()
         .name(admin_emails_ssm_id)
+        .with_decryption(true)
         .send()
         .await?;
 
@@ -171,13 +171,24 @@ async fn get_recipients(ssm_client: &ssm::Client) -> Result<Vec<String>, Error> 
     Ok(recipients.split(",").map(|s| s.to_string()).collect())
 }
 
-async fn send_email(
+async fn send_emails(
     ses_client: &ses::Client,
     recipients: &Vec<String>,
     attendees: &Attendees,
 ) -> Result<(), Error> {
+    for recipient in recipients {
+        send_email(ses_client, recipient.to_string(), attendees).await?;
+    }
+    Ok(())
+}
+
+async fn send_email(
+    ses_client: &ses::Client,
+    recipient: String,
+    attendees: &Attendees,
+) -> Result<(), Error> {
     let mut destination: ses::types::Destination = ses::types::Destination::builder().build();
-    destination.to_addresses = Some(recipients.clone());
+    destination.to_addresses = Some(vec![recipient]);
 
     let subject_content = ses::types::Content::builder()
         .data("This week's riders")
@@ -213,7 +224,7 @@ async fn send_email(
 }
 
 fn build_email_body(attendees: &Attendees) -> String {
-    let template_body = include_str!("../templates/attendance.html");
+    let template_body = include_str!("../../templates/attendance.html");
 
     let email_body = template_body
         .replace("%YES_LIST%", &attendees.yes.join("\n"))
