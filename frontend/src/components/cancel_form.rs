@@ -39,7 +39,7 @@ pub fn cancel_form(props: &CancelFormProps) -> Html {
                         class="textarea has-fixed-size is-medium"
                         onchange={handle_update_message}
                         placeholder="This message will be displayed on the ride page and sent out to the mailing list."
-                        style="height: 300px;"
+                        style="height: 400px;"
                     />
                 </div>
             </div>
