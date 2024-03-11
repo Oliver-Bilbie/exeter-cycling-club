@@ -1,9 +1,3 @@
-// #[derive(PartialEq)]
-// pub enum AboutUsSection {
-//     Len3(ThreeParagraphSection),
-//     Len5(FiveParagraphSection),
-// }
-
 #[derive(PartialEq, Clone)]
 pub struct AboutUsSection {
     pub title: &'static str,

@@ -6,14 +6,9 @@ use yew::prelude::*;
 
 use crate::components::loading_spinner::LoadingSpinner;
 use crate::components::notification::NotificationState;
+use crate::helpers::form_state::FormState;
 use crate::helpers::sign_up::sign_up;
 use crate::helpers::validate_email::validate_email;
-
-enum FormState {
-    Ready,
-    Loading,
-    Complete,
-}
 
 #[function_component(EmailSignUp)]
 pub fn email_sign_up() -> Html {

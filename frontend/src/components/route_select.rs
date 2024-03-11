@@ -18,7 +18,7 @@ use crate::helpers::list_routes::{list_routes, RouteData};
 use crate::Route;
 
 #[derive(PartialEq)]
-enum FormStatus {
+enum RouteFormStatus {
     Loading,
     Ready(Vec<RouteData>),
     Confirm(ConfirmRouteProps),
@@ -30,7 +30,7 @@ pub fn route_select() -> Html {
     let dispatch_notification = use_atom_setter::<NotificationState>();
     let auth_state = use_atom_value::<AuthState>();
     let navigator = use_navigator().unwrap();
-    let form_status = use_state_eq(|| FormStatus::Loading);
+    let form_status = use_state_eq(|| RouteFormStatus::Loading);
     let search_value = use_state_eq(String::new);
 
     {
@@ -39,8 +39,8 @@ pub fn route_select() -> Html {
         let status_callback =
             Callback::from(
                 move |response: Result<Vec<RouteData>, String>| match response {
-                    Ok(data) => form_status.set(FormStatus::Ready(data)),
-                    Err(err) => form_status.set(FormStatus::Error(err)),
+                    Ok(data) => form_status.set(RouteFormStatus::Ready(data)),
+                    Err(err) => form_status.set(RouteFormStatus::Error(err)),
                 },
             );
 
@@ -91,7 +91,7 @@ pub fn route_select() -> Html {
         let route_name = route_name.clone();
         let form_status = form_status.clone();
         move |_| {
-            form_status.set(FormStatus::Confirm(ConfirmRouteProps {
+            form_status.set(RouteFormStatus::Confirm(ConfirmRouteProps {
                 route_id: route_id.clone(),
                 name: route_name.clone(),
             }))
@@ -99,8 +99,8 @@ pub fn route_select() -> Html {
     };
 
     let page_body = {
-        move |form_status: &FormStatus| match form_status {
-            FormStatus::Ready(route_data) => html! {
+        move |form_status: &RouteFormStatus| match form_status {
+            RouteFormStatus::Ready(route_data) => html! {
                 <div>
                     <div class="field container pb-5" style="max-width: 350px;">
                         <label class="label is-size-5">
@@ -130,11 +130,13 @@ pub fn route_select() -> Html {
                     </div>
                 </div>
             },
-            FormStatus::Confirm(route_info) => {
+            RouteFormStatus::Confirm(route_info) => {
                 html! { <ConfirmRoute name={route_info.name.clone()} route_id={route_info.route_id.clone()} /> }
             }
-            FormStatus::Error(message) => html! { <NoRouteDisplay message={message.clone()} /> },
-            FormStatus::Loading => html! {
+            RouteFormStatus::Error(message) => {
+                html! { <NoRouteDisplay message={message.clone()} /> }
+            }
+            RouteFormStatus::Loading => html! {
                 <div class="container is-vcentered mb-6" style="display: grid;">
                     <LoadingSpinner size={200} />
                 </div>
