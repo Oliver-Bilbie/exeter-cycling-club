@@ -5,7 +5,7 @@ use yew_router::prelude::*;
 
 use crate::components::loading_spinner::LoadingSpinner;
 use crate::components::notification::NotificationState;
-use crate::components::route_form::RouteForm;
+use crate::components::route_form::{RouteForm, RouteFormData};
 use crate::helpers::auth_state::AuthState;
 use crate::helpers::set_route::{set_route, SetRouteData};
 use crate::Route;
@@ -27,13 +27,10 @@ pub fn confirm_route(props: &ConfirmRouteProps) -> Html {
         None => String::new(),
     };
 
-    let set_route_data = use_state(|| SetRouteData {
-        id: props.route_id.clone(),
-        name: props.name.clone(),
-        message: String::new(),
-        access_token,
-    });
     let is_loading = use_state_eq(|| false);
+
+    let initial_name = props.name.clone();
+    let route_id = props.route_id.clone();
 
     let handle_submit = {
         let set_form_loading = {
@@ -57,13 +54,6 @@ pub fn confirm_route(props: &ConfirmRouteProps) -> Html {
             move || is_loading.set(false)
         };
 
-        let set_route_data = SetRouteData {
-            id: set_route_data.id.clone(),
-            name: set_route_data.name.clone(),
-            message: set_route_data.message.clone(),
-            access_token: set_route_data.access_token.clone(),
-        };
-
         let notification_cb =
             Callback::from(move |response: Result<String, String>| match response {
                 Ok(_) => {
@@ -84,12 +74,19 @@ pub fn confirm_route(props: &ConfirmRouteProps) -> Html {
                 }
             });
 
-        move |_| {
-            let set_route_data = set_route_data.clone();
+        move |route_form_data: RouteFormData| {
             let notification_cb = notification_cb.clone();
+            let route_id = route_id.clone();
+            let access_token = access_token.clone();
             set_form_loading();
             spawn_local(async move {
-                let resp = set_route(set_route_data).await;
+                let resp = set_route(SetRouteData {
+                    id: route_id,
+                    name: route_form_data.name,
+                    message: route_form_data.message,
+                    access_token: access_token.to_owned(),
+                })
+                .await;
                 notification_cb.emit(resp);
             });
         }
@@ -105,7 +102,7 @@ pub fn confirm_route(props: &ConfirmRouteProps) -> Html {
                         },
                         false => html!(
                             <RouteForm
-                                route_data={set_route_data.clone()}
+                                initial_name={initial_name}
                                 on_submit={handle_submit}
                             />
                         ),

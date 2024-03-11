@@ -1,53 +1,49 @@
 use wasm_bindgen::JsCast;
-use web_sys::{EventTarget, HtmlInputElement, HtmlTextAreaElement};
+use web_sys::{HtmlInputElement, HtmlTextAreaElement};
 use yew::prelude::*;
-
-use crate::helpers::set_route::SetRouteData;
 
 #[derive(Properties, PartialEq)]
 pub struct RouteFormProps {
-    pub route_data: UseStateHandle<SetRouteData>,
-    pub on_submit: Callback<()>,
+    pub initial_name: String,
+    pub on_submit: Callback<RouteFormData>,
+}
+
+pub struct RouteFormData {
+    pub name: String,
+    pub message: String,
 }
 
 #[function_component(RouteForm)]
 pub fn route_form(props: &RouteFormProps) -> Html {
-    let handle_update_name = {
-        let route_data = props.route_data.clone();
-        Callback::from(move |e: Event| {
-            let target: Option<EventTarget> = e.target();
-            let user_input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
-            if let Some(input) = user_input {
-                route_data.set(SetRouteData {
-                    id: route_data.id.clone(),
-                    name: input.value(),
-                    message: route_data.message.clone(),
-                    access_token: route_data.access_token.clone(),
-                });
-            }
-        })
-    };
-
-    let handle_update_message = {
-        let route_data = props.route_data.clone();
-        Callback::from(move |e: Event| {
-            let target: Option<EventTarget> = e.target();
-            let user_input = target.and_then(|t| t.dyn_into::<HtmlTextAreaElement>().ok());
-            if let Some(input) = user_input {
-                route_data.set(SetRouteData {
-                    id: route_data.id.clone(),
-                    name: route_data.name.clone(),
-                    message: input.value(),
-                    access_token: route_data.access_token.clone(),
-                });
-            }
-        })
-    };
+    let initial_name = props.initial_name.clone();
 
     let handle_submit = {
+        let initial_name = props.initial_name.clone();
         let on_submit = props.on_submit.clone();
+
         Callback::from(move |_| {
-            on_submit.emit(());
+            let window = web_sys::window().unwrap();
+            let document = window.document().unwrap();
+
+            let name_element = document.get_element_by_id("name-input");
+            let name_input = name_element.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
+            let name_value = match name_input {
+                Some(name) => name.value(),
+                None => initial_name.clone(),
+            };
+
+            let message_element = document.get_element_by_id("message-input");
+            let message_input =
+                message_element.and_then(|t| t.dyn_into::<HtmlTextAreaElement>().ok());
+            let message_value = match message_input {
+                Some(message) => message.value(),
+                None => String::new(),
+            };
+
+            on_submit.emit(RouteFormData {
+                name: name_value,
+                message: message_value,
+            });
         })
     };
 
@@ -59,9 +55,9 @@ pub fn route_form(props: &RouteFormProps) -> Html {
                 </label>
                 <div class="control">
                     <input
+                        id="name-input"
                         class="input is-medium"
-                        onchange={handle_update_name}
-                        value={props.route_data.name.clone()}
+                        value={initial_name}
                         placeholder="Ride name"
                         type="text"
                     />
@@ -74,8 +70,8 @@ pub fn route_form(props: &RouteFormProps) -> Html {
                 </label>
                 <div class="control">
                     <textarea
+                        id="message-input"
                         class="textarea has-fixed-size is-medium"
-                        onchange={handle_update_message}
                         placeholder="Message"
                         style="height: 300px;"
                     />
