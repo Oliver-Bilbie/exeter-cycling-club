@@ -1,6 +1,6 @@
 use bounce::use_atom_setter;
 use wasm_bindgen::JsCast;
-use web_sys::{EventTarget, HtmlInputElement};
+use web_sys::HtmlInputElement;
 use yew::platform::spawn_local;
 use yew::prelude::*;
 
@@ -8,12 +8,6 @@ use crate::components::loading_spinner::LoadingSpinner;
 use crate::components::notification::NotificationState;
 use crate::helpers::sign_up::sign_up;
 use crate::helpers::validate_email::validate_email;
-
-#[derive(Clone)]
-struct SignUpData {
-    email: String,
-    name: String,
-}
 
 enum FormState {
     Ready,
@@ -25,40 +19,7 @@ enum FormState {
 pub fn email_sign_up() -> Html {
     let dispatch_notification = use_atom_setter::<NotificationState>();
 
-    let form_data = use_state(|| SignUpData {
-        email: String::new(),
-        name: String::new(),
-    });
-
     let form_state = use_state(|| FormState::Ready);
-
-    let handle_update_email = {
-        let form_data = form_data.clone();
-        Callback::from(move |e: Event| {
-            let target: Option<EventTarget> = e.target();
-            let user_input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
-            if let Some(input) = user_input {
-                form_data.set(SignUpData {
-                    email: input.value(),
-                    name: form_data.name.clone(),
-                });
-            }
-        })
-    };
-
-    let handle_update_message = {
-        let form_data = form_data.clone();
-        Callback::from(move |e: Event| {
-            let target: Option<EventTarget> = e.target();
-            let user_input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
-            if let Some(input) = user_input {
-                form_data.set(SignUpData {
-                    email: form_data.email.clone(),
-                    name: input.value(),
-                });
-            }
-        })
-    };
 
     let handle_submit = {
         let set_form_loading = {
@@ -80,11 +41,6 @@ pub fn email_sign_up() -> Html {
         let set_form_ready = {
             let form_state = form_state.clone();
             move || form_state.set(FormState::Ready)
-        };
-
-        let form_data = SignUpData {
-            email: form_data.email.clone(),
-            name: form_data.name.clone(),
         };
 
         let notification_cb =
@@ -109,13 +65,30 @@ pub fn email_sign_up() -> Html {
 
         move |_| {
             set_form_loading();
-            match validate_email(form_data.email.clone()) {
+
+            let window = web_sys::window().unwrap();
+            let document = window.document().unwrap();
+
+            let name_element = document.get_element_by_id("name-input");
+            let name_input = name_element.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
+            let name_value = match name_input {
+                Some(name) => name.value(),
+                None => "".to_string(),
+            };
+
+            let email_element = document.get_element_by_id("email-input");
+            let email_input = email_element.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
+            let email_value = match email_input {
+                Some(email) => email.value(),
+                None => "".to_string(),
+            };
+
+            match validate_email(&email_value) {
                 false => notification_cb.emit(Err("Invalid email address".to_string())),
                 true => {
-                    let submit_data = form_data.clone();
                     let callback = notification_cb.clone();
                     spawn_local(async move {
-                        let resp = sign_up(submit_data.email, submit_data.name).await;
+                        let resp = sign_up(email_value, name_value).await;
                         callback.emit(resp);
                     })
                 }
@@ -131,8 +104,8 @@ pub fn email_sign_up() -> Html {
                         <div class="field">
                             <div class="control has-icons-left has-icons-right">
                                 <input
+                                    id="name-input"
                                     class="input is-medium"
-                                    onchange={handle_update_message}
                                     placeholder="Name"
                                     type="text"
                                 />
@@ -144,8 +117,8 @@ pub fn email_sign_up() -> Html {
                         <div class="field">
                             <div class="control has-icons-left has-icons-right">
                                 <input
+                                    id="email-input"
                                     class="input is-medium"
-                                    onchange={handle_update_email}
                                     placeholder="Email"
                                     type="email"
                                 />

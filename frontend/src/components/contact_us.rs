@@ -68,7 +68,7 @@ pub fn contact_us() -> Html {
 
         move |message_data: MessageData| {
             set_form_loading();
-            match validate_email(message_data.email.clone()) {
+            match validate_email(&message_data.email) {
                 false => notification_cb.emit(Err("Invalid email address".to_string())),
                 true => {
                     let submit_data = message_data.clone();

@@ -21,10 +21,10 @@ pub async fn sign_up(email: String, name: String) -> Result<String, String> {
         .json(&map)
         .send()
         .await
-        .expect("An error occurred while sending your message. Please try again later or contact us via Facebook.");
+        .expect("An error occurred while attempting to sign up. Please try again later or contact us via Facebook.");
 
     if response.status() != StatusCode::OK {
-        return Err("An error occurred while delivering your message. Please try again later or contact us via Facebook.".to_string());
+        return Err("An error occurred while signing up. Please try again later or contact us via Facebook.".to_string());
     }
 
     let json_response: SubscribeResponse = response.json().await.expect(
