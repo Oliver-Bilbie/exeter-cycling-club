@@ -7,7 +7,8 @@ use crate::components::footer::Footer;
 use crate::components::loading_spinner::LoadingSpinner;
 use crate::components::nav_bar::NavBar;
 use crate::components::page_header::PageHeader;
-use crate::helpers::request_unsubscribe::{request_unsubscribe, UnsubscribeStatus};
+use crate::helpers::form_state::RequestState;
+use crate::helpers::request_unsubscribe::request_unsubscribe;
 
 #[derive(Serialize, Deserialize)]
 struct UnsubscribeQuery {
@@ -24,18 +25,18 @@ pub fn unsubscribe() -> Html {
         None => UnsubscribeQuery { id: String::new() },
     };
 
-    let unsubscribe_status = use_state_eq(|| UnsubscribeStatus::Loading);
+    let unsubscribe_status = use_state_eq(|| RequestState::Loading);
 
     {
         let unsubscribe_status = unsubscribe_status.clone();
         let user_id = user_id.id.clone();
         let status_callback =
-            Callback::from(move |response: UnsubscribeStatus| unsubscribe_status.set(response));
+            Callback::from(move |response: RequestState| unsubscribe_status.set(response));
 
         // Request unsubscribe only once
         use_effect_with(user_id.clone(), move |_| {
             if user_id.is_empty() {
-                status_callback.emit(UnsubscribeStatus::Failure);
+                status_callback.emit(RequestState::Failure);
             } else {
                 spawn_local(async move {
                     let resp = request_unsubscribe(user_id).await;
@@ -46,18 +47,18 @@ pub fn unsubscribe() -> Html {
     }
 
     let page_body = {
-        move |unsubscribe_status: &UnsubscribeStatus| match unsubscribe_status {
-            UnsubscribeStatus::Success => html! {
+        move |unsubscribe_status: &RequestState| match unsubscribe_status {
+            RequestState::Success => html! {
                 <h2 class="title is-2 has-text-centered">
                     {"You have been unsubscribed successfully"}
                 </h2>
             },
-            UnsubscribeStatus::Failure => html! {
+            RequestState::Failure => html! {
                 <h2 class="title is-2 has-text-centered">
                     {"An error occurred while trying to unsubscribe. Please try again later, or contact us if this persists."}
                 </h2>
             },
-            UnsubscribeStatus::Loading => html! {
+            RequestState::Loading => html! {
                 <div class="container is-vcentered mb-6" style="display: grid;">
                     <LoadingSpinner size={200} />
                 </div>

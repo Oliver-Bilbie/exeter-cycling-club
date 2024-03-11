@@ -7,9 +7,8 @@ use crate::components::footer::Footer;
 use crate::components::loading_spinner::LoadingSpinner;
 use crate::components::nav_bar::NavBar;
 use crate::components::page_header::PageHeader;
-use crate::helpers::request_confirm_subscribe::{
-    request_confirm_subscribe, ConfirmSubscribeStatus,
-};
+use crate::helpers::form_state::RequestState;
+use crate::helpers::request_confirm_subscribe::request_confirm_subscribe;
 
 #[derive(Serialize, Deserialize)]
 struct ConfirmSubscribeQuery {
@@ -26,19 +25,18 @@ pub fn confirm() -> Html {
         None => ConfirmSubscribeQuery { id: String::new() },
     };
 
-    let confirm_subscribe_status = use_state_eq(|| ConfirmSubscribeStatus::Loading);
+    let confirm_subscribe_status = use_state_eq(|| RequestState::Loading);
 
     {
         let confirm_subscribe_status = confirm_subscribe_status.clone();
         let user_id = user_id.id.clone();
-        let status_callback = Callback::from(move |response: ConfirmSubscribeStatus| {
-            confirm_subscribe_status.set(response)
-        });
+        let status_callback =
+            Callback::from(move |response: RequestState| confirm_subscribe_status.set(response));
 
         // Request confirmation only once
         use_effect_with(user_id.clone(), move |_| {
             if user_id.is_empty() {
-                status_callback.emit(ConfirmSubscribeStatus::Failure);
+                status_callback.emit(RequestState::Failure);
             } else {
                 spawn_local(async move {
                     let resp = request_confirm_subscribe(user_id).await;
@@ -49,18 +47,18 @@ pub fn confirm() -> Html {
     }
 
     let page_body = {
-        move |confirm_subscribe_status: &ConfirmSubscribeStatus| match confirm_subscribe_status {
-            ConfirmSubscribeStatus::Success => html! {
+        move |confirm_subscribe_status: &RequestState| match confirm_subscribe_status {
+            RequestState::Success => html! {
                 <h2 class="title is-2 has-text-centered">
                     {"Subscription confirmed successfully.\nYou will now receive emails about upcoming rides."}
                 </h2>
             },
-            ConfirmSubscribeStatus::Failure => html! {
+            RequestState::Failure => html! {
                 <h2 class="title is-2 has-text-centered">
                     {"Unable to confirm your subscription.\nPlease try subscribing again, or contact us if this persists."}
                 </h2>
             },
-            ConfirmSubscribeStatus::Loading => html! {
+            RequestState::Loading => html! {
                 <div class="container is-vcentered mb-6" style="display: grid;">
                     <LoadingSpinner size={200} />
                 </div>

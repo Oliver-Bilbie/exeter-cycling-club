@@ -7,7 +7,8 @@ use crate::components::footer::Footer;
 use crate::components::loading_spinner::LoadingSpinner;
 use crate::components::nav_bar::NavBar;
 use crate::components::page_header::PageHeader;
-use crate::helpers::put_status::{put_status, AttendanceStatus};
+use crate::helpers::form_state::RequestState;
+use crate::helpers::put_status::put_status;
 
 #[derive(Serialize, Deserialize)]
 struct SetStatusQuery {
@@ -31,14 +32,14 @@ pub fn set_status() -> Html {
         },
     };
 
-    let request_status = use_state_eq(|| AttendanceStatus::Loading);
+    let request_status = use_state_eq(|| RequestState::Loading);
 
     {
         let request_status = request_status.clone();
         let user_id = status_query.id.clone();
         let user_status = status_query.status.clone();
         let status_callback =
-            Callback::from(move |response: AttendanceStatus| request_status.set(response));
+            Callback::from(move |response: RequestState| request_status.set(response));
 
         // Set status only once
         use_effect_with(user_id.clone(), move |_| {
@@ -48,14 +49,14 @@ pub fn set_status() -> Html {
                     status_callback.emit(resp);
                 });
             } else {
-                status_callback.emit(AttendanceStatus::Failure);
+                status_callback.emit(RequestState::Failure);
             }
         });
     }
 
     let page_body = {
-        move |request_status: &AttendanceStatus| match request_status {
-            AttendanceStatus::Success => html! {
+        move |request_status: &RequestState| match request_status {
+            RequestState::Success => html! {
                 <h2 class="title is-2 has-text-centered">
                     { match status_query.status.as_str() {
                         "Y" => "Attendance confirmed, see you there!",
@@ -65,12 +66,12 @@ pub fn set_status() -> Html {
                     }}
                 </h2>
             },
-            AttendanceStatus::Failure => html! {
+            RequestState::Failure => html! {
                 <h2 class="title is-2 has-text-centered">
                     {"An error occurred while trying to update your status. Please try again later, or contact us if this persists."}
                 </h2>
             },
-            AttendanceStatus::Loading => html! {
+            RequestState::Loading => html! {
                 <div class="container is-vcentered mb-6" style="display: grid;">
                     <LoadingSpinner size={200} />
                 </div>

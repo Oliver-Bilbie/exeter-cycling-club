@@ -8,15 +8,9 @@ use crate::components::loading_spinner::LoadingSpinner;
 use crate::components::nav_bar::NavBar;
 use crate::components::notification::NotificationState;
 use crate::components::page_header::PageHeader;
+use crate::helpers::form_state::FormState;
 use crate::helpers::send_email::send_email;
 use crate::helpers::validate_email::validate_email;
-
-#[derive(PartialEq)]
-enum FormState {
-    Ready,
-    Loading,
-    Complete,
-}
 
 #[function_component(ContactUs)]
 pub fn contact_us() -> Html {
