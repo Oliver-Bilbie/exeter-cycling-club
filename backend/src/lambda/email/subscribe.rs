@@ -34,12 +34,13 @@ async fn subscribe(event: Request) -> Result<Response<Body>, Error> {
     let ses_client = ses::Client::new(&aws_config);
 
     let email_exists = check_email_exists(&ddb_client, &email).await?;
+    // Return an identical response to a success to avoid leaking email addresses
     if email_exists {
         return Ok(Response::builder()
-            .status(400)
+            .status(200)
             .header("content-type", "text/html")
             .body(
-                json!({ "message": "Email is already subscribed" })
+                json!({ "message": "Subscribed successfully" })
                     .to_string()
                     .into(),
             )
