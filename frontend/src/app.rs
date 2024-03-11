@@ -70,12 +70,12 @@ fn switch(routes: Route) -> Html {
 #[function_component(App)]
 pub fn app() -> Html {
     html! {
-        <BrowserRouter>
-            <BounceRoot>
+        <BounceRoot>
+            <BrowserRouter>
                 <Switch<Route> render={switch} />
                 <Notification />
-            </BounceRoot>
-        </BrowserRouter>
+            </BrowserRouter>
+        </BounceRoot>
     }
 }
 
@@ -93,11 +93,11 @@ pub fn server_app(props: &ServerAppProps) -> Html {
         .unwrap();
 
     html! {
-        <Router history={history}>
-            <BounceRoot>
+        <BounceRoot>
+            <Router history={history}>
                 <Switch<Route> render={switch} />
                 <Notification />
-            </BounceRoot>
-        </Router>
+            </Router>
+        </BounceRoot>
     }
 }
