@@ -1,30 +1,30 @@
 use wasm_bindgen::JsCast;
-use web_sys::{EventTarget, HtmlTextAreaElement};
+use web_sys::HtmlTextAreaElement;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct CancelFormProps {
-    pub cancellation_message: UseStateHandle<String>,
-    pub on_submit: Callback<()>,
+    pub on_submit: Callback<String>,
 }
 
 #[function_component(CancelForm)]
 pub fn cancel_form(props: &CancelFormProps) -> Html {
-    let handle_update_message = {
-        let cancellation_message = props.cancellation_message.clone();
-        Callback::from(move |e: Event| {
-            let target: Option<EventTarget> = e.target();
-            let user_input = target.and_then(|t| t.dyn_into::<HtmlTextAreaElement>().ok());
-            if let Some(input) = user_input {
-                cancellation_message.set(input.value());
-            }
-        })
-    };
-
     let handle_submit = {
         let on_submit = props.on_submit.clone();
+
         Callback::from(move |_| {
-            on_submit.emit(());
+            let window = web_sys::window().unwrap();
+            let document = window.document().unwrap();
+
+            let message_element = document.get_element_by_id("message-input");
+            let message_input =
+                message_element.and_then(|t| t.dyn_into::<HtmlTextAreaElement>().ok());
+            let message_value = match message_input {
+                Some(message) => message.value(),
+                None => String::new(),
+            };
+
+            on_submit.emit(message_value);
         })
     };
 
@@ -36,8 +36,8 @@ pub fn cancel_form(props: &CancelFormProps) -> Html {
                 </label>
                 <div class="control">
                     <textarea
+                        id="message-input"
                         class="textarea has-fixed-size is-medium"
-                        onchange={handle_update_message}
                         placeholder="This message will be displayed on the ride page and sent out to the mailing list."
                         style="height: 400px;"
                     />
