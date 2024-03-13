@@ -15,8 +15,8 @@ pub struct HomeProps {
 
 #[function_component(Home)]
 pub fn home(props: &HomeProps) -> Html {
-    let header_visible = use_state(|| props.header_visible);
     let navigator = use_navigator().unwrap();
+    let header_visible = props.header_visible;
 
     let scroll_to_about_us = |_| {
         let window = web_sys::window().unwrap();
@@ -36,9 +36,9 @@ pub fn home(props: &HomeProps) -> Html {
     html! {
         <>
             <section class="is-fullheight">
-                <NavBar is_sticky={*header_visible} />
+                <NavBar is_sticky={header_visible} />
 
-                if *header_visible {
+                if header_visible {
                     <section class="fullheight-bg hero is-fullheight-with-navbar" style="overflow: hidden;">
                         <div class="is-overlay hero-body">
                             <div class="container has-text-centered">

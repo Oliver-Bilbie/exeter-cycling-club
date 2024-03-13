@@ -24,7 +24,6 @@ pub fn route_cancel() -> Html {
         None => String::new(),
     };
 
-    let cancellation_message = use_state(|| String::new());
     let is_loading = use_state_eq(|| false);
 
     // Redirect unauthorized users to the home page
@@ -105,9 +104,7 @@ pub fn route_cancel() -> Html {
                 }
             });
 
-        let cancellation_message = cancellation_message.clone();
-
-        move |_| {
+        move |cancellation_message: String| {
             set_form_loading();
             let cancel_route_data = CancelRouteData {
                 message: cancellation_message.to_string(),
@@ -132,7 +129,7 @@ pub fn route_cancel() -> Html {
                         {match *is_loading {
                             true => html! { <LoadingSpinner size={200} /> },
                             false => html!(
-                                <CancelForm cancellation_message={cancellation_message} on_submit={handle_submit} />
+                                <CancelForm on_submit={handle_submit} />
                             ),
                         }}
                     </div>
