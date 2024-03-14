@@ -1,7 +1,7 @@
 use bounce::BounceRoot;
-use std::collections::HashMap;
+// use std::collections::HashMap;
 use yew::prelude::*;
-use yew_router::history::{AnyHistory, History, MemoryHistory};
+// use yew_router::history::{AnyHistory, History, MemoryHistory};
 use yew_router::prelude::*;
 
 use crate::components::confirm_subscribe::Confirm;
@@ -79,25 +79,25 @@ pub fn app() -> Html {
     }
 }
 
-#[derive(Properties, PartialEq, Eq)]
-pub struct ServerAppProps {
-    pub url: AttrValue,
-    pub queries: HashMap<String, String>,
-}
+// #[derive(Properties, PartialEq, Eq)]
+// pub struct ServerAppProps {
+//     pub url: AttrValue,
+//     pub queries: HashMap<String, String>,
+// }
 
-#[function_component(ServerApp)]
-pub fn server_app(props: &ServerAppProps) -> Html {
-    let history = AnyHistory::from(MemoryHistory::new());
-    history
-        .push_with_query(&*props.url, &props.queries)
-        .unwrap();
+// #[function_component(ServerApp)]
+// pub fn server_app(props: &ServerAppProps) -> Html {
+//     let history = AnyHistory::from(MemoryHistory::new());
+//     history
+//         .push_with_query(&*props.url, &props.queries)
+//         .unwrap();
 
-    html! {
-        <BounceRoot>
-            <Router history={history}>
-                <Switch<Route> render={switch} />
-                <Notification />
-            </Router>
-        </BounceRoot>
-    }
-}
+//     html! {
+//         <BounceRoot>
+//             <Router history={history}>
+//                 <Switch<Route> render={switch} />
+//                 <Notification />
+//             </Router>
+//         </BounceRoot>
+//     }
+// }
