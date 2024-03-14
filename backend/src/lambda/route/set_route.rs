@@ -230,9 +230,13 @@ async fn send_email_notifications(
 async fn get_mailing_list(ddb_client: &ddb::Client) -> Result<Vec<EmailRecipient>, Error> {
     let mailing_list_ddb_id =
         env::var("MAILING_LIST_TABLE_NAME").expect("MAILING_LIST_TABLE_NAME not set");
+
     let ddb_items = ddb_client
         .scan()
         .table_name(mailing_list_ddb_id)
+        .filter_expression("#verified = :v")
+        .expression_attribute_names("#verified", "verified")
+        .expression_attribute_values(":v", ddb::types::AttributeValue::Bool(true))
         .send()
         .await?
         .items
