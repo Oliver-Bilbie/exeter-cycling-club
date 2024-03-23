@@ -27,66 +27,24 @@ resource "aws_apigatewayv2_stage" "v1" {
   auto_deploy = true
 }
 
-resource "aws_lambda_permission" "apigw_invoke_authenticate" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.authenticate.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.api_gw.execution_arn}/*"
-}
+resource "aws_lambda_permission" "apigw_invoke" {
+  for_each = {
+    for fn in [
+      aws_lambda_function.authenticate,
+      aws_lambda_function.contact,
+      aws_lambda_function.get_route,
+      aws_lambda_function.set_route,
+      aws_lambda_function.cancel_route,
+      aws_lambda_function.email_subscribe,
+      aws_lambda_function.email_confirm_subscribe,
+      aws_lambda_function.email_unsubscribe,
+      aws_lambda_function.set_attendance
+    ] : fn.function_name => fn
+  }
 
-resource "aws_lambda_permission" "apigw_invoke_contact" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.contact.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.api_gw.execution_arn}/*"
-}
-
-resource "aws_lambda_permission" "apigw_invoke_get_route" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.get_route.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.api_gw.execution_arn}/*"
-}
-
-resource "aws_lambda_permission" "apigw_invoke_set_route" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.set_route.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.api_gw.execution_arn}/*"
-}
-
-resource "aws_lambda_permission" "apigw_invoke_cancel_route" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.cancel_route.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.api_gw.execution_arn}/*"
-}
-
-resource "aws_lambda_permission" "apigw_invoke_email_subscribe" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.email_subscribe.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.api_gw.execution_arn}/*"
-}
-
-resource "aws_lambda_permission" "apigw_invoke_email_confirm_subscribe" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.email_confirm_subscribe.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.api_gw.execution_arn}/*"
-}
-
-resource "aws_lambda_permission" "apigw_invoke_email_unsubscribe" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.email_unsubscribe.function_name
+  function_name = each.value.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.api_gw.execution_arn}/*"
 }
