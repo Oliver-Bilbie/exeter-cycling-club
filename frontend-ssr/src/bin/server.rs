@@ -16,8 +16,9 @@ use exeter_cycling_club::{ServerApp, ServerAppProps};
 use futures::stream::{self, StreamExt};
 use hyper::server::Server;
 use tower::ServiceExt;
-use tower_http::services::ServeDir;
+use tower_http::{services::ServeDir, compression::CompressionLayer};
 use yew::platform::Runtime;
+use lambda_http::{run, Error};
 
 // We use jemalloc as it produces better performance.
 #[cfg(unix)]
@@ -75,7 +76,7 @@ where
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Error> {
     let exec = Executor::default();
 
     env_logger::init();
@@ -99,6 +100,8 @@ async fn main() {
         )
     };
 
+    let compression_layer = CompressionLayer::new().gzip(true);
+
     let app = Router::new().fallback_service(HandleError::new(
         ServeDir::new(opts.dir)
             .append_index_html_on_directories(false)
@@ -109,13 +112,15 @@ async fn main() {
                     .map_err(|err| -> std::io::Error { match err {} }),
             ),
         handle_error,
-    ));
+    )).layer(compression_layer);
 
-    println!("You can view the website at: http://localhost:8080/");
+    run(app.into_make_service()).await
 
-    Server::bind(&"127.0.0.1:8080".parse().unwrap())
-        .executor(exec)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+//     println!("You can view the website at: http://localhost:8080/");
+
+//     Server::bind(&"127.0.0.1:8080".parse().unwrap())
+//         .executor(exec)
+//         .serve(app.into_make_service())
+//         .await
+//         .unwrap();
 }
