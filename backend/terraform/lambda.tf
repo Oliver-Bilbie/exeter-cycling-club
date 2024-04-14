@@ -4,7 +4,7 @@ resource "aws_lambda_function" "render_ui" {
   source_code_hash = filesha256("${path.module}/../../frontend-ssr/target/lambda/server/bootstrap.zip")
   role             = aws_iam_role.render_ui_lambda_role.arn
   handler          = "bootstrap"
-  runtime          = "provided.al2"
+  runtime          = "provided.al2023"
   timeout          = 25
   memory_size      = 128
 }
@@ -20,7 +20,7 @@ resource "aws_lambda_function" "authenticate" {
   source_code_hash = filesha256("${path.module}/../target/lambda/ecc-api-authenticate/bootstrap.zip")
   role             = aws_iam_role.authenticate_lambda_role.arn
   handler          = "bootstrap"
-  runtime          = "provided.al2"
+  runtime          = "provided.al2023"
   timeout          = 20
   memory_size      = 128
 }
@@ -31,7 +31,7 @@ resource "aws_lambda_function" "contact" {
   source_code_hash = filesha256("${path.module}/../target/lambda/ecc-api-contact/bootstrap.zip")
   role             = aws_iam_role.contact_lambda_role.arn
   handler          = "bootstrap"
-  runtime          = "provided.al2"
+  runtime          = "provided.al2023"
   timeout          = 10
   memory_size      = 128
 }
@@ -42,7 +42,7 @@ resource "aws_lambda_function" "get_route" {
   source_code_hash = filesha256("${path.module}/../target/lambda/ecc-api-get-route/bootstrap.zip")
   role             = aws_iam_role.get_route_lambda_role.arn
   handler          = "bootstrap"
-  runtime          = "provided.al2"
+  runtime          = "provided.al2023"
   timeout          = 10
   memory_size      = 128
 
@@ -59,7 +59,7 @@ resource "aws_lambda_function" "set_route" {
   source_code_hash = filesha256("${path.module}/../target/lambda/ecc-api-set-route/bootstrap.zip")
   role             = aws_iam_role.set_route_lambda_role.arn
   handler          = "bootstrap"
-  runtime          = "provided.al2"
+  runtime          = "provided.al2023"
   timeout          = 25
   memory_size      = 128
 
@@ -78,7 +78,7 @@ resource "aws_lambda_function" "cancel_route" {
   source_code_hash = filesha256("${path.module}/../target/lambda/ecc-api-cancel-route/bootstrap.zip")
   role             = aws_iam_role.cancel_route_lambda_role.arn
   handler          = "bootstrap"
-  runtime          = "provided.al2"
+  runtime          = "provided.al2023"
   timeout          = 25
   memory_size      = 128
 
@@ -97,7 +97,7 @@ resource "aws_lambda_function" "clear_route" {
   source_code_hash = filesha256("${path.module}/../target/lambda/ecc-process-clear-route/bootstrap.zip")
   role             = aws_iam_role.clear_route_lambda_role.arn
   handler          = "bootstrap"
-  runtime          = "provided.al2"
+  runtime          = "provided.al2023"
   timeout          = 10
   memory_size      = 128
 
@@ -114,7 +114,7 @@ resource "aws_lambda_function" "email_subscribe" {
   source_code_hash = filesha256("${path.module}/../target/lambda/ecc-api-subscribe/bootstrap.zip")
   role             = aws_iam_role.email_subscribe_lambda_role.arn
   handler          = "bootstrap"
-  runtime          = "provided.al2"
+  runtime          = "provided.al2023"
   timeout          = 10
   memory_size      = 128
 
@@ -131,7 +131,7 @@ resource "aws_lambda_function" "email_confirm_subscribe" {
   source_code_hash = filesha256("${path.module}/../target/lambda/ecc-api-confirm-subscribe/bootstrap.zip")
   role             = aws_iam_role.email_confirm_subscribe_lambda_role.arn
   handler          = "bootstrap"
-  runtime          = "provided.al2"
+  runtime          = "provided.al2023"
   timeout          = 10
   memory_size      = 128
 
@@ -148,7 +148,7 @@ resource "aws_lambda_function" "email_unsubscribe" {
   source_code_hash = filesha256("${path.module}/../target/lambda/ecc-api-unsubscribe/bootstrap.zip")
   role             = aws_iam_role.email_unsubscribe_lambda_role.arn
   handler          = "bootstrap"
-  runtime          = "provided.al2"
+  runtime          = "provided.al2023"
   timeout          = 10
   memory_size      = 128
 
@@ -165,7 +165,7 @@ resource "aws_lambda_function" "set_attendance" {
   source_code_hash = filesha256("${path.module}/../target/lambda/ecc-api-set-attendance/bootstrap.zip")
   role             = aws_iam_role.set_attendance_lambda_role.arn
   handler          = "bootstrap"
-  runtime          = "provided.al2"
+  runtime          = "provided.al2023"
   timeout          = 10
   memory_size      = 128
 
@@ -182,7 +182,7 @@ resource "aws_lambda_function" "attendance_report" {
   source_code_hash = filesha256("${path.module}/../target/lambda/ecc-process-attendance-report/bootstrap.zip")
   role             = aws_iam_role.attendance_report_lambda_role.arn
   handler          = "bootstrap"
-  runtime          = "provided.al2"
+  runtime          = "provided.al2023"
   timeout          = 25
   memory_size      = 128
 
