@@ -1,89 +1,48 @@
 use std::collections::HashMap;
 use std::convert::Infallible;
-use std::future::Future;
-use std::path::PathBuf;
 
-use axum::body::StreamBody;
-use axum::error_handling::HandleError;
+use axum::body::Body;
 use axum::extract::{Query, State};
 use axum::handler::HandlerWithoutStateExt;
-use axum::http::{StatusCode, Uri};
-use axum::response::IntoResponse;
+use axum::http::Uri;
+use axum::response::Html;
 use axum::routing::get;
 use axum::Router;
-use clap::Parser;
 use exeter_cycling_club::{ServerApp, ServerAppProps};
 use futures::stream::{self, StreamExt};
-use hyper::server::Server;
-use tower::ServiceExt;
-use tower_http::{services::ServeDir, compression::CompressionLayer};
-use yew::platform::Runtime;
-use lambda_http::{run, Error};
+use lambda_http::{run, tracing, Error};
+use tower_http::{compression::CompressionLayer, services::ServeDir};
+use yew::ServerRenderer;
 
-// We use jemalloc as it produces better performance.
+const DIST_DIR: &str = "dist";
+
 #[cfg(unix)]
 #[global_allocator]
 static GLOBAL: jemallocator::Jemalloc = jemallocator::Jemalloc;
-
-/// A basic example
-#[derive(Parser, Debug)]
-struct Opt {
-    /// the "dist" created by trunk directory to be served for hydration.
-    #[clap(short, long)]
-    dir: PathBuf,
-}
 
 async fn render(
     url: Uri,
     Query(queries): Query<HashMap<String, String>>,
     State((index_html_before, index_html_after)): State<(String, String)>,
-) -> impl IntoResponse {
+) -> Html<Body> {
     let url = url.path().to_owned();
 
-    let renderer = yew::ServerRenderer::<ServerApp>::with_props(move || ServerAppProps {
+    let renderer = ServerRenderer::<ServerApp>::with_props(move || ServerAppProps {
         url: url.into(),
         queries,
     });
 
-    StreamBody::new(
+    Html(Body::from_stream(
         stream::once(async move { index_html_before })
             .chain(renderer.render_stream())
             .chain(stream::once(async move { index_html_after }))
             .map(Result::<_, Infallible>::Ok),
-    )
-}
-
-// An executor to process requests on the Yew runtime.
-//
-// By spawning requests on the Yew runtime,
-// it processes request on the same thread as the rendering task.
-//
-// This increases performance in some environments (e.g.: in VM).
-#[derive(Clone, Default)]
-struct Executor {
-    inner: Runtime,
-}
-
-impl<F> hyper::rt::Executor<F> for Executor
-where
-    F: Future + Send + 'static,
-{
-    fn execute(&self, fut: F) {
-        self.inner.spawn_pinned(move || async move {
-            fut.await;
-        });
-    }
+    ))
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let exec = Executor::default();
-
-    env_logger::init();
-
-    let opts = Opt::parse();
-
-    let index_html_s = tokio::fs::read_to_string(opts.dir.join("index.html"))
+    let index_html_s = tokio::fs::read_to_string(DIST_DIR.to_owned() + "/index.html")
         .await
         .expect("failed to read index.html");
 
@@ -93,34 +52,39 @@ async fn main() -> Result<(), Error> {
 
     let index_html_after = index_html_after.to_owned();
 
-    let handle_error = |e| async move {
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            format!("error occurred: {e}"),
-        )
-    };
-
     let compression_layer = CompressionLayer::new().gzip(true);
 
-    let app = Router::new().fallback_service(HandleError::new(
-        ServeDir::new(opts.dir)
-            .append_index_html_on_directories(false)
-            .fallback(
-                get(render)
-                    .with_state((index_html_before.clone(), index_html_after.clone()))
-                    .into_service()
-                    .map_err(|err| -> std::io::Error { match err {} }),
-            ),
-        handle_error,
-    )).layer(compression_layer);
+    let serve_dir = ServeDir::new(DIST_DIR)
+        .append_index_html_on_directories(false)
+        .fallback(
+            get(render)
+                .with_state((index_html_before.clone(), index_html_after.clone()))
+                .into_service(),
+        );
 
-    run(app.into_make_service()).await
+    let app = Router::new()
+        .fallback_service(serve_dir)
+        .layer(compression_layer);
 
-//     println!("You can view the website at: http://localhost:8080/");
+    #[cfg(not(debug_assertions))]
+    {
+        // Run the server on AWS Lambda
+        tracing::init_default_subscriber();
+        run(app).await
+    }
 
-//     Server::bind(&"127.0.0.1:8080".parse().unwrap())
-//         .executor(exec)
-//         .serve(app.into_make_service())
-//         .await
-//         .unwrap();
+    #[cfg(debug_assertions)]
+    {
+        // Run the server locally for development
+        println!("Listening on: http://127.0.0.1:3000");
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
+            .await
+            .unwrap();
+        axum::serve(
+            listener,
+            app.into_make_service_with_connect_info::<std::net::SocketAddr>(),
+        )
+        .await?;
+        Ok(())
+    }
 }
