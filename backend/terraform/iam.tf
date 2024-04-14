@@ -1,3 +1,13 @@
+resource "aws_iam_role" "render_ui_lambda_role" {
+  name = "${var.app-name}-render-ui-lambda-role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
+
+  inline_policy {
+    name   = "${var.app-name}-lambda-logging"
+    policy = data.aws_iam_policy_document.lambda_logging.json
+  }
+}
+
 resource "aws_iam_role" "authenticate_lambda_role" {
   name               = "${var.app-name}-authenticate-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json

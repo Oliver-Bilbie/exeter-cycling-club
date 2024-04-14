@@ -1,3 +1,19 @@
+resource "aws_lambda_function" "render_ui" {
+  function_name    = "${var.app-name}-render-ui"
+  filename         = "${path.module}/../../frontend-ssr/target/lambda/server/bootstrap.zip"
+  source_code_hash = filesha256("${path.module}/../../frontend-ssr/target/lambda/server/bootstrap.zip")
+  role             = aws_iam_role.render_ui_lambda_role.arn
+  handler          = "bootstrap"
+  runtime          = "provided.al2"
+  timeout          = 25
+  memory_size      = 128
+}
+
+resource "aws_lambda_function_url" "render_ui_url" {
+  function_name      = aws_lambda_function.render_ui.function_name
+  authorization_type = "NONE"
+}
+
 resource "aws_lambda_function" "authenticate" {
   function_name    = "${var.app-name}-api-authenticate"
   filename         = "${path.module}/../target/lambda/ecc-api-authenticate/bootstrap.zip"
@@ -45,7 +61,7 @@ resource "aws_lambda_function" "set_route" {
   handler          = "bootstrap"
   runtime          = "provided.al2"
   timeout          = 25
-  memory_size      = 256
+  memory_size      = 128
 
   environment {
     variables = {
@@ -64,7 +80,7 @@ resource "aws_lambda_function" "cancel_route" {
   handler          = "bootstrap"
   runtime          = "provided.al2"
   timeout          = 25
-  memory_size      = 256
+  memory_size      = 128
 
   environment {
     variables = {
