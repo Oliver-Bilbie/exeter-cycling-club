@@ -11,9 +11,8 @@ The web application allows users to authenticate using Strava's Oauth2. This all
 
 ## To Do
 ### Frontend
-- Add meta tags using the helmet API
+- Scroll to the top when navigating to a new page
 
 ### Backend
-- Add a Cloudfront distribution in front of the SSR endpoint
 - Configure a custom endpoint for the backend API Gateway
 - Improve the HTML formatting of emails
