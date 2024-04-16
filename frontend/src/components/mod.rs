@@ -15,6 +15,7 @@ pub mod not_found;
 pub mod notification;
 pub mod page_header;
 pub mod redirect;
+pub mod reset_scroll;
 pub mod ride_page;
 pub mod route_cancel;
 pub mod route_card;
