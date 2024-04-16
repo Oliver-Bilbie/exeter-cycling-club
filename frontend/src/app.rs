@@ -10,6 +10,7 @@ use crate::components::home::Home;
 use crate::components::not_found::NotFound;
 use crate::components::notification::Notification;
 use crate::components::redirect::Redirect;
+use crate::components::reset_scroll::ResetScroll;
 use crate::components::ride_page::RidePage;
 use crate::components::route_cancel::RouteCancel;
 use crate::components::route_select::RouteSelect;
@@ -72,7 +73,9 @@ pub fn app() -> Html {
     html! {
         <BounceRoot>
             <BrowserRouter>
-                <Switch<Route> render={switch} />
+                <ResetScroll>
+                    <Switch<Route> render={switch} />
+                </ResetScroll>
                 <Notification />
             </BrowserRouter>
         </BounceRoot>
@@ -95,7 +98,9 @@ pub fn server_app(props: &ServerAppProps) -> Html {
     html! {
         <BounceRoot>
             <Router history={history}>
-                <Switch<Route> render={switch} />
+                <ResetScroll>
+                    <Switch<Route> render={switch} />
+                </ResetScroll>
                 <Notification />
             </Router>
         </BounceRoot>

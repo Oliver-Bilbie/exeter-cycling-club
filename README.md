@@ -10,9 +10,6 @@ The web application allows users to authenticate using Strava's Oauth2. This all
 - Temporarily hosted [here](https://kee4pqbtog5vwik77yfyrlapxi0jmobt.lambda-url.eu-west-1.on.aws/)
 
 ## To Do
-### Frontend
-- Scroll to the top when navigating to a new page
-
 ### Backend
-- Configure a custom endpoint for the backend API Gateway
+- Configure domain names for the APIs
 - Improve the HTML formatting of emails
