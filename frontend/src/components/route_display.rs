@@ -1,5 +1,6 @@
 use yew::prelude::*;
 
+use crate::constants::strava_endpoints::STRAVA_CLUB_ID;
 use crate::helpers::get_route::RouteData;
 
 #[derive(Properties, PartialEq)]
@@ -30,6 +31,7 @@ pub fn route_display(props: &RouteDataProps) -> Html {
                     data-units="metric"
                     data-full-width="true"
                     data-style="standard"
+                    data-club-id={STRAVA_CLUB_ID}
                 />
             </div>
             <script async={true} src="https://strava-embeds.com/embed.js" />
