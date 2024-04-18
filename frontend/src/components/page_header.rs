@@ -8,19 +8,14 @@ pub struct PageHeaderProps {
 #[function_component(PageHeader)]
 pub fn page_header(props: &PageHeaderProps) -> Html {
     html! {
-        <section class="hero" style="height: 20vh; max-height: 300px; position: relative;">
-            <div class="hero-body fullheight-bg-2 is-vcentered">
-                <h1 class="is-hidden-mobile title is-1 has-text-light" style="top: 50%; max-width: 32%; z-index: 10;">
-                        { props.title }
-                </h1>
-                <h1 class="is-hidden-tablet title is-1 has-text-light" style="top: 150px; z-index: 10;">
+        <section class="hero" style="height: 20vh; max-height: 300px; min-height: 200px; position: relative;">
+            <div class="hero-body fullheight-bg-2 is-vcentered" style="height: 20vh; max-height: 300px; min-height: 200px;">
+                <h1 class="title is-1 has-text-light" style="top: 200px; z-index: 10;">
                         { props.title }
                 </h1>
             </div>
-            <div class="is-hidden-tablet" style="height: 20vh; max-height: 300px; width: 100%; position: absolute; top: 0; left: 0; background-color: rgba(103, 103, 103, 0.6);" />
-            <div class="is-hidden-mobile" style="height: 20vh; max-height: 300px; width: 100%; position: absolute; top: 0; left: 0;">
-                <img src="/images/overlay.png" style="height: 20vh; max-height: 300px; width: 100%;" />
-            </div>
+            <div class="is-hidden-tablet" style="height: 20vh; max-height: 300px; min-height: 200px; width: 100%; position: absolute; top: 0; left: 0; background-color: rgba(103, 103, 103, 0.6);" />
+            <div class="is-hidden-mobile" style="height: 20vh; max-height: 300px; min-height: 200px; width: 100%; position: absolute; top: 0; left: 0; background: linear-gradient(90deg, rgba(103,103,103,0.6) 0%, rgba(103,103,103,0.6) 30%, rgba(103,103,103,0) 70%);" />
         </section>
     }
 }

@@ -84,9 +84,9 @@ $strava: #FC4C02;
   }
 }
 
-// Round the edges of iframes
-iframe {
-  border-radius: 4%;
+// Only wrap text after full words
+p {
+  word-wrap: break-word;
 }
 
 // Import Bulma
