@@ -25,4 +25,5 @@ pub mod route_select;
 pub mod set_status;
 pub mod sign_in;
 pub mod sign_out;
+pub mod text_column;
 pub mod unsubscribe;
