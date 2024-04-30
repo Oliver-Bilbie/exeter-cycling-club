@@ -5,6 +5,7 @@ dev: build_wasm run
 prd: build_wasm build
 
 build_wasm:
+	@rm -rf public images index.scss dist
 	@mkdir -p public && cp -r ../frontend/public/* public
 	@mkdir -p images && cp -r ../frontend/images/* images
 	@cp ../frontend/index.scss index.scss
