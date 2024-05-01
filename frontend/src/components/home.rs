@@ -75,6 +75,9 @@ pub fn home(props: &HomeProps) -> Html {
             <AboutSection content={RIDING_GUIDELINES} image="images/home3.jpg" reverse={true} />
 
             <Footer />
+
+            // Speed up image loading by adding it to the html
+            <img src="/images/header1.jpg" class="is-hidden" />
         </>
     }
 }
