@@ -6,7 +6,7 @@ resource "aws_lambda_function" "render_ui" {
   handler          = "bootstrap"
   runtime          = "provided.al2023"
   timeout          = 20
-  memory_size      = 128
+  memory_size      = 2048
 }
 
 resource "aws_lambda_function" "authenticate" {
@@ -17,7 +17,7 @@ resource "aws_lambda_function" "authenticate" {
   handler          = "bootstrap"
   runtime          = "provided.al2023"
   timeout          = 20
-  memory_size      = 128
+  memory_size      = 512
 }
 
 resource "aws_lambda_function" "contact" {
@@ -28,7 +28,7 @@ resource "aws_lambda_function" "contact" {
   handler          = "bootstrap"
   runtime          = "provided.al2023"
   timeout          = 10
-  memory_size      = 128
+  memory_size      = 512
 }
 
 resource "aws_lambda_function" "get_route" {
@@ -39,7 +39,7 @@ resource "aws_lambda_function" "get_route" {
   handler          = "bootstrap"
   runtime          = "provided.al2023"
   timeout          = 10
-  memory_size      = 128
+  memory_size      = 512
 
   environment {
     variables = {
@@ -56,7 +56,7 @@ resource "aws_lambda_function" "set_route" {
   handler          = "bootstrap"
   runtime          = "provided.al2023"
   timeout          = 25
-  memory_size      = 128
+  memory_size      = 512
 
   environment {
     variables = {
@@ -75,7 +75,7 @@ resource "aws_lambda_function" "cancel_route" {
   handler          = "bootstrap"
   runtime          = "provided.al2023"
   timeout          = 25
-  memory_size      = 128
+  memory_size      = 512
 
   environment {
     variables = {
@@ -94,7 +94,7 @@ resource "aws_lambda_function" "clear_route" {
   handler          = "bootstrap"
   runtime          = "provided.al2023"
   timeout          = 10
-  memory_size      = 128
+  memory_size      = 512
 
   environment {
     variables = {
@@ -111,7 +111,7 @@ resource "aws_lambda_function" "email_subscribe" {
   handler          = "bootstrap"
   runtime          = "provided.al2023"
   timeout          = 10
-  memory_size      = 128
+  memory_size      = 512
 
   environment {
     variables = {
@@ -128,7 +128,7 @@ resource "aws_lambda_function" "email_confirm_subscribe" {
   handler          = "bootstrap"
   runtime          = "provided.al2023"
   timeout          = 10
-  memory_size      = 128
+  memory_size      = 512
 
   environment {
     variables = {
@@ -145,7 +145,7 @@ resource "aws_lambda_function" "email_unsubscribe" {
   handler          = "bootstrap"
   runtime          = "provided.al2023"
   timeout          = 10
-  memory_size      = 128
+  memory_size      = 512
 
   environment {
     variables = {
@@ -162,7 +162,7 @@ resource "aws_lambda_function" "set_attendance" {
   handler          = "bootstrap"
   runtime          = "provided.al2023"
   timeout          = 10
-  memory_size      = 128
+  memory_size      = 512
 
   environment {
     variables = {
@@ -180,7 +180,7 @@ resource "aws_lambda_function" "attendance_report" {
   handler          = "bootstrap"
   runtime          = "provided.al2023"
   timeout          = 25
-  memory_size      = 128
+  memory_size      = 512
 
   environment {
     variables = {
