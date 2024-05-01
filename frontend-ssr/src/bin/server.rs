@@ -52,7 +52,7 @@ async fn main() -> Result<(), Error> {
 
     let index_html_after = index_html_after.to_owned();
 
-    let compression_layer = CompressionLayer::new().gzip(true);
+    let compression_layer = CompressionLayer::new().br(true);
 
     let serve_dir = ServeDir::new(DIST_DIR)
         .append_index_html_on_directories(false)
