@@ -1,5 +1,5 @@
 resource "aws_iam_role" "render_ui_lambda_role" {
-  name = "${var.app-name}-render-ui-lambda-role"
+  name               = "${var.app-name}-render-ui-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 
   inline_policy {
@@ -333,7 +333,7 @@ data "aws_iam_policy_document" "unsubscribe_lambda_policy" {
 data "aws_iam_policy_document" "set_attendance_lambda_policy" {
   statement {
     effect    = "Allow"
-    actions   = ["dynamodb:GetItem", "dynamodb:PutItem"]
+    actions   = ["dynamodb:GetItem", "dynamodb:UpdateItem"]
     resources = [aws_dynamodb_table.mailing_list.arn]
   }
 }
