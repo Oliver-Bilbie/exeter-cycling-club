@@ -26,11 +26,10 @@ pub fn home(props: &HomeProps) -> Html {
         let about_us_top = about_us.get_bounding_client_rect().top();
         let y_offset = window.scroll_y().unwrap();
 
-        window.scroll_with_scroll_to_options(
-            &web_sys::ScrollToOptions::new()
-                .top(about_us_top + y_offset - NAVBAR_HEIGHT)
-                .behavior(web_sys::ScrollBehavior::Smooth),
-        );
+        let scroll_options = &web_sys::ScrollToOptions::new();
+        scroll_options.set_top(about_us_top + y_offset - NAVBAR_HEIGHT);
+        scroll_options.set_behavior(web_sys::ScrollBehavior::Smooth);
+        window.scroll_with_scroll_to_options(scroll_options);
     };
 
     html! {
@@ -43,7 +42,7 @@ pub fn home(props: &HomeProps) -> Html {
                         <div class="is-overlay hero-body">
                             <div class="container has-text-centered">
                                 <h1 class="title is-1 has-text-light">
-                                        {"Exeter Cycling Club" }
+                                        { "Exeter Cycling Club" }
                                 </h1>
                                 <h3 class="subtitle is-4 has-text-light">
                                     { "Group rides in East Devon and Dartmoor" }
