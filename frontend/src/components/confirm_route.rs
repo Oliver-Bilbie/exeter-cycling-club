@@ -84,6 +84,7 @@ pub fn confirm_route(props: &ConfirmRouteProps) -> Html {
                     id: route_id,
                     name: route_form_data.name,
                     message: route_form_data.message,
+                    is_private: route_form_data.is_private,
                     access_token: access_token.to_owned(),
                 })
                 .await;
