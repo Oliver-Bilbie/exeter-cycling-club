@@ -11,6 +11,7 @@ pub struct RouteFormProps {
 pub struct RouteFormData {
     pub name: String,
     pub message: String,
+    pub is_private: bool,
 }
 
 #[function_component(RouteForm)]
@@ -40,9 +41,17 @@ pub fn route_form(props: &RouteFormProps) -> Html {
                 None => String::new(),
             };
 
+            let private_element = document.get_element_by_id("private-input");
+            let private_input = private_element.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
+            let private_value = match private_input {
+                Some(is_private) => is_private.checked(),
+                None => false,
+            };
+
             on_submit.emit(RouteFormData {
                 name: name_value,
                 message: message_value,
+                is_private: private_value,
             });
         })
     };
@@ -78,7 +87,24 @@ pub fn route_form(props: &RouteFormProps) -> Html {
                 </div>
             </div>
 
-            <div class="has-text-centered">
+            <div class="field" style="display: flex; justify-content: center; gap: 12px; margin: 30px;">
+                <label class="label is-size-5">
+                    {"Private"}
+                </label>
+                <div class="control" style="display: flex">
+                    <input
+                        id="private-input"
+                        type="checkbox"
+                        class="toggle-input"
+                    />
+                    <label
+                        for="private-input"
+                        class="toggle-label"
+                    />
+                </div>
+            </div>
+
+            <div class="has-text-centered" style="margin-top: 20px;">
                 <button class="button is-primary is-medium" onclick={handle_submit} type="button" >
                     {"Send"}
                 </button>

@@ -14,6 +14,7 @@ pub struct SetRouteData {
     pub id: String,
     pub name: String,
     pub message: String,
+    pub is_private: bool,
     pub access_token: String,
 }
 
@@ -25,6 +26,13 @@ pub async fn set_route(set_route_data: SetRouteData) -> Result<String, String> {
     body.insert("id", set_route_data.id);
     body.insert("name", set_route_data.name);
     body.insert("message", formatted_message);
+    body.insert(
+        "is_private",
+        match set_route_data.is_private {
+            true => "true".to_string(),
+            false => "false".to_string(),
+        },
+    );
 
     let client = Client::new();
 
