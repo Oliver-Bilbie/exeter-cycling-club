@@ -1,3 +1,4 @@
+use bounce::prelude::*;
 use yew::platform::spawn_local;
 use yew::prelude::*;
 
@@ -8,21 +9,30 @@ use crate::components::nav_bar::NavBar;
 use crate::components::no_route_display::NoRouteDisplay;
 use crate::components::page_header::PageHeader;
 use crate::components::route_display::RouteDisplay;
+use crate::helpers::auth_state::AuthState;
 use crate::helpers::get_route::{get_route, RouteStatus};
 
 #[function_component(RidePage)]
 pub fn ride_page() -> Html {
+    let auth_state = use_atom_value::<AuthState>();
+
     let route_status = use_state_eq(|| RouteStatus::Loading);
 
     {
+        let auth_state = auth_state.clone();
         let route_status = route_status.clone();
         let status_callback =
             Callback::from(move |response: RouteStatus| route_status.set(response));
 
         // Load the route data only once
-        use_effect_with(true, move |_| {
+        use_effect_with(auth_state.clone(), move |_| {
             spawn_local(async move {
-                let resp = get_route().await;
+                let access_token: Option<String> = match auth_state.user_data {
+                    Some(ref user_data) => Some(user_data.access_token.clone()),
+                    None => None,
+                };
+
+                let resp = get_route(access_token).await;
                 status_callback.emit(resp);
             });
         });
