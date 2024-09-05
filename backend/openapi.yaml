@@ -95,6 +95,21 @@ paths:
         timeoutInMillis: 30000
       # END-IGNORE
 
+  /route/{auth_token}:
+    get:
+      responses:
+        default:
+          description: "Default response for GET /route"
+      # BEGIN-IGNORE
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: ${get_route_lambda_arn}
+        connectionType: "INTERNET"
+        timeoutInMillis: 30000
+      # END-IGNORE
+
   /auth/{code}:
     get:
       responses:
