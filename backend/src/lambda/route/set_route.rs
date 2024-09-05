@@ -14,6 +14,7 @@ struct SetRouteRequest {
     id: String,
     name: String,
     message: String,
+    is_private: String,
 }
 
 struct RouteData {
@@ -31,6 +32,7 @@ struct Route {
     distance: String,
     elevation_gain: String,
     map_url: String,
+    is_private: String,
 }
 
 #[derive(Deserialize)]
@@ -56,6 +58,7 @@ async fn set_route(event: Request) -> Result<Response<Body>, Error> {
     let route_id = body.id;
     let name = body.name;
     let message = body.message;
+    let is_private = body.is_private;
 
     let aws_config = load_defaults(BehaviorVersion::latest()).await;
     let ddb_client = ddb::Client::new(&aws_config);
@@ -83,6 +86,7 @@ async fn set_route(event: Request) -> Result<Response<Body>, Error> {
         distance,
         elevation_gain,
         map_url: route_data.map_url,
+        is_private,
     };
 
     update_route_data(&ssm_client, &route).await?;
@@ -338,16 +342,22 @@ async fn send_email(
 }
 
 fn build_email_body(route: &Route, recipient: &EmailRecipient) -> String {
-    let template_body = include_str!("../../templates/update.html");
+    if route.is_private == "true" {
+        let template_body = include_str!("../../templates/update-private.html");
 
-    let email_body = template_body
-        .replace("%ROUTE_NAME%", &route.name)
-        .replace("%DESCRIPTION%", &route.message)
-        .replace("%DISTANCE%", &route.distance)
-        .replace("%ELEVATION_GAIN%", &route.elevation_gain)
-        .replace("%MAP_URL%", &route.map_url)
-        .replace("%RECIPIENT_ID%", &recipient.id)
-        .replace("$NEWLINE", "\n");
+        template_body
+            .replace("%RECIPIENT_ID%", &recipient.id)
+            .replace("$NEWLINE", "\n")
+    } else {
+        let template_body = include_str!("../../templates/update.html");
 
-    return email_body;
+        template_body
+            .replace("%ROUTE_NAME%", &route.name)
+            .replace("%DESCRIPTION%", &route.message)
+            .replace("%DISTANCE%", &route.distance)
+            .replace("%ELEVATION_GAIN%", &route.elevation_gain)
+            .replace("%MAP_URL%", &route.map_url)
+            .replace("%RECIPIENT_ID%", &recipient.id)
+            .replace("$NEWLINE", "\n")
+    }
 }
