@@ -14,6 +14,12 @@ struct Attendees {
     maybe: Vec<String>,
 }
 
+impl Attendees {
+    fn total(&self) -> usize {
+        self.yes.len() + self.maybe.len()
+    }
+}
+
 struct Member {
     id: String,
     name: String,
@@ -39,6 +45,10 @@ async fn attendance_report(_event: LambdaEvent<Request>) -> Result<(), Error> {
 
     let members = read_all_members(&ddb_client).await?;
     let attendees = get_attendees(&members);
+
+    if attendees.total() == 0 {
+        return Ok(());
+    }
 
     reset_member_statuses(&ddb_client, &members).await?;
 
@@ -116,20 +126,18 @@ async fn read_all_members(ddb_client: &ddb::Client) -> Result<Vec<Member>, Error
 }
 
 fn get_attendees(members: &Vec<Member>) -> Attendees {
-    members.iter().fold(
-        Attendees {
-            yes: Vec::new(),
-            maybe: Vec::new(),
-        },
-        |mut acc, member| {
-            match member.ride_status.as_str() {
-                "Y" => acc.yes.push(member.name.clone()),
-                "M" => acc.maybe.push(member.name.clone()),
-                _ => (),
-            }
-            acc
-        },
-    )
+    Attendees {
+        yes: members
+            .iter()
+            .filter(|member| member.ride_status == "Y")
+            .map(|member| member.name.clone())
+            .collect(),
+        maybe: members
+            .iter()
+            .filter(|member| member.ride_status == "M")
+            .map(|member| member.name.clone())
+            .collect(),
+    }
 }
 
 async fn reset_member_statuses(
