@@ -33,12 +33,12 @@ pub fn footer() -> Html {
                 <div style="height: 50px;">
                     <span class="icon light-icon is-large m-2">
                         <a href={STRAVA_URL} target="_blank">
-                            <img src="/images/strava_logo.svg" />
+                            <img src="/images/strava_logo.svg" loading="lazy" />
                         </a>
                     </span>
                     <span class="icon light-icon is-large m-2">
                         <a href={FACEBOOK_URL} target="_blank">
-                            <img src="/images/facebook_logo.svg" />
+                            <img src="/images/facebook_logo.svg" loading="lazy" />
                         </a>
                     </span>
                 </div>
