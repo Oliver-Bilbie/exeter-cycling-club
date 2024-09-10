@@ -4,9 +4,11 @@ use aws_sdk_sesv2 as ses;
 use aws_sdk_ssm as ssm;
 use lambda_http::{run, service_fn, Body, Error, Request, Response};
 use reqwest::Client as ReqwestClient;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use serde_json::json;
 use std::env;
+
+use route_lib::Route;
 
 #[derive(Deserialize)]
 struct SetRouteRequest {
@@ -17,22 +19,10 @@ struct SetRouteRequest {
     is_private: String,
 }
 
-struct RouteData {
+struct StravaRouteData {
     distance: f64,
     elevation_gain: f64,
     map_url: String,
-}
-
-#[derive(Serialize)]
-struct Route {
-    status: String,
-    id: String,
-    name: String,
-    message: String,
-    distance: String,
-    elevation_gain: String,
-    map_url: String,
-    is_private: String,
 }
 
 #[derive(Deserialize)]
@@ -172,7 +162,7 @@ async fn get_route_data(
     reqwest_client: &ReqwestClient,
     access_token: &String,
     route_id: &String,
-) -> Result<RouteData, Error> {
+) -> Result<StravaRouteData, Error> {
     #[derive(Deserialize)]
     struct StravaMapUrls {
         retina_url: String,
@@ -195,7 +185,7 @@ async fn get_route_data(
 
     let route_json: StravaRoute = route_resp.json().await?;
 
-    Ok(RouteData {
+    Ok(StravaRouteData {
         distance: route_json.distance,
         elevation_gain: route_json.elevation_gain,
         map_url: route_json.map_urls.retina_url,
