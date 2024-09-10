@@ -1,22 +1,13 @@
 use aws_config::{load_defaults, BehaviorVersion};
 use aws_sdk_ssm as ssm;
 use lambda_runtime::{run, service_fn, Error, LambdaEvent};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::env;
+
+use route_lib::Route;
 
 #[derive(Deserialize)]
 struct Request {}
-
-#[derive(Serialize)]
-struct Route {
-    status: String,
-    id: String,
-    name: String,
-    message: String,
-    distance: String,
-    elevation_gain: String,
-    map_url: String,
-}
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -41,6 +32,7 @@ async fn clear_route(_event: LambdaEvent<Request>) -> Result<(), Error> {
         distance: "".to_string(),
         elevation_gain: "".to_string(),
         map_url: "".to_string(),
+        is_private: "false".to_string(),
     };
 
     let route_data_ssm_id = env::var("ROUTE_DATA_SSM").expect("ROUTE_DATA_SSM not set");

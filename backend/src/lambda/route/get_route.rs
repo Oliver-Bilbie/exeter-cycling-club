@@ -5,10 +5,7 @@ use reqwest::Client as ReqwestClient;
 use serde::Deserialize;
 use std::env;
 
-#[derive(Deserialize)]
-struct RouteData {
-    is_private: String,
-}
+use route_lib::Route;
 
 #[derive(Deserialize)]
 struct AthleteClubsResponse {
@@ -46,7 +43,7 @@ async fn get_route(event: Request) -> Result<Response<Body>, Error> {
         .expect("No value found");
 
     println!("Route data: {}", route_data);
-    let route_data_json: RouteData =
+    let route_data_json: Route =
         serde_json::from_str(&route_data).expect("Unexpected response from server");
 
     if route_data_json.is_private == "true" {

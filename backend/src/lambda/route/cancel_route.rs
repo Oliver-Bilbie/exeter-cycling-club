@@ -4,25 +4,16 @@ use aws_sdk_sesv2 as ses;
 use aws_sdk_ssm as ssm;
 use lambda_http::{run, service_fn, Body, Error, Request, Response};
 use reqwest::Client as ReqwestClient;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use serde_json::json;
 use std::env;
+
+use route_lib::Route;
 
 #[derive(Deserialize)]
 struct CancelRouteRequest {
     access_token: String,
     message: String,
-}
-
-#[derive(Serialize, Deserialize)]
-struct Route {
-    status: String,
-    id: String,
-    name: String,
-    message: String,
-    distance: String,
-    elevation_gain: String,
-    map_url: String,
 }
 
 #[derive(Deserialize)]
@@ -77,6 +68,7 @@ async fn cancel_route(event: Request) -> Result<Response<Body>, Error> {
         distance: "".to_string(),
         elevation_gain: "".to_string(),
         map_url: "".to_string(),
+        is_private: "false".to_string(),
     };
 
     update_route_data(&ssm_client, &route).await?;
