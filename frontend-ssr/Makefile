@@ -17,5 +17,9 @@ run:
 build:
 	@rm -rf target/lambda/server/dist target/lambda/server/bootstrap.zip
 	@cp -r dist target/lambda/server
+	@rm -rf target/lambda/server/dist/public/bulma/docs
+	@rm -rf target/lambda/server/dist/public/bulma/test
+	@rm -rf target/lambda/server/dist/public/bulma/.git
+	@rm -rf target/lambda/server/dist/public/bulma/.github
 	@cargo lambda build --release --features=ssr --bin server --
 	@cd target/lambda/server && zip -r bootstrap.zip bootstrap dist
