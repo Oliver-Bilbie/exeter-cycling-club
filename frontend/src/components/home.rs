@@ -34,11 +34,17 @@ pub fn home(props: &HomeProps) -> Html {
 
     html! {
         <>
+            // Speed up image loading by adding it to the html
+            <img src="/images/header1.jpg" rel="preload" class="is-hidden" />
+
             <section class="is-fullheight">
                 <NavBar is_sticky={header_visible} />
 
                 if header_visible {
-                    <section class="fullheight-bg hero is-fullheight-with-navbar" style="overflow: hidden;">
+                    <section
+                        class="fullheight-bg hero is-fullheight-with-navbar"
+                        style="overflow: hidden;"
+                    >
                         <div class="is-overlay hero-body">
                             <div class="container has-text-centered">
                                 <h1 class="title is-1 has-text-light">
@@ -74,9 +80,6 @@ pub fn home(props: &HomeProps) -> Html {
             <AboutSection content={RIDING_GUIDELINES} image="images/home3.jpg" reverse={true} />
 
             <Footer />
-
-            // Speed up image loading by adding it to the html
-            <img src="/images/header1.jpg" class="is-hidden" />
         </>
     }
 }

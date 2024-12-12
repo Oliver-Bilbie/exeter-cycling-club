@@ -40,7 +40,12 @@ pub fn nav_bar(props: &Props) -> Html {
                     }}
                     onclick={ go_to_page(navigator.clone(), Route::Home) }
                 >
-                    <img class="logo-button" src="/images/logo.png" style="max-height: 120px; align-self: start;" />
+                    <img
+                        class="logo-button"
+                        src="/images/logo.png"
+                        rel="preload"
+                        alt="Home"
+                    />
                 </a>
 
                 <a

@@ -39,6 +39,12 @@ $strava: #FC4C02;
 }
 
 // Logo button
+.logo-button {
+  height: 120px;
+  min-height: 120px;
+  width: 120px;
+  align-self: start;
+}
 .logo-button:hover{
   filter: drop-shadow(0 0 0.75rem #bfbfbf);
 }

@@ -126,7 +126,7 @@ pub fn route_select() -> Html {
                             }).collect::<Html>()}
                     </div>
                     <div class="m-6" style="display: flex; justify-content: center; align-content: center;">
-                        <img src="images/api_logo_pwrdBy_strava_horiz_gray.png" />
+                        <img src="images/api_logo_pwrdBy_strava_horiz_gray.png" alt="Powered by Strava" />
                     </div>
                 </div>
             },
