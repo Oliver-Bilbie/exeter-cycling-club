@@ -105,7 +105,7 @@ pub fn email_sign_up() -> Html {
                                     type="text"
                                 />
                                 <span class="icon is-small is-left p-2">
-                                    <img src="/images/user_icon.svg" />
+                                    <img src="/images/user_icon.svg" loading="lazy" alt="Name" />
                                 </span>
                             </div>
                         </div>
@@ -118,7 +118,7 @@ pub fn email_sign_up() -> Html {
                                     type="email"
                                 />
                                 <span class="icon is-small is-left p-2">
-                                    <img src="/images/email.svg" />
+                                    <img src="/images/email.svg" loading="lazy" alt="Email address" />
                                 </span>
                             </div>
                         </div>

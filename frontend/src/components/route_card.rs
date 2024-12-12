@@ -28,7 +28,7 @@ pub fn route_card(props: &RouteCardProps) -> Html {
         <div class="card" style="max-width: 350px; display: inline-grid;">
             <div class="card-image">
                 <figure class="image is-350x146">
-                    <img src={ map_url } />
+                    <img src={ map_url } loading="lazy" alt="Route map" />
                 </figure>
             </div>
             <header class="card-header">
@@ -38,7 +38,7 @@ pub fn route_card(props: &RouteCardProps) -> Html {
                 <div class="media is-align-items-center m-2">
                     <div class="media-left">
                         <figure class="image is-32x32">
-                            <img src="/images/road_icon.svg" alt="Placeholder image"/>
+                            <img src="/images/road_icon.svg" alt="Distance" loading="lazy" />
                         </figure>
                     </div>
                     <div class="media-content">
@@ -47,7 +47,7 @@ pub fn route_card(props: &RouteCardProps) -> Html {
                     <div class="m-3" />
                     <div class="media-left">
                         <figure class="image is-32x32">
-                            <img src="/images/mountain_icon.svg" alt="Placeholder image"/>
+                            <img src="/images/mountain_icon.svg" alt="Elevation gain" loading="lazy" />
                         </figure>
                     </div>
                     <div class="media-content">
