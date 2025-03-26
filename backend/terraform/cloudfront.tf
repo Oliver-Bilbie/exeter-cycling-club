@@ -7,7 +7,7 @@ resource "aws_cloudfront_distribution" "render_ui_distribution" {
   enabled         = true
   is_ipv6_enabled = true
   price_class     = "PriceClass_100"
-  # TODO: aliases         = [var.app-name]
+  aliases         = ["${var.app-name}.${var.domain}"]
 
   origin {
     domain_name = "${aws_lambda_function_url.render_ui_url.url_id}.lambda-url.${var.region}.on.aws"
@@ -36,7 +36,8 @@ resource "aws_cloudfront_distribution" "render_ui_distribution" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    acm_certificate_arn = var.cert_arn
+    ssl_support_method  = "sni-only"
   }
 
   tags = {

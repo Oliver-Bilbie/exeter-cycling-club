@@ -32,3 +32,8 @@ variable "admin-emails" {
   type        = string
   description = "Email addresses of any admins"
 }
+
+variable "cert_arn" {
+  type        = string
+  description = "ARN of the ACM certificate for full_domain"
+}
