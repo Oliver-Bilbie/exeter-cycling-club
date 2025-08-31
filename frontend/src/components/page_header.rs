@@ -10,7 +10,7 @@ pub fn page_header(props: &PageHeaderProps) -> Html {
     html! {
         <>
             // Speed up image loading by adding it to the html
-            <img src="/images/header3.jpg" rel="preload" class="is-hidden" />
+            <img src="/images/header2.webp" rel="preload" class="is-hidden" />
 
             <section class="hero" style="height: 20vh; max-height: 300px; min-height: 200px; position: relative;">
                 <div class="hero-body fullheight-bg-2 is-vcentered" style="height: 20vh; max-height: 300px; min-height: 200px;">

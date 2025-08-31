@@ -42,7 +42,7 @@ pub fn nav_bar(props: &Props) -> Html {
                 >
                     <img
                         class="logo-button"
-                        src="/images/logo.png"
+                        src="/images/logo.webp"
                         rel="preload"
                         alt="Home"
                     />

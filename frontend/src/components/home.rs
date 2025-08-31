@@ -35,7 +35,7 @@ pub fn home(props: &HomeProps) -> Html {
     html! {
         <>
             // Speed up image loading by adding it to the html
-            <img src="/images/header1.jpg" rel="preload" class="is-hidden" />
+            <img src="/images/header1.webp" rel="preload" class="is-hidden" />
 
             <section class="is-fullheight">
                 <NavBar is_sticky={header_visible} />
@@ -75,9 +75,9 @@ pub fn home(props: &HomeProps) -> Html {
                 }
             </section>
 
-            <AboutSection content={ABOUT_US} image="images/home1.jpg" reverse={true} />
-            <AboutSection content={JOIN_US_ON_A_RIDE} image="images/home2.jpg" reverse={false} />
-            <AboutSection content={RIDING_GUIDELINES} image="images/home3.jpg" reverse={true} />
+            <AboutSection content={ABOUT_US} image="images/home1.webp" reverse={true} />
+            <AboutSection content={JOIN_US_ON_A_RIDE} image="images/home2.webp" reverse={false} />
+            <AboutSection content={RIDING_GUIDELINES} image="images/home3.webp" reverse={true} />
 
             <Footer />
         </>

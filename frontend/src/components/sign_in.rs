@@ -36,7 +36,7 @@ pub fn set_status() -> Html {
                         </h2>
                         <a href={strava_authorize_url_with_params}>
                             <img
-                                src="/images/btn_strava_connectwith_orange.png"
+                                src="/images/btn_strava_connectwith_orange.webp"
                                 alt="Connect with Strava"
                             />
                         </a>
