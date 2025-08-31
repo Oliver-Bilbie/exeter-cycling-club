@@ -9,13 +9,14 @@ build_wasm:
 	@mkdir -p public && cp -r ../frontend/public/* public
 	@mkdir -p images && cp -r ../frontend/images/* images
 	@cp ../frontend/index.scss index.scss
-	@trunk build --release index.html
+	@trunk build --release=true index.html
 
 run:
 	@cargo run --features=ssr --bin server -- --dir dist
 
 build:
 	@rm -rf target/lambda/server/dist target/lambda/server/bootstrap.zip
+	@mkdir -p target/lambda/server
 	@cp -r dist target/lambda/server
 	@rm -rf target/lambda/server/dist/public/bulma/docs
 	@rm -rf target/lambda/server/dist/public/bulma/test

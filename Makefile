@@ -1,7 +1,7 @@
 default: build
 
 build:
-	@cd frontend && trunk build --release
+	@cd frontend && make
 	@cd frontend-ssr && make prd
 	@cd backend && make
 
