@@ -56,7 +56,7 @@ async fn unsubscribe(event: Request) -> Result<Response<Body>, Error> {
 
     Ok(Response::builder()
         .status(200)
-        .header("content-type", "text/html")
+        .header("content-type", "application/json")
         .body(
             json!({ "message": "Unsubscribed successfully" })
                 .to_string()

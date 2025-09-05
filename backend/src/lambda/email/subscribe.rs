@@ -38,7 +38,7 @@ async fn subscribe(event: Request) -> Result<Response<Body>, Error> {
     if email_exists {
         return Ok(Response::builder()
             .status(200)
-            .header("content-type", "text/html")
+            .header("content-type", "application/json")
             .body(
                 json!({ "message": "Subscribed successfully" })
                     .to_string()
@@ -55,7 +55,7 @@ async fn subscribe(event: Request) -> Result<Response<Body>, Error> {
 
     Ok(Response::builder()
         .status(200)
-        .header("content-type", "text/html")
+        .header("content-type", "application/json")
         .body(
             json!({ "message": "Subscribed successfully" })
                 .to_string()

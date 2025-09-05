@@ -63,7 +63,7 @@ async fn authenticate(event: Request) -> Result<Response<Body>, Error> {
 
     Ok(Response::builder()
         .status(200)
-        .header("content-type", "text/html")
+        .header("content-type", "application/json")
         .body(json!(user).to_string().into())
         .map_err(Box::new)?)
 }

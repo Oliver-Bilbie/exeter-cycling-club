@@ -62,7 +62,7 @@ async fn get_route(event: Request) -> Result<Response<Body>, Error> {
             if !check_if_member(access_token.unwrap()).await? {
                 return Ok(Response::builder()
                     .status(403)
-                    .header("content-type", "text/html")
+                    .header("content-type", "application/json")
                     .body(
                         "This week's route is only available to members."
                             .to_string()
@@ -73,7 +73,7 @@ async fn get_route(event: Request) -> Result<Response<Body>, Error> {
         } else {
             return Ok(Response::builder()
                 .status(401)
-                .header("content-type", "text/html")
+                .header("content-type", "application/json")
                 .body(
                     "This week's route is only available to members. Please sign in and try again."
                         .to_string()
@@ -85,7 +85,7 @@ async fn get_route(event: Request) -> Result<Response<Body>, Error> {
 
     Ok(Response::builder()
         .status(200)
-        .header("content-type", "text/html")
+        .header("content-type", "application/json")
         .body(route_data.to_string().into())
         .map_err(Box::new)?)
 }

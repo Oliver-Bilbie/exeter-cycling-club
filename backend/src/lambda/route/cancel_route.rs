@@ -47,7 +47,7 @@ async fn cancel_route(event: Request) -> Result<Response<Body>, Error> {
     if !check_if_admin(&ssm_client, &reqwest_client, &access_token).await? {
         return Ok(Response::builder()
             .status(401)
-            .header("content-type", "text/html")
+            .header("content-type", "application/json")
             .body(json!({ "message": "Unauthorized" }).to_string().into())
             .map_err(Box::new)?);
     }
@@ -55,7 +55,7 @@ async fn cancel_route(event: Request) -> Result<Response<Body>, Error> {
     if !check_route_exists(&ssm_client).await? {
         return Ok(Response::builder()
             .status(200)
-            .header("content-type", "text/html")
+            .header("content-type", "application/json")
             .body(json!({ "message": "No route is set" }).to_string().into())
             .map_err(Box::new)?);
     }
@@ -77,7 +77,7 @@ async fn cancel_route(event: Request) -> Result<Response<Body>, Error> {
 
     Ok(Response::builder()
         .status(200)
-        .header("content-type", "text/html")
+        .header("content-type", "application/json")
         .body(
             json!({ "message": "Route set successfully" })
                 .to_string()

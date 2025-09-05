@@ -33,7 +33,7 @@ async fn set_attendance(event: Request) -> Result<Response<Body>, Error> {
     if !validate_status(&status) {
         return Ok(Response::builder()
             .status(400)
-            .header("content-type", "text/html")
+            .header("content-type", "application/json")
             .body(json!({ "message": "Invalid status" }).to_string().into())
             .map_err(Box::new)?);
     }
@@ -41,7 +41,7 @@ async fn set_attendance(event: Request) -> Result<Response<Body>, Error> {
     if !check_user_exists(&ddb_client, &id).await? {
         return Ok(Response::builder()
             .status(404)
-            .header("content-type", "text/html")
+            .header("content-type", "application/json")
             .body(json!({ "message": "User not found" }).to_string().into())
             .map_err(Box::new)?);
     }
@@ -50,7 +50,7 @@ async fn set_attendance(event: Request) -> Result<Response<Body>, Error> {
 
     Ok(Response::builder()
         .status(200)
-        .header("content-type", "text/html")
+        .header("content-type", "application/json")
         .body(
             json!({ "message": "Attendance set successfully" })
                 .to_string()

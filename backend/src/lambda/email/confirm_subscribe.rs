@@ -32,7 +32,7 @@ async fn confirm_subscribe(event: Request) -> Result<Response<Body>, Error> {
     if !id_exists {
         return Ok(Response::builder()
             .status(404)
-            .header("content-type", "text/html")
+            .header("content-type", "application/json")
             .body(
                 json!({ "message": "User does not exist. Please try subscribing again." })
                     .to_string()
@@ -45,7 +45,7 @@ async fn confirm_subscribe(event: Request) -> Result<Response<Body>, Error> {
 
     Ok(Response::builder()
         .status(200)
-        .header("content-type", "text/html")
+        .header("content-type", "application/json")
         .body(
             json!({ "message": "Subscribed successfully" })
                 .to_string()

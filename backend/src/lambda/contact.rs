@@ -38,7 +38,7 @@ async fn contact_us(event: Request) -> Result<Response<Body>, Error> {
 
     Ok(Response::builder()
         .status(200)
-        .header("content-type", "text/html")
+        .header("content-type", "application/json")
         .body(
             json!({ "message": "Message sent successfully" })
                 .to_string()
