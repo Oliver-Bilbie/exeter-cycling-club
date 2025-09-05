@@ -9,7 +9,7 @@ pub struct FramedImageProps {
 pub fn framed_image(props: &FramedImageProps) -> Html {
     html! {
         <div class="box is-flex has-background-dark p-2">
-            <img src={props.image} loading="lazy" style="object-fit: cover;" alt="" />
+            <img src={props.image} style="object-fit: cover;" alt="" />
         </div>
     }
 }
