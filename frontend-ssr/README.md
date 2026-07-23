@@ -1,12 +1,35 @@
-# SSR Frontend
+# Frontend SSR
 
-This directory contains the code to support hosting the [frontend](../frontend) as server-side-rendered web application using Axum. The frontend itself is not contained within this directory.
+Axum host that server-renders the [`frontend`](../frontend) Yew app and ships as an AWS Lambda (`render-ui`).
 
-This implementation is heavily borrowed from the [ssr_router](https://github.com/yewstack/yew/tree/master/examples/ssr_router) example from the Yew repository.
+Based on the Yew [`ssr_router`](https://github.com/yewstack/yew/tree/master/examples/ssr_router) example. UI source lives in `../frontend`; this crate only hosts it.
 
-## Running the server
+## Binaries
 
-You will need to install [Rust](https://www.rust-lang.org/) and [Trunk](https://trunkrs.dev/) on your machine to build and run this project.
+| Binary | Features | Role |
+| --- | --- | --- |
+| `server` | `ssr` | Axum SSR server (local + Lambda) |
+| `client` | `hydration` | WASM hydration client |
 
-A Makefile has been provided in this directory for convenience. To build and run the server simply run `make`.
-You may run these commands separately using `make build` and `make run` respectively.
+## Develop
+
+Install [Rust](https://www.rust-lang.org/), [Trunk](https://trunkrs.dev/), and (for deploy builds) [cargo-lambda](https://www.cargo-lambda.info/).
+
+```bash
+make          # default: dev — build WASM assets and run the server
+make dev      # same as above
+make build_wasm
+make run      # cargo run --features=ssr --bin server -- --dir dist
+```
+
+`build_wasm` copies `public/`, `images/`, and `index.scss` from `../frontend`, then runs Trunk.
+
+## Production / Lambda package
+
+```bash
+make prd      # build_wasm + Lambda zip
+```
+
+Produces `target/lambda/server/bootstrap.zip` (bootstrap + `dist/`), which backend Terraform deploys as the `render-ui` function.
+
+Root `make` runs `make prd` here as part of the full project build.
