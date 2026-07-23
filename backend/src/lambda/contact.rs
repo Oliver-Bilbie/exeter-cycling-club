@@ -1,9 +1,11 @@
 use aws_config::{load_defaults, BehaviorVersion};
 use aws_sdk_sesv2 as ses;
 use aws_sdk_ssm as ssm;
+use ecc_lib::email;
+use ecc_lib::http::{json_message, parse_body};
+use ecc_lib::ssm as ssm_util;
 use lambda_http::{run, service_fn, Body, Error, Request, Response};
 use serde::Deserialize;
-use serde_json::json;
 
 #[derive(Deserialize)]
 struct ContactUsRequest {
@@ -19,113 +21,36 @@ async fn main() -> Result<(), Error> {
         .without_time()
         .init();
 
-    run(service_fn(contact_us)).await
-}
-
-async fn contact_us(event: Request) -> Result<Response<Body>, Error> {
-    let body = read_event_body(event)?;
-    let contact_email = body.contact_email;
-    let message = body.message;
-
     let aws_config = load_defaults(BehaviorVersion::latest()).await;
     let ssm_client = ssm::Client::new(&aws_config);
     let ses_client = ses::Client::new(&aws_config);
 
-    let recipients = get_admin_list(&ssm_client).await?;
+    run(service_fn(move |event| {
+        let ssm_client = ssm_client.clone();
+        let ses_client = ses_client.clone();
+        async move { contact_us(event, &ssm_client, &ses_client).await }
+    }))
+    .await
+}
 
-    let message = format!("Message from: {}\n\n{}", contact_email, message);
-    send_emails(&ses_client, &recipients, &message).await?;
+async fn contact_us(
+    event: Request,
+    ssm_client: &ssm::Client,
+    ses_client: &ses::Client,
+) -> Result<Response<Body>, Error> {
+    let body = parse_body::<ContactUsRequest>(&event)?;
+    let recipients = ssm_util::get_csv_list(ssm_client, "ecc-admin-emails").await?;
+    let message = format!("Message from: {}\n\n{}", body.contact_email, body.message);
 
-    Ok(Response::builder()
-        .status(200)
-        .header("content-type", "application/json")
-        .body(
-            json!({ "message": "Message sent successfully" })
-                .to_string()
-                .into(),
+    for recipient in &recipients {
+        email::send_text(
+            ses_client,
+            recipient.clone(),
+            "Message from website",
+            &message,
         )
-        .map_err(Box::new)?)
-}
-
-async fn get_admin_list(ssm_client: &ssm::Client) -> Result<Vec<String>, Error> {
-    let ssm_resp = ssm_client
-        .get_parameter()
-        .name("ecc-admin-emails")
-        .with_decryption(true)
-        .send()
         .await?;
-
-    let ssm_value = ssm_resp
-        .parameter
-        .expect("No parameter found")
-        .value
-        .expect("No value found");
-
-    let admin_list: Vec<String> = ssm_value.split(",").map(|s| s.to_string()).collect();
-
-    Ok(admin_list)
-}
-
-async fn send_emails(
-    ses_client: &ses::Client,
-    recipients: &Vec<String>,
-    message: &String,
-) -> Result<(), Error> {
-    for recipient in recipients {
-        send_email(ses_client, recipient.to_string(), message).await?;
     }
-    Ok(())
-}
 
-async fn send_email(
-    ses_client: &ses::Client,
-    recipient: String,
-    message: &String,
-) -> Result<(), Error> {
-    let mut destination: ses::types::Destination = ses::types::Destination::builder().build();
-    destination.to_addresses = Some(vec![recipient]);
-
-    let subject_content = ses::types::Content::builder()
-        .data("Message from website")
-        .charset("UTF-8")
-        .build()
-        .expect("Unable to build subject content");
-
-    let body_content = ses::types::Content::builder()
-        .data(message)
-        .charset("UTF-8")
-        .build()
-        .expect("Unable to build body content");
-
-    let body = ses::types::Body::builder().text(body_content).build();
-
-    let message = ses::types::Message::builder()
-        .subject(subject_content)
-        .body(body)
-        .build();
-
-    let email_content = ses::types::EmailContent::builder().simple(message).build();
-
-    ses_client
-        .send_email()
-        // TODO: Replace with production domain
-        .from_email_address("Exeter Cycling Club <ecc@oliver-bilbie.co.uk>")
-        .destination(destination)
-        .content(email_content)
-        .send()
-        .await?;
-
-    Ok(())
-}
-
-fn read_event_body(event: Request) -> Result<ContactUsRequest, Error> {
-    let body = match event.body() {
-        Body::Text(text) => serde_json::from_str(text).expect("Unable to parse body"),
-        Body::Binary(input) => {
-            let text = String::from_utf8(input.to_vec()).expect("Unable to parse binary body");
-            serde_json::from_str(&text).expect("Unable to parse body")
-        }
-        _ => panic!("No event body was provided"),
-    };
-    Ok(body)
+    json_message(200, "Message sent successfully")
 }
