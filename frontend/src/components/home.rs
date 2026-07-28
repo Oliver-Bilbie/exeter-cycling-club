@@ -1,3 +1,5 @@
+use bounce::prelude::*;
+use yew::platform::spawn_local;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
@@ -5,7 +7,10 @@ use crate::components::about_section::AboutSection;
 use crate::components::footer::Footer;
 use crate::components::nav_bar::{NavBar, NAVBAR_HEIGHT};
 use crate::helpers::about_us::*;
+use crate::helpers::auth_state::AuthState;
+use crate::helpers::get_route::get_route;
 use crate::helpers::go_to_page::go_to_page;
+use crate::helpers::route_state::RouteState;
 use crate::Route;
 
 #[derive(Properties, PartialEq)]
@@ -17,6 +22,24 @@ pub struct HomeProps {
 pub fn home(props: &HomeProps) -> Html {
     let navigator = use_navigator().unwrap();
     let header_visible = props.header_visible;
+    let auth_state = use_atom_value::<AuthState>();
+    let set_route_state = use_atom_setter::<RouteState>();
+
+    {
+        let auth_state = auth_state.clone();
+        let set_route_state = set_route_state.clone();
+        use_effect_with(auth_state.clone(), move |_| {
+            let access_token = auth_state
+                .user_data
+                .as_ref()
+                .map(|user| user.access_token.clone());
+            spawn_local(async move {
+                let status = get_route(access_token).await;
+                set_route_state(RouteState { status });
+            });
+            || ()
+        });
+    }
 
     let scroll_to_about_us = |_| {
         let window = web_sys::window().unwrap();
