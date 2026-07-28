@@ -21,10 +21,10 @@ pub fn nav_bar(props: &Props) -> Html {
 
     let nav_styles = match props.is_sticky {
         true => format!(
-            "height: {}px; position: -webkit-sticky; position: sticky; top: 0;",
+            "height: {}px; position: -webkit-sticky; position: sticky; top: 0; z-index: 30;",
             NAVBAR_HEIGHT
         ),
-        false => format!("height: {}px;", NAVBAR_HEIGHT),
+        false => format!("height: {}px; z-index: 30;", NAVBAR_HEIGHT),
     };
 
     html! {

@@ -13,8 +13,8 @@ pub fn page_header(props: &PageHeaderProps) -> Html {
             <img src="/images/header2.webp" rel="preload" class="is-hidden" />
 
             <section class="hero" style="height: 20vh; max-height: 300px; min-height: 200px; position: relative;">
-                <div class="hero-body fullheight-bg-2 is-vcentered" style="height: 20vh; max-height: 300px; min-height: 200px;">
-                    <h1 class="title is-1 has-text-light" style="top: 200px; z-index: 10;">
+                <div class="hero-body fullheight-bg-2 is-flex is-align-items-center" style="height: 20vh; max-height: 300px; min-height: 200px;">
+                    <h1 class="title is-1 has-text-light" style="z-index: 10;">
                             { props.title }
                     </h1>
                 </div>

@@ -51,7 +51,7 @@ pub fn ride_page() -> Html {
             }
             RouteStatus::Error(message) => html! { <NoRouteDisplay message={message.clone()} /> },
             RouteStatus::Loading => html! {
-                <div class="container is-vcentered mb-6" style="display: grid;">
+                <div class="page-center mb-6">
                     <LoadingSpinner size={200} />
                 </div>
             },

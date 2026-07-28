@@ -132,14 +132,14 @@ pub fn email_sign_up() -> Html {
             }
             FormState::Loading => {
                 html! {
-                    <div class="container is-vcentered mb-6" style="display: grid;">
+                    <div class="page-center mb-6">
                         <LoadingSpinner size={100} />
                     </div>
                 }
             }
             FormState::Complete => {
                 html! {
-                    <div class="container is-vcentered mb-6" style="display: grid;">
+                    <div class="page-center mb-6">
                         <h2 class="title is-2 has-text-centered">
                             {"Thanks for signing up!"}
                         </h2>
@@ -150,7 +150,7 @@ pub fn email_sign_up() -> Html {
     };
 
     html!(
-        <div class="container" style="max-width: 400px;">
+        <div class="container mt-6" style="max-width: 400px;">
             <h4 class="title is-4 has-text-centered">
                 {"Subscribe to email alerts"}
             </h4>

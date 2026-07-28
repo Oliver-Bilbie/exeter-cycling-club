@@ -17,13 +17,13 @@ pub fn not_found() -> Html {
             <PageHeader title="Exeter Cycling Club" />
 
             <div class="hero texture-light is-flex-grow-5">
-                <div class="container is-flex is-flex-direction-column is-justify-content-center">
-                    <div class="my-6 mx-4 is-flex is-flex-direction-column">
+                <div class="container page-center">
+                    <div class="page-center-stack my-6 mx-4">
                         <h2 class="title is-2 has-text-centered">
                             {"Page not found"}
                         </h2>
                         <button
-                            class="button is-primary is-align-self-center m-2"
+                            class="button is-primary m-2"
                             onclick={
                                 go_to_page(navigator.clone(), Route::Home)
                             }

@@ -59,7 +59,7 @@ pub fn unsubscribe() -> Html {
                 </h2>
             },
             RequestState::Loading => html! {
-                <div class="container is-vcentered mb-6" style="display: grid;">
+                <div class="page-center mb-6">
                     <LoadingSpinner size={200} />
                 </div>
             },
@@ -72,8 +72,8 @@ pub fn unsubscribe() -> Html {
             <PageHeader title="Exeter Cycling Club" />
 
             <div class="hero texture-light is-flex-grow-5">
-                <div class="container is-flex is-flex-direction-column is-justify-content-center">
-                    <div class="my-6 mx-4 is-flex is-flex-direction-column">
+                <div class="container page-center">
+                    <div class="page-center-stack my-6 mx-4">
                         {page_body(&unsubscribe_status)}
                     </div>
                 </div>

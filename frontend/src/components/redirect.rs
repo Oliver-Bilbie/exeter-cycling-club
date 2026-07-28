@@ -68,7 +68,7 @@ pub fn redirect() -> Html {
 
     html! {
         <section class="hero texture-light is-fullheight">
-            <div class="container is-vcentered is-flex is-flex-direction-column is-justify-content-center mb-6" style="display: grid;">
+            <div class="container page-center mb-6">
                 <LoadingSpinner size={200} />
             </div>
         </section>
