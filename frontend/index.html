@@ -1,16 +1,38 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="light">
   <head>
     <title>Exeter Cycling Club</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Group rides in East Devon and Dartmoor. The best way to describe us is a 'cafe club', we love cycling and we equally enjoy a social cafe stop." />
-    <meta name="keywords" content="cycling, exeter, bicycle, bike, road, group ride, club ride" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Group rides in East Devon and Dartmoor. The best way to describe us is a 'cafe club', we love cycling and we equally enjoy a social cafe stop."
+    />
+    <meta
+      name="keywords"
+      content="cycling, exeter, bicycle, bike, road, group ride, club ride"
+    />
     <meta name="robots" content="noindex" />
+
+    <link rel="preload" href="/images/logo.webp" as="image" />
+    <link rel="preload" href="/images/header1.webp" as="image" />
+    <link rel="preload" href="/images/texture-light.webp" as="image" />
+    <link rel="preload" href="/images/texture-dark.webp" as="image" />
+
+    <link rel="prefetch" href="/images/header2.webp" as="image" />
+    <link rel="prefetch" href="/images/home1.webp" as="image" />
+    <link rel="prefetch" href="/images/home2.webp" as="image" />
+    <link rel="prefetch" href="/images/home3.webp" as="image" />
+
     <link data-trunk rel="copy-dir" href="public" />
     <link rel="icon" href="./public/favicon.ico" type="image/x-icon" />
     <link data-trunk rel="copy-dir" href="images" />
     <link data-trunk rel="sass" href="index.scss" />
-    <link data-trunk rel="rust" data-cargo-features="yew/csr" data-bin="exeter_cycling_club" />
+    <link
+      data-trunk
+      rel="rust"
+      data-cargo-features="yew/csr"
+      data-bin="exeter_cycling_club"
+    />
   </head>
   <body></body>
 </html>

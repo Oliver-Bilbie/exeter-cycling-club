@@ -19,14 +19,14 @@ $strava: #FC4C02;
 
 // Responsive image background to fill the parent container
 .fullheight-bg {
-  background-image: url("images/header1.webp");
+  background-image: url("/images/header1.webp");
   background-attachment: fixed;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
 }
 .fullheight-bg-2 {
-  background-image: url("images/header2.webp");
+  background-image: url("/images/header2.webp");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -34,10 +34,10 @@ $strava: #FC4C02;
 
 // Tiling textures for backgrounds
 .texture-light {
-  background: url("images/texture-light.webp") repeat 0 0;
+  background: url("/images/texture-light.webp") repeat 0 0;
 }
 .texture-dark {
-  background: url("images/texture-dark.webp") repeat 0 0;
+  background: url("/images/texture-dark.webp") repeat 0 0;
 }
 
 // Logo button (overflows the fixed-height nav bar by design)
