@@ -99,7 +99,9 @@ pub fn confirm_route(props: &ConfirmRouteProps) -> Html {
                 <div class="my-6 mx-4">
                     {match *is_loading {
                         true => html! {
-                            <LoadingSpinner size={200} />
+                            <div class="page-center">
+                                <LoadingSpinner size={200} />
+                            </div>
                         },
                         false => html!(
                             <RouteForm

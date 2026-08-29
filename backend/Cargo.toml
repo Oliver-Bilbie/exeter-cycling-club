@@ -19,8 +19,8 @@ tracing-subscriber = { version = "0.3", default-features = false, features = ["f
 uuid = { version = "1.7.0", features = ["v4"] }
 
 [lib]
-name = "route_lib"
-path = "src/lib/route.rs"
+name = "ecc_lib"
+path = "src/lib.rs"
 
 [[bin]]
 name = "ecc-api-authenticate"

@@ -102,7 +102,7 @@ pub fn route_select() -> Html {
         move |form_status: &RouteFormStatus| match form_status {
             RouteFormStatus::Ready(route_data) => html! {
                 <div>
-                    <div class="field container pb-5" style="max-width: 350px;">
+                    <div class="field container pb-5 mx-auto" style="max-width: 350px;">
                         <label class="label is-size-5">
                             {"Search"}
                         </label>
@@ -126,7 +126,7 @@ pub fn route_select() -> Html {
                             }).collect::<Html>()}
                     </div>
                     <div class="m-6" style="display: flex; justify-content: center; align-content: center;">
-                        <img src="images/api_logo_pwrdBy_strava_horiz_gray.webp" alt="Powered by Strava" />
+                        <img src="/images/api_logo_pwrdBy_strava_horiz_gray.webp" alt="Powered by Strava" />
                     </div>
                 </div>
             },
@@ -137,7 +137,7 @@ pub fn route_select() -> Html {
                 html! { <NoRouteDisplay message={message.clone()} /> }
             }
             RouteFormStatus::Loading => html! {
-                <div class="container is-vcentered mb-6" style="display: grid;">
+                <div class="page-center mb-6">
                     <LoadingSpinner size={200} />
                 </div>
             },
@@ -149,7 +149,7 @@ pub fn route_select() -> Html {
             <NavBar is_sticky={false} />
             <PageHeader title="Set route" />
 
-            <section class="section texture-light pt-8 is-flex is-flex-grow-5 is-flex-direction-column is-align-content-center">
+            <section class="section texture-light pt-8 is-flex is-flex-grow-5 is-flex-direction-column is-align-items-center">
                 {page_body(&form_status)}
             </section>
 

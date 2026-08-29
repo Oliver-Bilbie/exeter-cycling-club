@@ -1,9 +1,10 @@
 use aws_config::{load_defaults, BehaviorVersion};
 use aws_sdk_ssm as ssm;
+use ecc_lib::http::{json_response, path_param};
+use ecc_lib::ssm as ssm_util;
 use lambda_http::{run, service_fn, Body, Error, Request, Response};
 use reqwest::Client as ReqwestClient;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 
 #[derive(Serialize)]
 struct User {
@@ -39,64 +40,72 @@ async fn main() -> Result<(), Error> {
         .without_time()
         .init();
 
-    run(service_fn(authenticate)).await
-}
-
-async fn authenticate(event: Request) -> Result<Response<Body>, Error> {
-    let request_path = event.uri().path();
-    let code = request_path.split("/").last().expect("No code found");
-
     let aws_config = load_defaults(BehaviorVersion::latest()).await;
     let ssm_client = ssm::Client::new(&aws_config);
     let reqwest_client = ReqwestClient::new();
 
-    let strava_client = get_client_details(&ssm_client).await?;
+    run(service_fn(move |event| {
+        let ssm_client = ssm_client.clone();
+        let reqwest_client = reqwest_client.clone();
+        async move { authenticate(event, &ssm_client, &reqwest_client).await }
+    }))
+    .await
+}
 
-    let user = handle_authentication(&reqwest_client, code, &strava_client).await?;
-    let is_admin = check_if_admin(&ssm_client, &user.athlete.id.to_string()).await?;
+async fn authenticate(
+    event: Request,
+    ssm_client: &ssm::Client,
+    reqwest_client: &ReqwestClient,
+) -> Result<Response<Body>, Error> {
+    let code = path_param(&event).ok_or("No code found")?;
+
+    let strava_client = get_client_details(ssm_client).await?;
+    let auth = handle_authentication(reqwest_client, code, &strava_client).await?;
+    let is_admin = check_if_admin(ssm_client, &auth.athlete.id.to_string()).await?;
+
     let user = User {
-        id: user.athlete.id.to_string(),
-        name: format!("{} {}", user.athlete.firstname, user.athlete.lastname),
-        access_token: user.access_token,
+        id: auth.athlete.id.to_string(),
+        name: format!("{} {}", auth.athlete.firstname, auth.athlete.lastname),
+        access_token: auth.access_token,
         admin: is_admin,
     };
 
-    Ok(Response::builder()
-        .status(200)
-        .header("content-type", "application/json")
-        .body(json!(user).to_string().into())
-        .map_err(Box::new)?)
+    json_response(200, &user)
 }
 
 async fn get_client_details(ssm_client: &ssm::Client) -> Result<StravaClient, Error> {
-    let id_param = "ecc-strava-client-id";
-    let secret_param = "ecc-strava-client-secret";
+    const ID_PARAM: &str = "ecc-strava-client-id";
+    const SECRET_PARAM: &str = "ecc-strava-client-secret";
 
     let ssm_resp = ssm_client
         .get_parameters()
-        .names(id_param)
-        .names(secret_param)
+        .names(ID_PARAM)
+        .names(SECRET_PARAM)
         .with_decryption(true)
         .send()
         .await?;
 
-    let client: StravaClient = ssm_resp.parameters().iter().fold(
-        StravaClient {
-            id: String::new(),
-            secret: String::new(),
-        },
-        |mut client, param| {
-            let name = param.name.clone().expect("Parameter has no name");
-            if name == id_param {
-                client.id = param.value.clone().expect("No value found");
-            } else if name == secret_param {
-                client.secret = param.value.clone().expect("No value found");
-            }
-            client
-        },
-    );
+    let mut id = None;
+    let mut secret = None;
 
-    Ok(client)
+    for param in ssm_resp.parameters() {
+        let name = param.name.as_deref().unwrap_or_default();
+        let value = param
+            .value
+            .clone()
+            .ok_or_else(|| Error::from(format!("No value found for {name}")))?;
+
+        match name {
+            ID_PARAM => id = Some(value),
+            SECRET_PARAM => secret = Some(value),
+            _ => {}
+        }
+    }
+
+    Ok(StravaClient {
+        id: id.ok_or("Missing Strava client id")?,
+        secret: secret.ok_or("Missing Strava client secret")?,
+    })
 }
 
 async fn handle_authentication(
@@ -104,36 +113,15 @@ async fn handle_authentication(
     code: &str,
     client: &StravaClient,
 ) -> Result<AuthenticationResponse, Error> {
-    let endpoint = "https://www.strava.com/oauth/token";
     let url = format!(
-        "{}?client_id={}&client_secret={}&code={}&grant_type=authorization_code",
-        endpoint, client.id, client.secret, code
+        "https://www.strava.com/oauth/token?client_id={}&client_secret={}&code={}&grant_type=authorization_code",
+        client.id, client.secret, code
     );
 
-    let auth_resp = reqwest_client.post(url).send().await?;
-    let auth_json = auth_resp.json().await?;
-
-    Ok(auth_json)
+    Ok(reqwest_client.post(url).send().await?.json().await?)
 }
 
 async fn check_if_admin(ssm_client: &ssm::Client, id: &str) -> Result<bool, Error> {
-    let ssm_resp = ssm_client
-        .get_parameter()
-        .name("ecc-admin-strava-ids")
-        .with_decryption(true)
-        .send()
-        .await?;
-
-    let ssm_value = ssm_resp
-        .parameter
-        .expect("No parameter found")
-        .value
-        .expect("No value found");
-
-    for admin_id in ssm_value.split(",") {
-        if admin_id == id {
-            return Ok(true);
-        }
-    }
-    Ok(false)
+    let admin_ids = ssm_util::get_csv_list(ssm_client, "ecc-admin-strava-ids").await?;
+    Ok(admin_ids.iter().any(|admin_id| admin_id == id))
 }

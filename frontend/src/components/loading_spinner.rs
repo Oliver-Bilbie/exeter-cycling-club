@@ -10,7 +10,7 @@ pub fn loading_spinner(props: &LoadingSpinnerProps) -> Html {
     html! {
         <figure
             class={format!("image is-{}x{}", props.size, props.size)}
-            style={format!("justify-self: center; max-width: {}px; max-height: {}px;", props.size, props.size)}
+            style={format!("max-width: {}px; max-height: {}px;", props.size, props.size)}
         >
             <img class="is-rounded spin" src="/images/logo.webp" alt="Loading" />
         </figure>

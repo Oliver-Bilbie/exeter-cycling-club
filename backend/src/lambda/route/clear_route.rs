@@ -1,10 +1,10 @@
 use aws_config::{load_defaults, BehaviorVersion};
 use aws_sdk_ssm as ssm;
+use ecc_lib::ssm as ssm_util;
+use ecc_lib::Route;
 use lambda_runtime::{run, service_fn, Error, LambdaEvent};
 use serde::Deserialize;
 use std::env;
-
-use route_lib::Route;
 
 #[derive(Deserialize)]
 struct Request {}
@@ -17,34 +17,20 @@ async fn main() -> Result<(), Error> {
         .without_time()
         .init();
 
-    run(service_fn(clear_route)).await
-}
-
-async fn clear_route(_event: LambdaEvent<Request>) -> Result<(), Error> {
     let aws_config = load_defaults(BehaviorVersion::latest()).await;
     let ssm_client = ssm::Client::new(&aws_config);
 
-    let route = Route {
-        status: "unavailable".to_string(),
-        id: "".to_string(),
-        name: "".to_string(),
-        message: "Subscribe to email updates to find out when a route is announced".to_string(),
-        distance: "".to_string(),
-        elevation_gain: "".to_string(),
-        map_url: "".to_string(),
-        is_private: "false".to_string(),
-    };
+    run(service_fn(move |event| {
+        let ssm_client = ssm_client.clone();
+        async move { clear_route(event, &ssm_client).await }
+    }))
+    .await
+}
 
-    let route_data_ssm_id = env::var("ROUTE_DATA_SSM").expect("ROUTE_DATA_SSM not set");
-    let route_json = serde_json::to_string(&route).expect("Unable to serialize route data");
-
-    ssm_client
-        .put_parameter()
-        .name(route_data_ssm_id)
-        .value(route_json)
-        .overwrite(true)
-        .send()
-        .await?;
-
+async fn clear_route(_event: LambdaEvent<Request>, ssm_client: &ssm::Client) -> Result<(), Error> {
+    let route = Route::unavailable();
+    let route_data_ssm_id = env::var("ROUTE_DATA_SSM")?;
+    let route_json = serde_json::to_string(&route)?;
+    ssm_util::put_parameter(ssm_client, route_data_ssm_id, route_json).await?;
     Ok(())
 }

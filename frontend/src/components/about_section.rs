@@ -24,8 +24,8 @@ pub fn about_section(props: &AboutSectionProps) -> Html {
 
     html! {
         <section id={id} class={format!("section {}", texture)}>
-            <container class="container is-widescreen is-flex">
-                <div class="columns is-desktop is-centered m-1">
+            <div class="container is-widescreen">
+                <div class="columns is-desktop is-centered is-vcentered m-1">
                     // We only want to reverse in the left-right direction, not in the
                     // up-down direction which will be used on smaller displays.
                     // Since the reactivity is handled by the css, we create two images
@@ -59,7 +59,7 @@ pub fn about_section(props: &AboutSectionProps) -> Html {
                         },
                     }}
                 </div>
-            </container>
+            </div>
         </section>
     }
 }

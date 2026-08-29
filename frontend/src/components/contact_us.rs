@@ -89,7 +89,9 @@ pub fn contact_us() -> Html {
                                 <ContactForm on_submit={handle_submit} />
                             ),
                             FormState::Loading => html! {
-                                <LoadingSpinner size={128} />
+                                <div class="page-center">
+                                    <LoadingSpinner size={128} />
+                                </div>
                             },
                             FormState::Complete => html! {
                                 <h2 class="title is-2 has-text-centered">

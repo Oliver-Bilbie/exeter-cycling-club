@@ -11,30 +11,32 @@ use crate::components::page_header::PageHeader;
 use crate::components::route_display::RouteDisplay;
 use crate::helpers::auth_state::AuthState;
 use crate::helpers::get_route::{get_route, RouteStatus};
+use crate::helpers::route_state::RouteState;
 
 #[function_component(RidePage)]
 pub fn ride_page() -> Html {
     let auth_state = use_atom_value::<AuthState>();
-
-    let route_status = use_state_eq(|| RouteStatus::Loading);
+    let route_state = use_atom_value::<RouteState>();
+    let set_route_state = use_atom_setter::<RouteState>();
 
     {
         let auth_state = auth_state.clone();
-        let route_status = route_status.clone();
-        let status_callback =
-            Callback::from(move |response: RouteStatus| route_status.set(response));
+        let cached_status = route_state.status.clone();
+        let set_route_state = set_route_state.clone();
 
-        // Load the route data only once
+        // Show cached data immediately; refresh in the background and replace if stale.
         use_effect_with(auth_state.clone(), move |_| {
+            let access_token = auth_state
+                .user_data
+                .as_ref()
+                .map(|user| user.access_token.clone());
             spawn_local(async move {
-                let access_token: Option<String> = match auth_state.user_data {
-                    Some(ref user_data) => Some(user_data.access_token.clone()),
-                    None => None,
-                };
-
-                let resp = get_route(access_token).await;
-                status_callback.emit(resp);
+                let status = get_route(access_token).await;
+                if status != cached_status {
+                    set_route_state(RouteState { status });
+                }
             });
+            || ()
         });
     }
 
@@ -51,7 +53,7 @@ pub fn ride_page() -> Html {
             }
             RouteStatus::Error(message) => html! { <NoRouteDisplay message={message.clone()} /> },
             RouteStatus::Loading => html! {
-                <div class="container is-vcentered mb-6" style="display: grid;">
+                <div class="page-center mb-6">
                     <LoadingSpinner size={200} />
                 </div>
             },
@@ -64,7 +66,7 @@ pub fn ride_page() -> Html {
             <PageHeader title="Upcoming ride" />
 
             <section class="section texture-light pt-8 is-flex-grow-5">
-                {page_body(&route_status)}
+                {page_body(&route_state.status)}
                 <EmailSignUp />
             </section>
 

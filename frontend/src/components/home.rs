@@ -1,3 +1,5 @@
+use bounce::prelude::*;
+use yew::platform::spawn_local;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
@@ -5,7 +7,10 @@ use crate::components::about_section::AboutSection;
 use crate::components::footer::Footer;
 use crate::components::nav_bar::{NavBar, NAVBAR_HEIGHT};
 use crate::helpers::about_us::*;
+use crate::helpers::auth_state::AuthState;
+use crate::helpers::get_route::get_route;
 use crate::helpers::go_to_page::go_to_page;
+use crate::helpers::route_state::RouteState;
 use crate::Route;
 
 #[derive(Properties, PartialEq)]
@@ -17,6 +22,24 @@ pub struct HomeProps {
 pub fn home(props: &HomeProps) -> Html {
     let navigator = use_navigator().unwrap();
     let header_visible = props.header_visible;
+    let auth_state = use_atom_value::<AuthState>();
+    let set_route_state = use_atom_setter::<RouteState>();
+
+    {
+        let auth_state = auth_state.clone();
+        let set_route_state = set_route_state.clone();
+        use_effect_with(auth_state.clone(), move |_| {
+            let access_token = auth_state
+                .user_data
+                .as_ref()
+                .map(|user| user.access_token.clone());
+            spawn_local(async move {
+                let status = get_route(access_token).await;
+                set_route_state(RouteState { status });
+            });
+            || ()
+        });
+    }
 
     let scroll_to_about_us = |_| {
         let window = web_sys::window().unwrap();
@@ -34,9 +57,6 @@ pub fn home(props: &HomeProps) -> Html {
 
     html! {
         <>
-            // Speed up image loading by adding it to the html
-            <img src="/images/header1.webp" rel="preload" class="is-hidden" />
-
             <section class="is-fullheight">
                 <NavBar is_sticky={header_visible} />
 
@@ -75,9 +95,9 @@ pub fn home(props: &HomeProps) -> Html {
                 }
             </section>
 
-            <AboutSection content={ABOUT_US} image="images/home1.webp" reverse={true} />
-            <AboutSection content={JOIN_US_ON_A_RIDE} image="images/home2.webp" reverse={false} />
-            <AboutSection content={RIDING_GUIDELINES} image="images/home3.webp" reverse={true} />
+            <AboutSection content={ABOUT_US} image={"/images/home1.webp"} reverse={true} />
+            <AboutSection content={JOIN_US_ON_A_RIDE} image={"/images/home2.webp"} reverse={false} />
+            <AboutSection content={RIDING_GUIDELINES} image={"/images/home3.webp"} reverse={true} />
 
             <Footer />
         </>

@@ -127,7 +127,11 @@ pub fn route_cancel() -> Html {
                 <div class="container">
                     <div class="my-6 mx-4">
                         {match *is_loading {
-                            true => html! { <LoadingSpinner size={200} /> },
+                            true => html! {
+                                <div class="page-center">
+                                    <LoadingSpinner size={200} />
+                                </div>
+                            },
                             false => html!(
                                 <CancelForm on_submit={handle_submit} />
                             ),

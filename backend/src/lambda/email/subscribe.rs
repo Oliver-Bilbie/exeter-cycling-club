@@ -1,9 +1,10 @@
 use aws_config::{load_defaults, BehaviorVersion};
 use aws_sdk_dynamodb as ddb;
 use aws_sdk_sesv2 as ses;
+use ecc_lib::email as email_util;
+use ecc_lib::http::{json_message, parse_body};
 use lambda_http::{run, service_fn, Body, Error, Request, Response};
 use serde::Deserialize;
-use serde_json::json;
 use std::env;
 use uuid::Uuid;
 
@@ -21,140 +22,83 @@ async fn main() -> Result<(), Error> {
         .without_time()
         .init();
 
-    run(service_fn(subscribe)).await
-}
-
-async fn subscribe(event: Request) -> Result<Response<Body>, Error> {
-    let body = read_event_body(event)?;
-    let name = body.name;
-    let email = body.email;
-
     let aws_config = load_defaults(BehaviorVersion::latest()).await;
     let ddb_client = ddb::Client::new(&aws_config);
     let ses_client = ses::Client::new(&aws_config);
 
-    let email_exists = check_email_exists(&ddb_client, &email).await?;
+    run(service_fn(move |event| {
+        let ddb_client = ddb_client.clone();
+        let ses_client = ses_client.clone();
+        async move { subscribe(event, &ddb_client, &ses_client).await }
+    }))
+    .await
+}
+
+async fn subscribe(
+    event: Request,
+    ddb_client: &ddb::Client,
+    ses_client: &ses::Client,
+) -> Result<Response<Body>, Error> {
+    let body = parse_body::<SubscribeRequest>(&event)?;
+
     // Return an identical response to a success to avoid leaking email addresses
-    if email_exists {
-        return Ok(Response::builder()
-            .status(200)
-            .header("content-type", "application/json")
-            .body(
-                json!({ "message": "Subscribed successfully" })
-                    .to_string()
-                    .into(),
-            )
-            .map_err(Box::new)?);
+    if check_email_exists(ddb_client, &body.email).await? {
+        return json_message(200, "Subscribed successfully");
     }
 
     let id = Uuid::new_v4().to_string();
+    send_verification_email(ses_client, &body.email, &id).await?;
+    write_to_ddb(ddb_client, &body.name, &body.email, &id).await?;
 
-    send_verification_email(&ses_client, &email, &id).await?;
-
-    write_to_ddb(&ddb_client, &name, &email, &id).await?;
-
-    Ok(Response::builder()
-        .status(200)
-        .header("content-type", "application/json")
-        .body(
-            json!({ "message": "Subscribed successfully" })
-                .to_string()
-                .into(),
-        )
-        .map_err(Box::new)?)
-}
-
-fn read_event_body(event: Request) -> Result<SubscribeRequest, Error> {
-    let body = match event.body() {
-        Body::Text(text) => serde_json::from_str(&text).expect("Unable to parse text body"),
-        Body::Binary(input) => {
-            let text = String::from_utf8(input.to_vec()).expect("Unable to parse binary body");
-            serde_json::from_str(&text).expect("Unable to parse body")
-        }
-        _ => panic!("No event body was provided"),
-    };
-    Ok(body)
+    json_message(200, "Subscribed successfully")
 }
 
 async fn check_email_exists(ddb_client: &ddb::Client, email: &str) -> Result<bool, Error> {
-    let mailing_list_ddb_id =
-        env::var("MAILING_LIST_TABLE_NAME").expect("MAILING_LIST_TABLE_NAME not set");
+    let table_name = env::var("MAILING_LIST_TABLE_NAME")?;
 
-    let email_exists = ddb_client
+    let count = ddb_client
         .query()
-        .table_name(mailing_list_ddb_id)
+        .table_name(table_name)
         .index_name("EmailIndex")
         .key_condition_expression("#email = :email")
         .expression_attribute_names("#email", "email")
         .expression_attribute_values(":email", ddb::types::AttributeValue::S(email.to_string()))
         .send()
         .await?
-        .count
-        > 0;
-    Ok(email_exists)
+        .count;
+
+    Ok(count > 0)
 }
 
 async fn send_verification_email(
     ses_client: &ses::Client,
     email: &str,
-    id: &String,
+    id: &str,
 ) -> Result<(), Error> {
-    let mut destination: ses::types::Destination = ses::types::Destination::builder().build();
-    destination.to_addresses = Some(vec![email.to_string()]);
-
-    let subject_content = ses::types::Content::builder()
-        .data("Confirm your subscription")
-        .charset("UTF-8")
-        .build()
-        .expect("Unable to build subject content");
-
-    let body_content = ses::types::Content::builder()
-        .data(build_email_body(id))
-        .charset("UTF-8")
-        .build()
-        .expect("Unable to build body content");
-
-    let body = ses::types::Body::builder().html(body_content).build();
-
-    let message = ses::types::Message::builder()
-        .subject(subject_content)
-        .body(body)
-        .build();
-
-    let email_content = ses::types::EmailContent::builder().simple(message).build();
-
-    ses_client
-        .send_email()
-        // TODO: Replace with production domain
-        .from_email_address("Exeter Cycling Club <ecc@oliver-bilbie.co.uk>")
-        .destination(destination)
-        .content(email_content)
-        .send()
-        .await?;
-
-    Ok(())
+    email_util::send_html(
+        ses_client,
+        email.to_string(),
+        "Confirm your subscription",
+        build_email_body(id),
+    )
+    .await
 }
 
-fn build_email_body(id: &String) -> String {
-    let template_body = include_str!("../../templates/confirm.html");
-
-    let email_body = template_body.replace("%RECIPIENT_ID%", id);
-
-    return email_body;
+fn build_email_body(id: &str) -> String {
+    include_str!("../../templates/confirm.html").replace("%RECIPIENT_ID%", id)
 }
 
 async fn write_to_ddb(
     ddb_client: &ddb::Client,
     name: &str,
     email: &str,
-    id: &String,
+    id: &str,
 ) -> Result<(), Error> {
-    let mailing_list_ddb_id =
-        env::var("MAILING_LIST_TABLE_NAME").expect("MAILING_LIST_TABLE_NAME not set");
+    let table_name = env::var("MAILING_LIST_TABLE_NAME")?;
 
     ddb_client
         .put_item()
-        .table_name(mailing_list_ddb_id)
+        .table_name(table_name)
         .item("id", ddb::types::AttributeValue::S(id.to_string()))
         .item("name", ddb::types::AttributeValue::S(name.to_string()))
         .item("email", ddb::types::AttributeValue::S(email.to_string()))
